@@ -16,10 +16,6 @@ void mpi_finalize_wrapper(int *ierr) {
     *ierr = MPI_Finalize();
 }
 
-void mpi_bcast_int_wrapper(void* buffer, int count, int datatype, int root, MPI_Comm comm, int *ierr) {
-    *ierr = MPI_Bcast(buffer, count, MPI_INT, root, comm);
-}
-
-void mpi_bcast_real_wrapper(float* buffer, int count, int datatype, int root, MPI_Comm comm, int *ierr) {
-    *ierr = MPI_Bcast(buffer, count, MPI_FLOAT, root, comm);
+void mpi_comm_size_wrapper(MPI_Comm *comm, int *size, int *ierr) {
+    *ierr = MPI_Comm_size(*comm, size);
 }
