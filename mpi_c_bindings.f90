@@ -1,6 +1,4 @@
 module mpi_c_bindings
-    use iso_c_binding, only: c_int, c_float
-
     implicit none
 
     interface
@@ -116,6 +114,15 @@ module mpi_c_bindings
             use iso_c_binding, only: c_int
             integer(c_int), intent(in) :: comm
             integer(c_int), intent(out) :: rank
+            integer(c_int), optional, intent(out) :: ierror
+        end subroutine
+
+        subroutine c_mpi_comm_split_type(comm, split_type, key, info, newcomm, ierror) bind(C, name="mpi_comm_split_type_wrapper")
+            use iso_c_binding, only: c_int
+            integer(c_int) :: comm
+            integer(c_int), intent(in) :: split_type, key
+            integer(c_int), intent(in) :: info
+            integer(c_int), intent(out) :: newcomm
             integer(c_int), optional, intent(out) :: ierror
         end subroutine
     end interface

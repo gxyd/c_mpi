@@ -5,10 +5,12 @@ module mpi
     integer, parameter :: MPI_INTEGER = 0
     integer, parameter :: MPI_REAL4 = 0
     integer, parameter :: MPI_REAL8 = 1
+    integer, parameter :: MPI_COMM_TYPE_SHARED = 1
 
     integer, parameter :: MPI_COMM_WORLD = 0
     real(8), parameter :: MPI_IN_PLACE = 1
     integer, parameter :: MPI_SUM = 1
+    integer, parameter :: MPI_INFO_NULL = 0
 
     ! not used in pot3d.F90
     interface MPI_Init
@@ -63,6 +65,9 @@ module mpi
         module procedure MPI_Comm_rank_proc
     end interface
 
+    interface MPI_Comm_split_type
+        module procedure MPI_Comm_split_type_proc
+    end interface
 
     contains
 
@@ -239,6 +244,16 @@ module mpi
         integer, optional, intent(out) :: ierror
         call c_mpi_comm_rank(comm, rank, ierror)
     end subroutine
+
+    subroutine MPI_Comm_split_type_proc(comm, split_type, key, info, newcomm, ierror)
+        use mpi_c_bindings, only: c_mpi_comm_split_type
+        integer :: comm
+        integer, intent(in) :: split_type, key
+        integer, intent(in) :: info
+        integer, intent(out) :: newcomm
+        integer, optional, intent(out) :: ierror
+        call c_mpi_comm_split_type(comm, split_type, key, info, newcomm, ierror)
+    end subroutine
 end module mpi
 
 program main
@@ -278,6 +293,7 @@ program main
     real(8), dimension(nstack) :: tstart=0.
     integer :: istack=1
     integer :: iprocw
+    integer :: comm_shared
     allocate (br0_g(nt_g,np_g))
 
     ! NOTE: called in pot3d.F90 as:
@@ -340,6 +356,11 @@ program main
     call MPI_Comm_rank (MPI_COMM_WORLD,iprocw,ierr)
     if (ierr /= 0) error stop
     print *, iprocw
+
+    ierr = -1
+    call MPI_Comm_split_type (MPI_COMM_WORLD,MPI_COMM_TYPE_SHARED,0, &
+        MPI_INFO_NULL,comm_shared,ierr)
+    if (ierr /= 0) error stop
 
     ! called in pot3d.F90 as
     ! call MPI_Finalize (ierr)
