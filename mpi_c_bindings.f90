@@ -48,5 +48,28 @@ module mpi_c_bindings
             integer(c_int), intent(in) :: comm
             integer(c_int), optional, intent(out) :: ierror
         end subroutine
+
+        subroutine c_mpi_allgather_int(sendbuf, sendcount, sendtype, recvbuf, &
+            recvcount, recvtype, comm, ierror) bind(C, name="mpi_allgather_int_wrapper")
+            use iso_c_binding, only: c_int
+            integer(c_int), dimension(*), intent(in) :: sendbuf
+            integer(c_int), dimension(*) :: recvbuf
+            integer(c_int), intent(in) :: sendcount, recvcount
+            integer(c_int), intent(in) :: sendtype, recvtype
+            integer(c_int), intent(in) :: comm
+            integer(c_int), optional, intent(out) :: ierror
+        end subroutine
+
+        subroutine c_mpi_allgather_real(sendbuf, sendcount, sendtype, recvbuf, &
+                    recvcount, recvtype, comm, ierror) bind(C, name="mpi_allgather_real_wrapper")
+            use iso_c_binding, only: c_int, c_double
+            real(c_double), dimension(*), intent(in) :: sendbuf
+            real(c_double), dimension(*) :: recvbuf
+            integer(c_int), intent(in) :: sendcount, recvcount
+            integer(c_int), intent(in) :: sendtype, recvtype
+            integer(c_int), intent(in) :: comm
+            integer(c_int), optional, intent(out) :: ierror
+        end subroutine
+
     end interface
 end module mpi_c_bindings
