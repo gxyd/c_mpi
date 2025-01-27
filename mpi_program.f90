@@ -86,6 +86,21 @@ module mpi
         module procedure MPI_Ssend_proc
     end interface
 
+    interface MPI_Cart_create
+        module procedure MPI_Cart_create_proc
+    end interface
+
+    ! interface MPI_Cart_sub
+    !     module procedure MPI_Cart_sub_proc
+    ! end interface
+    ! interface MPI_Cart_shift
+    !     module procedure MPI_Cart_shift_proc
+    ! end interface
+
+    ! interface MPI_Cart_coords
+    !     module procedure MPI_Cart_coords_proc
+    ! end interface
+
    contains
 
     subroutine MPI_Init_proc(ierr)
@@ -302,6 +317,29 @@ module mpi
         call c_mpi_ssend(buf, count, datatype, dest, tag, comm, ierror)
     end subroutine
 
+    subroutine MPI_Cart_create_proc(comm, ndims, dims, periods, reorder, newcomm, ierror)
+        use mpi_c_bindings, only: c_mpi_cart_create
+        use iso_c_binding, only: c_int
+        integer, intent(in) :: ndims, dims(ndims)
+        logical, intent(in) :: periods(ndims), reorder
+        integer, intent(in) :: comm
+        integer, intent(out) :: newcomm
+        integer, optional, intent(out) :: ierror
+        integer(c_int) :: ndims_c, reorder_c, dims_c(ndims), periods_c(ndims)
+            ndims_c = ndims
+            if (reorder) then
+                reorder_c = 1
+            else
+                reorder_c = 0
+            end if
+            dims_c = dims
+            where (periods)
+                periods_c = 1
+            elsewhere
+                periods_c = 0
+            end where
+        call c_mpi_cart_create(comm, ndims_c, dims_c, periods_c, reorder_c, newcomm, ierror)
+    end subroutine
 end module mpi
 
 program main
@@ -321,7 +359,7 @@ program main
     integer, parameter :: nproc = 2
     integer, dimension(lbuf,0:nproc-1) :: rbuf
     integer :: ntype_real = MPI_REAL8
-    integer :: comm_all
+    integer :: comm_all, newcomm_all
     integer, parameter :: nr = 2
     integer, parameter :: nt = 3
     integer, parameter :: np = 2
@@ -350,6 +388,9 @@ program main
     integer, parameter :: lsbuf5 = 24
     real(8), dimension(2,3,4) :: a5
     integer :: iproc05 = 10
+    integer, parameter :: ndims = 2
+    integer :: dims(ndims) = 1
+    logical :: periods(ndims) = .false.
     allocate (br0_g(nt_g,np_g))
     allocate (rbuf4(lbuf4))
 
@@ -430,17 +471,23 @@ program main
     !                comm_all,MPI_STATUS_IGNORE,ierr)
     ! if (ierr /= 0) error stop
 
-    ierr = -1
-    ! I've no idea for why the below works, I don't understand
-    ! things here, cause I've no idea for why declaring
-    ! MPI_STATUSES_IGNORE as an integer allocatable makes it work here
-    call MPI_Waitall (4,reqs,MPI_STATUSES_IGNORE,ierr)
-    if (ierr /= 0) error stop
-
     ! maybe this required a very specific "rank" for the arguments
     ! ierr = -1
     ! call MPI_Ssend (sbuf5,lsbuf5,ntype_real,iproc05,tag,comm_all,ierr)
     ! if (ierr /= 0) error stop
+
+    ! ierr = -1
+    ! I've no idea for why the below works, I don't understand
+    ! things here, cause I've no idea for why declaring
+    ! MPI_STATUSES_IGNORE as an integer allocatable makes it work here
+    ! call MPI_Waitall (4,reqs,MPI_STATUSES_IGNORE,ierr)
+    ! if (ierr /= 0) error stop
+
+
+    ! Here Ideally we would need MPI_Dims_create(size,2,dims) as dims() value can't be zero it have to be initialized
+    ierr = -1
+    call MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periods, .false., newcomm_all, ierr)
+    if (ierr /= 0) error stop
 
     ! called in pot3d.F90 as
     ! call MPI_Finalize (ierr)
