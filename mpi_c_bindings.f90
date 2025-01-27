@@ -78,5 +78,45 @@ module mpi_c_bindings
             integer(c_int), optional, intent(out) :: ierror
         end subroutine
 
+        subroutine c_mpi_irecv(buf, count, datatype, source, tag, comm, request, ierror) bind(C, name="mpi_irecv_wrapper")
+            use iso_c_binding, only: c_int, c_double
+            real(c_double), dimension(..) :: buf
+            integer(c_int), intent(in) :: count, source, tag
+            integer(c_int), intent(in) :: datatype
+            integer(c_int), intent(in) :: comm
+            integer(c_int), intent(out) :: request
+            integer(c_int), optional, intent(out) :: ierror
+        end subroutine
+
+        subroutine c_mpi_allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm, ierror) bind(C, name="mpi_allreduce_wrapper")
+            use iso_c_binding, only: c_int, c_double
+            real(c_double), intent(in) :: sendbuf
+            real(c_double), intent(in) :: recvbuf
+            integer(c_int) :: count, datatype, op, comm, ierror
+        end subroutine
+
+        subroutine c_mpi_allreduce_1d(sendbuf, recvbuf, count, datatype, op, comm, ierror) bind(C, name="mpi_allreduce_wrapper")
+            use iso_c_binding, only: c_int, c_double
+            real(c_double), intent(in) :: sendbuf
+            real(c_double), dimension(*), intent(in) :: recvbuf
+            integer(c_int) :: count, datatype, op, comm, ierror
+        end subroutine
+
+        function c_mpi_wtime() result(time) bind(C, name="mpi_wtime_wrapper")
+            use iso_c_binding, only: c_double
+            real(c_double) :: time
+        end function
+
+        subroutine c_mpi_barrier(comm, ierror) bind(C, name="mpi_barrier_wrapper")
+            use iso_c_binding, only: c_int
+            integer(c_int) :: comm, ierror
+        end subroutine
+
+        subroutine c_mpi_comm_rank(comm, rank, ierror) bind(C, name="mpi_comm_rank_wrapper")
+            use iso_c_binding, only: c_int
+            integer(c_int), intent(in) :: comm
+            integer(c_int), intent(out) :: rank
+            integer(c_int), optional, intent(out) :: ierror
+        end subroutine
     end interface
 end module mpi_c_bindings

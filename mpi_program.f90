@@ -7,6 +7,8 @@ module mpi
     integer, parameter :: MPI_REAL8 = 1
 
     integer, parameter :: MPI_COMM_WORLD = 0
+    real(8), parameter :: MPI_IN_PLACE = 1
+    integer, parameter :: MPI_SUM = 1
 
     ! not used in pot3d.F90
     interface MPI_Init
@@ -39,6 +41,28 @@ module mpi
         module procedure MPI_Isend_2d
         module procedure MPI_Isend_3d
     end interface
+
+    interface MPI_IRecv
+        module procedure MPI_IRecv_proc
+    end interface
+
+    interface MPI_Allreduce
+        module procedure MPI_Allreduce_scalar
+        module procedure MPI_Allreduce_1d
+    end interface
+
+    interface MPI_Wtime
+        module procedure MPI_Wtime_proc
+    end interface
+
+    interface MPI_Barrier
+        module procedure MPI_Barrier_proc
+    end interface
+
+    interface MPI_Comm_rank
+        module procedure MPI_Comm_rank_proc
+    end interface
+
 
     contains
 
@@ -169,6 +193,52 @@ module mpi
         call c_mpi_isend(buf, count, datatype, dest, tag, comm, request, ierror)
     end subroutine
 
+    subroutine MPI_Irecv_proc(buf, count, datatype, source, tag, comm, request, ierror)
+        use mpi_c_bindings, only: c_mpi_irecv
+        real(8), dimension(:,:) :: buf
+        integer, intent(in) :: count, source, tag
+        integer, intent(in) :: datatype
+        integer, intent(in) :: comm
+        integer, intent(out) :: request
+        integer, optional, intent(out) :: ierror
+        call c_mpi_irecv(buf, count, datatype, source, tag, comm, request, ierror)
+    end subroutine
+
+    subroutine MPI_Allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+        use mpi_c_bindings, only: c_mpi_allreduce_scalar
+        real(8), intent(in) :: sendbuf
+        real(8), intent(in) :: recvbuf
+        integer :: count, datatype, op, comm, ierror
+        call c_mpi_allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+    end subroutine
+
+    subroutine MPI_Allreduce_1d(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+        use mpi_c_bindings, only: c_mpi_allreduce_1d
+        real(8), intent(in) :: sendbuf
+        real(8), dimension(:), intent(in) :: recvbuf
+        integer :: count, datatype, op, comm, ierror
+        call c_mpi_allreduce_1d(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+    end subroutine
+
+    function MPI_Wtime_proc() result(time)
+        use mpi_c_bindings, only: c_mpi_wtime
+        real(8) :: time
+        time = c_mpi_wtime()
+    end function
+
+    subroutine MPI_Barrier_proc(comm, ierror)
+        use mpi_c_bindings, only: c_mpi_barrier
+        integer :: comm, ierror
+        call c_mpi_barrier(comm, ierror)
+    end subroutine
+
+    subroutine MPI_Comm_rank_proc(comm, rank, ierror)
+        use mpi_c_bindings, only: c_mpi_comm_rank
+        integer, intent(in) :: comm
+        integer, intent(out) :: rank
+        integer, optional, intent(out) :: ierror
+        call c_mpi_comm_rank(comm, rank, ierror)
+    end subroutine
 end module mpi
 
 program main
@@ -193,14 +263,21 @@ program main
     integer, parameter :: nt = 3
     integer, parameter :: np = 2
     real(8), dimension(nr,nt,np) :: a
+    integer, parameter :: n1 = 2
+    real(8), dimension(n1) :: a0
     integer :: tag=0
 
     integer, parameter :: lbuf2=10
     real(8), dimension(lbuf2) :: sbuf2
     real(8), dimension(lbuf2,0:nproc-1) :: tbuf
     integer, parameter :: lbuf3 = 10
+    integer :: comm_phi
     integer :: iproc_pp
     integer :: reqs(4)
+    integer, parameter :: nstack=10
+    real(8), dimension(nstack) :: tstart=0.
+    integer :: istack=1
+    integer :: iprocw
     allocate (br0_g(nt_g,np_g))
 
     ! NOTE: called in pot3d.F90 as:
@@ -236,8 +313,33 @@ program main
 
     ierr = -1
     call MPI_Isend (a(:,:,np-1),lbuf3,ntype_real,iproc_pp,tag, &
-    comm_all,reqs(1),ierr)
+        comm_all,reqs(1),ierr)
     if (ierr /= 0) error stop
+
+    ierr = -1
+    call MPI_Irecv (a(:,:, 1),lbuf3,ntype_real,iproc_pp,tag,   &
+        comm_all,reqs(3),ierr)
+    if (ierr /= 0) error stop
+
+    ierr = -1
+    call MPI_Allreduce (MPI_IN_PLACE,a0,n1,ntype_real, &
+        MPI_SUM,comm_phi,ierr)
+    if (ierr /= 0) error stop
+
+    tstart(istack)=MPI_Wtime()
+
+    ierr = -1
+    call MPI_Barrier(MPI_COMM_WORLD,ierr)
+    if (ierr /= 0) error stop
+
+    ierr = -1
+    call MPI_Barrier (comm_all,ierr)
+    if (ierr /= 0) error stop
+
+    ierr = -1
+    call MPI_Comm_rank (MPI_COMM_WORLD,iprocw,ierr)
+    if (ierr /= 0) error stop
+    print *, iprocw
 
     ! called in pot3d.F90 as
     ! call MPI_Finalize (ierr)

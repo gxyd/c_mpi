@@ -140,3 +140,62 @@ void mpi_isend_wrapper(const double *buf, int *count, int *datatype_f,
     MPI_Request request = MPI_Request_f2c(*request_f);
     *ierror = MPI_Isend(buf, *count, datatype, *dest, *tag, comm, &request);
 }
+
+void mpi_irecv_wrapper(double *buf, int *count, int *datatype_f,
+                        int *source, int *tag, int *comm_f, int *request_f,
+                        int *ierror) {
+    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Datatype datatype;
+    switch (*datatype_f) {
+        case 0:
+            datatype = MPI_FLOAT;
+            break;
+        case 1:
+            datatype = MPI_DOUBLE;
+            break;
+        default:
+            *request_f = -1;
+            return;
+    }
+
+    MPI_Request request = MPI_Request_f2c(*request_f);
+    *ierror = MPI_Irecv(buf, *count, datatype, *source, *tag, comm, &request);
+}
+
+void mpi_allreduce_wrapper(const double *sendbuf, double *recvbuf, int *count,
+                            int *datatype_f, int *op_f, int *comm_f, int *ierror) {
+    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Datatype datatype;
+    switch (*datatype_f) {
+        case 0:
+            datatype = MPI_FLOAT;
+            break;
+        case 1:
+            datatype = MPI_DOUBLE;
+            break;
+        default:
+            *ierror = -1;
+            return;
+    }
+
+    // I'm a little doubtful: as how would it identify that this part
+    // is supposed to be for MPI_SUM?
+    MPI_Op op = MPI_Op_f2c(*op_f);
+    // I've hard-coded as "MPI_SUM" for now, as in POT3D codebase, it's always
+    // used as MPI_SUM
+    *ierror = MPI_Allreduce(sendbuf, recvbuf, *count, datatype, MPI_SUM, comm);
+}
+
+double mpi_wtime_wrapper() {
+    return MPI_Wtime();
+}
+
+void mpi_barrier_wrapper(int *comm_f, int *ierror) {
+    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    *ierror = MPI_Barrier(comm);
+}
+
+void mpi_comm_rank_wrapper(int *comm_f, int *rank, int *ierror) {
+    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    *ierror = MPI_Comm_rank(comm, rank);
+}
