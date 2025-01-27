@@ -11,6 +11,11 @@ module mpi
     real(8), parameter :: MPI_IN_PLACE = 1
     integer, parameter :: MPI_SUM = 1
     integer, parameter :: MPI_INFO_NULL = 0
+    integer :: MPI_STATUS_IGNORE = 0
+    ! NOTE: I've no idea for how to implement this, refer
+    ! see section 2.5.4 page 21 of mpi40-report.pdf
+    ! this is probably not correct right now
+    integer, allocatable :: MPI_STATUSES_IGNORE(:)
 
     ! not used in pot3d.F90
     interface MPI_Init
@@ -69,7 +74,15 @@ module mpi
         module procedure MPI_Comm_split_type_proc
     end interface
 
-    contains
+    interface MPI_Recv
+        module procedure MPI_Recv_proc
+    end interface
+
+    interface MPI_Waitall
+        module procedure MPI_Waitall_proc
+    end interface
+
+   contains
 
     subroutine MPI_Init_proc(ierr)
         use mpi_c_bindings, only: c_mpi_init
@@ -254,6 +267,27 @@ module mpi
         integer, optional, intent(out) :: ierror
         call c_mpi_comm_split_type(comm, split_type, key, info, newcomm, ierror)
     end subroutine
+
+    subroutine MPI_Recv_proc(buf, count, datatype, source, tag, comm, status, ierror)
+        use mpi_c_bindings, only: c_mpi_recv
+        real(8), dimension(:) :: buf
+        integer, intent(in) :: count, source, tag
+        integer, intent(in) :: datatype
+        integer, intent(in) :: comm
+        integer, intent(out) :: status
+        integer, optional, intent(out) :: ierror
+        call c_mpi_recv(buf, count, datatype, source, tag, comm, status, ierror)
+    end subroutine
+
+    subroutine MPI_Waitall_proc(count, array_of_requests, array_of_statuses, ierror)
+        use mpi_c_bindings, only: c_mpi_waitall
+        integer, intent(in) :: count
+        integer, intent(inout) :: array_of_requests(count)
+        integer :: array_of_statuses(*)
+        integer, optional, intent(out) :: ierror
+        call c_mpi_waitall(count, array_of_requests, array_of_requests, ierror)
+    end subroutine
+
 end module mpi
 
 program main
@@ -281,6 +315,10 @@ program main
     integer, parameter :: n1 = 2
     real(8), dimension(n1) :: a0
     integer :: tag=0
+    real(8), dimension(:), allocatable :: rbuf4
+    integer, parameter :: lbuf4 = 4
+    integer :: irank4 = 2
+    integer :: tag4 = 0
 
     integer, parameter :: lbuf2=10
     real(8), dimension(lbuf2) :: sbuf2
@@ -295,6 +333,7 @@ program main
     integer :: iprocw
     integer :: comm_shared
     allocate (br0_g(nt_g,np_g))
+    allocate (rbuf4(lbuf4))
 
     ! NOTE: called in pot3d.F90 as:
     call MPI_Init_thread (MPI_THREAD_FUNNELED,tcheck,ierr)
@@ -362,8 +401,24 @@ program main
         MPI_INFO_NULL,comm_shared,ierr)
     if (ierr /= 0) error stop
 
+    ! I'm not sure of the exact conditions to test "MPI_Recv",
+    ! currently it fails on program execution
+    ! ierr = -1
+    ! call MPI_Recv (rbuf4,lbuf4,ntype_real,irank4,tag4, &
+    !                comm_all,MPI_STATUS_IGNORE,ierr)
+    ! if (ierr /= 0) error stop
+
+    ierr = -1
+    ! I've no idea for why the below works, I don't understand
+    ! things here, cause I've no idea for why declaring
+    ! MPI_STATUSES_IGNORE as an integer allocatable makes it work here
+    call MPI_Waitall (4,reqs,MPI_STATUSES_IGNORE,ierr)
+    print *, ierr
+
     ! called in pot3d.F90 as
     ! call MPI_Finalize (ierr)
+
+
     ierr = -1
     call MPI_Finalize(ierr)
     if (ierr /= 0) error stop "MPI_Finalize failed"

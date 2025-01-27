@@ -125,5 +125,23 @@ module mpi_c_bindings
             integer(c_int), intent(out) :: newcomm
             integer(c_int), optional, intent(out) :: ierror
         end subroutine
+
+        subroutine c_mpi_recv(buf, count, datatype, source, tag, comm, status, ierror) bind(C, name="mpi_recv_wrapper")
+            use iso_c_binding, only: c_int, c_double
+            real(c_double), dimension(*) :: buf
+            integer(c_int), intent(in) :: count, source, tag
+            integer(c_int), intent(in) :: datatype
+            integer(c_int), intent(in) :: comm
+            integer(c_int), intent(out) :: status
+            integer(c_int), optional, intent(out) :: ierror
+        end subroutine
+
+        subroutine c_mpi_waitall(count, array_of_requests, array_of_statuses, ierror) bind(C, name="mpi_waitall_wrapper")
+            use iso_c_binding, only: c_int
+            integer(c_int), intent(in) :: count
+            integer(c_int), intent(inout) :: array_of_requests(count)
+            integer(c_int) :: array_of_statuses(*)
+            integer(c_int), optional, intent(out) :: ierror
+        end subroutine
     end interface
 end module mpi_c_bindings

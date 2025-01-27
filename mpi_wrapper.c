@@ -1,4 +1,7 @@
 #include <mpi.h>
+#include <stdlib.h>
+
+#define MPI_STATUS_SIZE 5
 
 void mpi_init_wrapper(int *ierr) {
     int argc = 0;
@@ -206,4 +209,54 @@ void mpi_comm_split_type_wrapper(int *comm_f, int *split_type, int *key,
     MPI_Info info = MPI_Info_f2c(*info_f);
     MPI_Comm newcomm = MPI_Comm_f2c(*newcomm_f);
     *ierror = MPI_Comm_split_type( comm, *split_type, *key , info, &newcomm);
+}
+
+void mpi_recv_wrapper(double *buf, int *count, int *datatype_f, int *source,
+                    int *tag, int *comm_f, int *status_f, int *ierror) {
+    MPI_Datatype datatype;
+    switch (*datatype_f) {
+        case 0:
+            datatype = MPI_FLOAT;
+            break;
+        case 1:
+            datatype = MPI_DOUBLE;
+            break;
+        default:
+            *ierror = -1;
+            return;
+    }
+
+    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Status status;
+    *ierror = MPI_Recv(buf, *count, datatype, *source, *tag, comm, &status);
+    if (*ierror == MPI_SUCCESS) {
+        MPI_Status_c2f(&status, status_f);
+    }
+}
+
+void mpi_waitall_wrapper(int *count, int *array_of_requests_f,
+                        int *array_of_statuses_f, int *ierror) {
+    MPI_Request *array_of_requests;
+    MPI_Status *array_of_statuses;
+    array_of_requests = (MPI_Request *)malloc((*count) * sizeof(MPI_Request));
+    array_of_statuses = (MPI_Status *)malloc((*count) * sizeof(MPI_Status));
+    if (array_of_requests == NULL || array_of_statuses == NULL) {
+        *ierror = MPI_ERR_NO_MEM;
+        return;
+    }
+    for (int i = 0; i < *count; i++) {
+        array_of_requests[i] = MPI_Request_f2c(array_of_requests_f[i]);
+    }
+
+    *ierror = MPI_Waitall(*count, array_of_requests, array_of_statuses);
+    for (int i = 0; i < *count; i++) {
+        array_of_requests_f[i] = MPI_Request_c2f(array_of_requests[i]);
+    }
+
+    for (int i = 0; i < *count; i++) {
+        MPI_Status_c2f(&array_of_statuses[i], &array_of_statuses_f[i * MPI_STATUS_SIZE]);
+    }
+
+    free(array_of_requests);
+    free(array_of_statuses);
 }
