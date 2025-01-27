@@ -143,5 +143,15 @@ module mpi_c_bindings
             integer(c_int) :: array_of_statuses(*)
             integer(c_int), optional, intent(out) :: ierror
         end subroutine
+
+        subroutine c_mpi_ssend(buf, count, datatype, dest, tag, comm, ierror) bind(C, name="mpi_ssend_wrapper")
+            use iso_c_binding, only: c_int, c_double
+            real(c_double), dimension(*), intent(in) :: buf
+            integer(c_int), intent(in) :: count, dest, tag
+            integer(c_int), intent(in) :: datatype
+            integer(c_int), intent(in) :: comm
+            integer(c_int), optional, intent(out) :: ierror
+        end subroutine
+
     end interface
 end module mpi_c_bindings

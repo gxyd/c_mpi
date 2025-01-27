@@ -260,3 +260,22 @@ void mpi_waitall_wrapper(int *count, int *array_of_requests_f,
     free(array_of_requests);
     free(array_of_statuses);
 }
+
+void mpi_ssend_wrapper(double *buf, int *count, int *datatype_f, int *dest,
+                       int *tag, int *comm_f, int *ierror) {
+    MPI_Datatype datatype;
+    switch (*datatype_f) {
+        case 0:
+            datatype = MPI_FLOAT;
+            break;
+        case 1:
+            datatype = MPI_DOUBLE;
+            break;
+        default:
+            *ierror = -1;
+            return;
+    }
+
+    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    *ierror = MPI_Ssend(buf, *count, datatype, *dest, *tag, comm);
+}

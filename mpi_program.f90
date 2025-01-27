@@ -82,6 +82,10 @@ module mpi
         module procedure MPI_Waitall_proc
     end interface
 
+    interface MPI_Ssend
+        module procedure MPI_Ssend_proc
+    end interface
+
    contains
 
     subroutine MPI_Init_proc(ierr)
@@ -288,6 +292,16 @@ module mpi
         call c_mpi_waitall(count, array_of_requests, array_of_requests, ierror)
     end subroutine
 
+    subroutine MPI_Ssend_proc(buf, count, datatype, dest, tag, comm, ierror)
+        use mpi_c_bindings, only: c_mpi_ssend
+        real(8), dimension(*), intent(in) :: buf
+        integer, intent(in) :: count, dest, tag
+        integer, intent(in) :: datatype
+        integer, intent(in) :: comm
+        integer, optional, intent(out) :: ierror
+        call c_mpi_ssend(buf, count, datatype, dest, tag, comm, ierror)
+    end subroutine
+
 end module mpi
 
 program main
@@ -332,8 +346,16 @@ program main
     integer :: istack=1
     integer :: iprocw
     integer :: comm_shared
+    real(8), dimension(:), allocatable :: sbuf5
+    integer, parameter :: lsbuf5 = 24
+    real(8), dimension(2,3,4) :: a5
+    integer :: iproc05 = 10
     allocate (br0_g(nt_g,np_g))
     allocate (rbuf4(lbuf4))
+
+
+    allocate (sbuf5(lsbuf5))
+    sbuf5=reshape(a5(1:2,1:3,1:4),(/lsbuf5/))
 
     ! NOTE: called in pot3d.F90 as:
     call MPI_Init_thread (MPI_THREAD_FUNNELED,tcheck,ierr)
@@ -413,11 +435,15 @@ program main
     ! things here, cause I've no idea for why declaring
     ! MPI_STATUSES_IGNORE as an integer allocatable makes it work here
     call MPI_Waitall (4,reqs,MPI_STATUSES_IGNORE,ierr)
-    print *, ierr
+    if (ierr /= 0) error stop
+
+    ! maybe this required a very specific "rank" for the arguments
+    ! ierr = -1
+    ! call MPI_Ssend (sbuf5,lsbuf5,ntype_real,iproc05,tag,comm_all,ierr)
+    ! if (ierr /= 0) error stop
 
     ! called in pot3d.F90 as
     ! call MPI_Finalize (ierr)
-
 
     ierr = -1
     call MPI_Finalize(ierr)
