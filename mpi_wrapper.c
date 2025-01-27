@@ -119,3 +119,24 @@ void mpi_allgather_real_wrapper(const double *sendbuf, int *sendcount, int *send
     *ierror = MPI_Allgather(sendbuf, *sendcount, sendtype,
                             recvbuf, *recvcount, recvtype, comm);
 }
+
+void mpi_isend_wrapper(const double *buf, int *count, int *datatype_f,
+                        int *dest, int *tag, int *comm_f, int *request_f,
+                        int *ierror) {
+    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Datatype datatype;
+    switch (*datatype_f) {
+        case 0:
+            datatype = MPI_FLOAT;
+            break;
+        case 1:
+            datatype = MPI_DOUBLE;
+            break;
+        default:
+            *request_f = -1;
+            return;
+    }
+
+    MPI_Request request = MPI_Request_f2c(*request_f);
+    *ierror = MPI_Isend(buf, *count, datatype, *dest, *tag, comm, &request);
+}

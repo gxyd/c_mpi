@@ -35,6 +35,11 @@ module mpi
         module procedure MPI_Allgather_real
     end interface MPI_Allgather
 
+    interface MPI_Isend
+        module procedure MPI_Isend_2d
+        module procedure MPI_Isend_3d
+    end interface
+
     contains
 
     subroutine MPI_Init_proc(ierr)
@@ -142,6 +147,28 @@ module mpi
         call c_mpi_allgather_real(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm, ierror)
     end subroutine
 
+    subroutine MPI_Isend_2d(buf, count, datatype, dest, tag, comm, request, ierror)
+        use mpi_c_bindings, only: c_mpi_isend
+        real(8), dimension(:, :), intent(in) :: buf
+        integer, intent(in) :: count, dest, tag
+        integer, intent(in) :: datatype
+        integer, intent(in) :: comm
+        integer, intent(out) :: request
+        integer, optional, intent(out) :: ierror
+        call c_mpi_isend(buf, count, datatype, dest, tag, comm, request, ierror)
+    end subroutine
+
+    subroutine MPI_Isend_3d(buf, count, datatype, dest, tag, comm, request, ierror)
+        use mpi_c_bindings, only: c_mpi_isend
+        real(8), dimension(:, :, :), intent(in) :: buf
+        integer, intent(in) :: count, dest, tag
+        integer, intent(in) :: datatype
+        integer, intent(in) :: comm
+        integer, intent(out) :: request
+        integer, optional, intent(out) :: ierror
+        call c_mpi_isend(buf, count, datatype, dest, tag, comm, request, ierror)
+    end subroutine
+
 end module mpi
 
 program main
@@ -162,10 +189,18 @@ program main
     integer, dimension(lbuf,0:nproc-1) :: rbuf
     integer :: ntype_real = MPI_REAL8
     integer :: comm_all
+    integer, parameter :: nr = 2
+    integer, parameter :: nt = 3
+    integer, parameter :: np = 2
+    real(8), dimension(nr,nt,np) :: a
+    integer :: tag=0
 
     integer, parameter :: lbuf2=10
     real(8), dimension(lbuf2) :: sbuf2
     real(8), dimension(lbuf2,0:nproc-1) :: tbuf
+    integer, parameter :: lbuf3 = 10
+    integer :: iproc_pp
+    integer :: reqs(4)
     allocate (br0_g(nt_g,np_g))
 
     ! NOTE: called in pot3d.F90 as:
@@ -197,6 +232,11 @@ program main
     call MPI_Allgather (sbuf2,lbuf2,ntype_real, &
         tbuf,lbuf2,ntype_real,comm_all,ierr)
 
+    if (ierr /= 0) error stop
+
+    ierr = -1
+    call MPI_Isend (a(:,:,np-1),lbuf3,ntype_real,iproc_pp,tag, &
+    comm_all,reqs(1),ierr)
     if (ierr /= 0) error stop
 
     ! called in pot3d.F90 as

@@ -1,9 +1,6 @@
 module mpi_c_bindings
     use iso_c_binding, only: c_int, c_float
 
-    ! type, bind(C) :: MPI_Comm
-    !     integer(c_int) :: MPI_VAL
-    ! end type
     implicit none
 
     interface
@@ -68,6 +65,16 @@ module mpi_c_bindings
             integer(c_int), intent(in) :: sendcount, recvcount
             integer(c_int), intent(in) :: sendtype, recvtype
             integer(c_int), intent(in) :: comm
+            integer(c_int), optional, intent(out) :: ierror
+        end subroutine
+
+        subroutine c_mpi_isend(buf, count, datatype, dest, tag, comm, request, ierror) bind(C, name="mpi_isend_wrapper")
+            use iso_c_binding, only: c_int, c_double
+            real(c_double), dimension(*), intent(in) :: buf
+            integer(c_int), intent(in) :: count, dest, tag
+            integer(c_int), intent(in) :: datatype
+            integer(c_int), intent(in) :: comm
+            integer(c_int), intent(out) :: request
             integer(c_int), optional, intent(out) :: ierror
         end subroutine
 
