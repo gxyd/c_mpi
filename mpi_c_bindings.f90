@@ -153,5 +153,12 @@ module mpi_c_bindings
             integer(c_int), optional, intent(out) :: ierror
         end subroutine
 
+        subroutine c_mpi_cart_create(comm, ndims, dims, periods, reorder, newcomm, ierror) bind(C, name="mpi_cart_create_wrapper")
+            use iso_c_binding, only: c_int
+            integer(c_int), intent(in) :: comm, ndims, reorder
+            integer(c_int), intent(in) :: dims(*), periods(*)
+            integer(c_int), intent(out) :: newcomm, ierror
+        end subroutine
+
     end interface
 end module mpi_c_bindings
