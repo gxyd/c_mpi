@@ -93,13 +93,14 @@ module mpi
     ! interface MPI_Cart_sub
     !     module procedure MPI_Cart_sub_proc
     ! end interface
+
     ! interface MPI_Cart_shift
     !     module procedure MPI_Cart_shift_proc
     ! end interface
 
-    ! interface MPI_Cart_coords
-    !     module procedure MPI_Cart_coords_proc
-    ! end interface
+    interface MPI_Cart_coords
+        module procedure MPI_Cart_coords_proc
+    end interface
 
    contains
 
@@ -338,8 +339,18 @@ module mpi
             elsewhere
                 periods_c = 0
             end where
-        call c_mpi_cart_create(comm, ndims_c, dims_c, periods_c, reorder_c, newcomm, ierror)
+        call c_mpi_cart_create(comm, ndims, dims_c, periods_c, reorder_c, newcomm, ierror)
     end subroutine
+
+    subroutine MPI_Cart_coords_proc(comm, rank, maxdims, coords, ierror)
+        use mpi_c_bindings, only: c_mpi_cart_coords
+        integer, intent(in) :: comm
+        integer, intent(in) :: rank, maxdims
+        integer, intent(out) :: coords(maxdims)
+        integer, optional, intent(out) :: ierror
+        call c_mpi_cart_coords(comm, rank, maxdims, coords, ierror)
+    end subroutine
+
 end module mpi
 
 program main
@@ -351,6 +362,7 @@ program main
     integer :: tcheck
     integer :: ierr0
     integer :: nproc1
+    integer :: rank = 0
     integer, parameter :: nt_g = 2
     integer, parameter :: np_g = 3
     real(8), dimension(:,:), allocatable :: br0_g
@@ -370,6 +382,8 @@ program main
     real(8), dimension(:), allocatable :: rbuf4
     integer, parameter :: lbuf4 = 4
     integer :: irank4 = 2
+    integer, parameter :: maxdim = 2
+    integer :: coords(maxdim)
     integer :: tag4 = 0
 
     integer, parameter :: lbuf2=10
@@ -488,6 +502,10 @@ program main
     ierr = -1
     call MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periods, .false., newcomm_all, ierr)
     if (ierr /= 0) error stop
+
+    ! ierr = -1
+    ! call MPI_Cart_coords(MPI_COMM_WORLD, iprocw, maxdim, coords, ierr)
+    ! if (ierr /= 0) error stop
 
     ! called in pot3d.F90 as
     ! call MPI_Finalize (ierr)

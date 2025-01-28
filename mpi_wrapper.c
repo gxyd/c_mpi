@@ -286,3 +286,9 @@ void mpi_cart_create_wrapper(int * comm_f, int * ndims, int * dims, int * period
     *ierror = MPI_Cart_create(comm, *ndims, dims, periods, *reorder, &newcomm);
     *newcomm_f = MPI_Comm_c2f(newcomm);
 }
+
+void mpi_cart_coords_wrapper(int * comm_f, int * rank, int * maxdims, int * coords, int * ierror)
+{
+    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    *ierror = MPI_Cart_coords(comm, *rank, *maxdims, coords);
+}
