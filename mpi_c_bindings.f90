@@ -165,5 +165,24 @@ module mpi_c_bindings
             integer(c_int), intent(in) :: comm, rank, maxdims
             integer(c_int), intent(out) :: coords(*), ierror
         end subroutine 
+
+        subroutine c_mpi_cart_shift(comm, direction, disp, rank_source, rank_dest, ierror) bind(C, name="mpi_cart_shift_wrapper")
+            use iso_c_binding, only: c_int
+            integer(c_int), intent(in) :: comm, direction, disp
+            integer(c_int), intent(out) :: rank_source, rank_dest, ierror
+        end subroutine
+
+        subroutine c_mpi_dims_create(nnodes, ndims, dims, ierror) bind(C, name="mpi_dims_create_wrapper")
+            use iso_c_binding, only: c_int
+            integer(c_int), intent(in) :: nnodes, ndims
+            integer(c_int), intent(inout) :: dims(*), ierror
+        end subroutine
+
+        subroutine c_mpi_cart_sub(comm, remain_dims, newcomm, ierror) bind(C, name ="mpi_cart_sub_wrapper")
+            use iso_c_binding, only: c_int
+            integer(c_int), intent(in) :: comm
+            integer(c_int), intent(in) :: remain_dims(*)
+            integer(c_int), intent(out) :: newcomm, ierror
+        end subroutine
     end interface
 end module mpi_c_bindings

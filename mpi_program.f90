@@ -90,13 +90,17 @@ module mpi
         module procedure MPI_Cart_create_proc
     end interface
 
-    ! interface MPI_Cart_sub
-    !     module procedure MPI_Cart_sub_proc
-    ! end interface
+    interface MPI_Cart_sub
+        module procedure MPI_Cart_sub_proc
+    end interface
 
-    ! interface MPI_Cart_shift
-    !     module procedure MPI_Cart_shift_proc
-    ! end interface
+    interface MPI_Cart_shift
+        module procedure MPI_Cart_shift_proc
+    end interface
+
+    interface MPI_Dims_create
+        module procedure MPI_Dims_create_proc
+    end interface
 
     interface MPI_Cart_coords
         module procedure MPI_Cart_coords_proc
@@ -351,6 +355,37 @@ module mpi
         call c_mpi_cart_coords(comm, rank, maxdims, coords, ierror)
     end subroutine
 
+    subroutine MPI_Cart_shift_proc(comm, direction, disp, rank_source, rank_dest, ierror)
+        use mpi_c_bindings, only: c_mpi_cart_shift
+        integer, intent(in) :: comm
+        integer, intent(in) :: direction, disp
+        integer, intent(out) :: rank_source, rank_dest
+        integer, optional, intent(out) :: ierror
+        call c_mpi_cart_shift(comm, direction, disp, rank_source, rank_dest, ierror)
+    end subroutine
+
+    subroutine MPI_Dims_create_proc(nnodes, ndims, dims, ierror)
+        use mpi_c_bindings, only: c_mpi_dims_create
+        integer, intent(in) :: nnodes, ndims
+        integer, intent(out) :: dims(ndims)
+        integer, optional, intent(out) :: ierror
+        call c_mpi_dims_create(nnodes, ndims, dims, ierror)
+    end subroutine
+
+    subroutine MPI_Cart_sub_proc (comm, remain_dims, newcomm, ierror)
+        use mpi_c_bindings, only: c_mpi_cart_sub
+        integer, intent(in) :: comm
+        logical, intent(in) :: remain_dims(:)
+        integer, intent(out) :: newcomm
+        integer, optional, intent(out) :: ierror
+        integer :: remain_dims_i(size(remain_dims))
+        where (remain_dims)
+            remain_dims_i = 1
+        elsewhere
+            remain_dims_i = 0
+        end where
+        call c_mpi_cart_sub(comm, remain_dims_i, newcomm, ierror)
+    end subroutine
 end module mpi
 
 program main
@@ -371,7 +406,7 @@ program main
     integer, parameter :: nproc = 2
     integer, dimension(lbuf,0:nproc-1) :: rbuf
     integer :: ntype_real = MPI_REAL8
-    integer :: comm_all, newcomm_all
+    integer :: comm_all, newcomm_all, newcomm_after_sub
     integer, parameter :: nr = 2
     integer, parameter :: nt = 3
     integer, parameter :: np = 2
@@ -382,6 +417,7 @@ program main
     real(8), dimension(:), allocatable :: rbuf4
     integer, parameter :: lbuf4 = 4
     integer :: irank4 = 2
+    
     integer, parameter :: maxdim = 2
     integer :: coords(maxdim)
     integer :: tag4 = 0
@@ -401,10 +437,13 @@ program main
     real(8), dimension(:), allocatable :: sbuf5
     integer, parameter :: lsbuf5 = 24
     real(8), dimension(2,3,4) :: a5
+
     integer :: iproc05 = 10
     integer, parameter :: ndims = 2
     integer :: dims(ndims) = 1
-    logical :: periods(ndims) = .false.
+    logical :: periods(ndims), remain_dims(ndims) = .false.
+    integer :: direction, displ, source, dest
+    
     allocate (br0_g(nt_g,np_g))
     allocate (rbuf4(lbuf4))
 
@@ -421,6 +460,7 @@ program main
     ! NOTE: called in pot3d.F90 as:
     call MPI_Comm_size (MPI_COMM_WORLD,nproc1,ierr)
     if (ierr /= 0) error stop
+    print *, "Number of processes:", nproc1
 
     ierr = -1
     call MPI_Bcast (ierr0,1,MPI_INTEGER,0,MPI_COMM_WORLD,ierr)
@@ -497,23 +537,39 @@ program main
     ! call MPI_Waitall (4,reqs,MPI_STATUSES_IGNORE,ierr)
     ! if (ierr /= 0) error stop
 
-
+    ierr = -1
+    call MPI_Dims_create (nproc1, ndims, dims, ierr)
+    if (ierr /= 0) error stop
+    print *, "Computed dimensions:", dims
     ! Here Ideally we would need MPI_Dims_create(size,2,dims) as dims() value can't be zero it have to be initialized
     ierr = -1
     ! Just experimental
     ! periods(1) = .TRUE.
     call MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periods, .FALSE., newcomm_all, ierr)
     if (ierr /= 0) error stop
+    print *, "Cartesian communicator created"
 
     ierr = -1
     call MPI_Comm_rank (newcomm_all,iprocw,ierr)
     if (ierr /= 0) error stop
-    print *, iprocw
+    print *, "Cartesian rank:", iprocw
 
     ierr = -1
     call MPI_Cart_coords(newcomm_all, iprocw, 2, coords, ierr)
     if (ierr /= 0) error stop
-    print *, coords(1),coords(2)
+    print *, "Coordinates:", coords
+
+    ierr = -1
+    call MPI_Cart_shift(newcomm_all, direction, displ, source, dest, ierr)
+    if (ierr /= 0) error stop
+    print *, "Shift results - Source:", source, "Dest:", dest
+
+    ierr = -1
+    call MPI_Cart_sub(newcomm_all, remain_dims, newcomm_after_sub, ierr)
+    if (ierr /= 0) error stop
+
+    print *, "Initial Communicator created:", newcomm_all
+    print *, "Subcommunicator created:", newcomm_after_sub
 
     ! called in pot3d.F90 as
     ierr = -1
