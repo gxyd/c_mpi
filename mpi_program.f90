@@ -500,17 +500,24 @@ program main
 
     ! Here Ideally we would need MPI_Dims_create(size,2,dims) as dims() value can't be zero it have to be initialized
     ierr = -1
-    call MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periods, .false., newcomm_all, ierr)
+    ! Just experimental
+    ! periods(1) = .TRUE.
+    call MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periods, .FALSE., newcomm_all, ierr)
     if (ierr /= 0) error stop
 
-    ! ierr = -1
-    ! call MPI_Cart_coords(MPI_COMM_WORLD, iprocw, maxdim, coords, ierr)
-    ! if (ierr /= 0) error stop
+    ierr = -1
+    call MPI_Comm_rank (newcomm_all,iprocw,ierr)
+    if (ierr /= 0) error stop
+    print *, iprocw
+
+    ierr = -1
+    call MPI_Cart_coords(newcomm_all, iprocw, 2, coords, ierr)
+    if (ierr /= 0) error stop
+    print *, coords(1),coords(2)
 
     ! called in pot3d.F90 as
-    ! call MPI_Finalize (ierr)
-
     ierr = -1
     call MPI_Finalize(ierr)
     if (ierr /= 0) error stop "MPI_Finalize failed"
+
 end program main
