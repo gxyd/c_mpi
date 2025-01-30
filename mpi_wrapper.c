@@ -292,3 +292,22 @@ void mpi_cart_coords_wrapper(int * comm_f, int * rank, int * maxdims, int * coor
     MPI_Comm comm = MPI_Comm_f2c(*comm_f);
     *ierror = MPI_Cart_coords(comm, *rank, *maxdims, coords);
 }
+
+void mpi_cart_shift_wrapper(int * comm_f, int * dir, int * disp, int * rank_source, int * rank_dest, int * ierror)
+{
+    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    *ierror = MPI_Cart_shift(comm, *dir, *disp, rank_source, rank_dest);
+}
+
+void mpi_dims_create_wrapper(int * nnodes, int * ndims, int * dims, int * ierror)
+{
+    *ierror = MPI_Dims_create(*nnodes, *ndims, dims);
+}
+
+void mpi_cart_sub_wrapper(int *  comm_f, int * rmains_dims, int * newcomm_f, int * ierror)
+{
+    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm newcomm = MPI_COMM_NULL;
+    *ierror = MPI_Cart_sub(comm, rmains_dims, &newcomm);
+    *newcomm_f = MPI_Comm_c2f(newcomm);
+}
