@@ -109,7 +109,8 @@ module mpi_c_bindings
 
         subroutine c_mpi_barrier(comm, ierror) bind(C, name="mpi_barrier_wrapper")
             use iso_c_binding, only: c_int
-            integer(c_int) :: comm, ierror
+            integer(c_int), intent(in) :: comm
+            integer(c_int), intent(out), optional :: ierror
         end subroutine
 
         subroutine c_mpi_comm_rank(comm, rank, ierror) bind(C, name="mpi_comm_rank_wrapper")
