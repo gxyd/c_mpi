@@ -273,7 +273,8 @@ module mpi
 
     subroutine MPI_Barrier_proc(comm, ierror)
         use mpi_c_bindings, only: c_mpi_barrier
-        integer :: comm, ierror
+        integer, intent(in) :: comm
+        integer, intent(out), optional :: ierror
         call c_mpi_barrier(comm, ierror)
     end subroutine
 
