@@ -140,8 +140,9 @@ void mpi_isend_wrapper(const double *buf, int *count, int *datatype_f,
             return;
     }
 
-    MPI_Request request = MPI_Request_f2c(*request_f);
+    MPI_Request request;
     *ierror = MPI_Isend(buf, *count, datatype, *dest, *tag, comm, &request);
+    *request_f = MPI_Request_c2f(request);
 }
 
 void mpi_irecv_wrapper(double *buf, int *count, int *datatype_f,
@@ -163,6 +164,7 @@ void mpi_irecv_wrapper(double *buf, int *count, int *datatype_f,
 
     MPI_Request request = MPI_Request_f2c(*request_f);
     *ierror = MPI_Irecv(buf, *count, datatype, *source, *tag, comm, &request);
+    *request_f = MPI_Request_c2f(request);
 }
 
 void mpi_allreduce_wrapper(const double *sendbuf, double *recvbuf, int *count,
@@ -304,8 +306,7 @@ void mpi_dims_create_wrapper(int * nnodes, int * ndims, int * dims, int * ierror
     *ierror = MPI_Dims_create(*nnodes, *ndims, dims);
 }
 
-void mpi_cart_sub_wrapper(int *  comm_f, int * rmains_dims, int * newcomm_f, int * ierror)
-{
+void mpi_cart_sub_wrapper(int *  comm_f, int * rmains_dims, int * newcomm_f, int * ierror) {
     MPI_Comm comm = MPI_Comm_f2c(*comm_f);
     MPI_Comm newcomm = MPI_COMM_NULL;
     *ierror = MPI_Cart_sub(comm, rmains_dims, &newcomm);
