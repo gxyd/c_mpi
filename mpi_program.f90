@@ -443,7 +443,7 @@ program main
     integer :: dims(ndims) = 1
     logical :: periods(ndims), remain_dims(ndims) = .false.
     integer :: direction, displ, source, dest
-    
+
     allocate (br0_g(nt_g,np_g))
     allocate (rbuf4(lbuf4))
 
