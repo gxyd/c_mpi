@@ -1,17 +1,24 @@
-## How to run 'mpi_program.f90'
+## How to run 'cart_sub.f90'
 
-```console
-> mpicc -c mpi_wrapper.c -o mpi_wrapper.o
-> mpif90 -c mpi_types.f90
-> mpif90 -c mpi_c_bindings.f90
-> mpif90 mpi_program.f90 mpi_types.o mpi_c_bindings.o mpi_wrapper.o -o mpi_program
-> ./mpi_program
-[Gauravs-MacBook-Air:00000] *** An error occurred in MPI_Comm_size
-[Gauravs-MacBook-Air:00000] *** reported by process [632750080,0]
-[Gauravs-MacBook-Air:00000] *** on communicator MPI_COMM_WORLD
-[Gauravs-MacBook-Air:00000] *** MPI_ERR_COMM: invalid communicator
-[Gauravs-MacBook-Air:00000] *** MPI_ERRORS_ARE_FATAL (processes in this communicator will now abort,
-[Gauravs-MacBook-Air:00000] ***    and MPI will try to terminate your MPI job as well)
+```clojure
+⚡aditya-trivedi ❯❯ cd src
+⚡aditya-trivedi ❯❯ mpicc -c mpi_wrapper.c -o mpi_wrapper.o
+ ⚡aditya-trivedi ❯❯ mpif90 -c mpi_c_bindings.f90 mpi.f90                                                                                               
+ ⚡aditya-trivedi ❯❯ cd ../tests/                                                                                                                       
+ ⚡aditya-trivedi ❯❯ mpif90 cart_sub.f90 ../src/mpi_c_bindings.o ../src/mpi_wrapper.c ../src/mpi.o -o a && ./a                                          
+ Global Rank:           0 Cartesian Coordinates:           0           0
+ New communicator rank:           0 New communicator size:           1
 
+OR via MPIRUN
+
+ ⚡aditya-trivedi ❯❯ mpif90 cart_sub.f90 ../src/mpi_c_bindings.o ../src/mpi_wrapper.c ../src/mpi.o -o a && mpirun -np 4 ./a                             
+ Global Rank:           3 Cartesian Coordinates:           1           1
+ Global Rank:           0 Cartesian Coordinates:           0           0
+ Global Rank:           1 Cartesian Coordinates:           0           1
+ Global Rank:           2 Cartesian Coordinates:           1           0
+ New communicator rank:           3 New communicator size:           2
+ New communicator rank:           0 New communicator size:           2
+ New communicator rank:           1 New communicator size:           2
+ New communicator rank:           2 New communicator size:           2
 ```
 
