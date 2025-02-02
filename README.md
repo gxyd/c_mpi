@@ -1,6 +1,6 @@
-## How to run 'cart_sub.f90'
+## How to run 'tests/cart_sub.f90'
 
-```clojure
+```console
 ⚡aditya-trivedi ❯❯ cd src
 ⚡aditya-trivedi ❯❯ mpicc -c mpi_wrapper.c -o mpi_wrapper.o
  ⚡aditya-trivedi ❯❯ mpif90 -c mpi_c_bindings.f90 mpi.f90                                                                                               
