@@ -58,6 +58,7 @@ module mpi
     interface MPI_Allreduce
         module procedure MPI_Allreduce_scalar
         module procedure MPI_Allreduce_1d
+        module procedure MPI_Allreduce_array
     end interface
 
     interface MPI_Wtime
@@ -265,6 +266,16 @@ module mpi
         integer, intent(out), optional :: ierror
         call c_mpi_allreduce_1d(sendbuf, recvbuf, count, datatype, op, comm, ierror)
     end subroutine
+
+    subroutine MPI_Allreduce_array(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+        use mpi_c_bindings, only: c_mpi_allreduce_array
+        ! Declare both send and recv as arrays:
+        real(8), dimension(:), intent(in)  :: sendbuf
+        real(8), dimension(:), intent(out) :: recvbuf
+        integer, intent(in) :: count, datatype, op, comm
+        integer, intent(out), optional :: ierror
+        call c_mpi_allreduce_array(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+    end subroutine MPI_Allreduce_array
 
     function MPI_Wtime_proc() result(time)
         use mpi_c_bindings, only: c_mpi_wtime
