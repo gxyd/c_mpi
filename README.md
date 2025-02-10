@@ -1,11 +1,13 @@
 ## How to run 'tests/cart_sub.f90'
 
 ```console
-⚡aditya-trivedi ❯❯ cd src
-⚡aditya-trivedi ❯❯ mpicc -c mpi_wrapper.c -o mpi_wrapper.o
- ⚡aditya-trivedi ❯❯ mpif90 -c mpi_c_bindings.f90 mpi.f90                                                                                               
- ⚡aditya-trivedi ❯❯ cd ../tests/                                                                                                                       
- ⚡aditya-trivedi ❯❯ mpif90 cart_sub.f90 ../src/mpi_c_bindings.o ../src/mpi_wrapper.o ../src/mpi.o -o cart_sub && ./cart_sub
+> cd src
+> echo ${CC}
+/usr/bin/clang  # result on macOS
+> ${CC} -c -I${CONDA_PREFIX}/include mpi_wrapper.c
+> mpif90 -c mpi_c_bindings.f90 mpi.f90
+> cd ../tests/
+> mpif90 cart_sub.f90 ../src/mpi_c_bindings.o ../src/mpi_wrapper.o ../src/mpi.o -o cart_sub && ./cart_sub
  Global Rank:           0 Cartesian Coordinates:           0           0
  New communicator rank:           0 New communicator size:           1
 ```
@@ -13,7 +15,7 @@
 OR via MPIRUN
 
 ```console
- ⚡aditya-trivedi ❯❯ mpif90 cart_sub.f90 ../src/mpi_c_bindings.o ../src/mpi_wrapper.c ../src/mpi.o -o a && mpirun -np 4 ./a                             
+> mpif90 cart_sub.f90 ../src/mpi_c_bindings.o ../src/mpi_wrapper.c ../src/mpi.o -o a && mpirun -np 4 ./a
  Global Rank:           3 Cartesian Coordinates:           1           1
  Global Rank:           0 Cartesian Coordinates:           0           0
  Global Rank:           1 Cartesian Coordinates:           0           1
