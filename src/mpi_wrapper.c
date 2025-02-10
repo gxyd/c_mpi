@@ -1,5 +1,6 @@
 #include <mpi.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define MPI_STATUS_SIZE 5
 
@@ -193,7 +194,11 @@ void mpi_allreduce_wrapper(const double *sendbuf, double *recvbuf, int *count,
     2. the first argument (i.e. sendbuf) as "MPI_IN_PLACE" for now as it's always
        used as such in POT3D codebase
     */
-    *ierror = MPI_Allreduce(MPI_IN_PLACE, recvbuf, *count, datatype, MPI_SUM, comm);
+   if (*sendbuf == -1) {
+        *ierror = MPI_Allreduce(MPI_IN_PLACE , recvbuf, *count, datatype, MPI_SUM, comm);
+   } else {
+        *ierror = MPI_Allreduce(sendbuf , recvbuf, *count, datatype, MPI_SUM, comm);
+   }
 }
 
 double mpi_wtime_wrapper() {
