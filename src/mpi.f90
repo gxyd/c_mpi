@@ -130,7 +130,7 @@ module mpi
         use mpi_c_bindings, only : c_mpi_init_thread
         use iso_c_binding, only: c_int
         integer, intent(in) :: required
-        integer, intent(in) :: provided
+        integer, intent(out) :: provided
         integer, optional, intent(out) :: ierr
         integer :: local_ierr
         if (present(ierr)) then
