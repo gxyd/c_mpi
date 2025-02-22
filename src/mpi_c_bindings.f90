@@ -10,7 +10,7 @@ module mpi_c_bindings
         subroutine c_mpi_init_thread(required, provided, ierr) bind(C, name="mpi_init_thread_wrapper")
             use iso_c_binding, only: c_int
             integer(c_int), intent(in) :: required
-            integer(c_int), intent(in) :: provided
+            integer(c_int), intent(out) :: provided
             integer(c_int), intent(out) :: ierr
         end subroutine c_mpi_init_thread
 
