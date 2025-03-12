@@ -17,7 +17,7 @@ module mpi
     ! NOTE: I've no idea for how to implement this, refer
     ! see section 2.5.4 page 21 of mpi40-report.pdf
     ! this is probably not correct right now
-    integer, allocatable :: MPI_STATUSES_IGNORE(:)
+    integer :: MPI_STATUSES_IGNORE(1024)
 
     ! not used in pot3d.F90
     interface MPI_Init
@@ -325,7 +325,7 @@ module mpi
         integer, intent(inout) :: array_of_requests(count)
         integer :: array_of_statuses(*)
         integer, optional, intent(out) :: ierror
-        call c_mpi_waitall(count, array_of_requests, array_of_requests, ierror)
+        call c_mpi_waitall(count, array_of_requests, array_of_statuses, ierror)
     end subroutine
 
     subroutine MPI_Ssend_proc(buf, count, datatype, dest, tag, comm, ierror)
