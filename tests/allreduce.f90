@@ -13,7 +13,8 @@ program main
     use mpi
     external uop
     integer ierr, errs
-    integer count, vin(65000), vout(65000), i, size
+    real(8)  :: vin(65000),vout(65000)
+    integer :: i, count, size
     integer :: comm
 
     errs = 0
@@ -28,8 +29,7 @@ program main
             vin(i) = i
             vout(i) = -1
         enddo
-        call mpi_allreduce( vin, vout, count, MPI_INTEGER, MPI_SUM,  &
-    &                       comm, ierr )
+        call mpi_allreduce( vin, vout, count, MPI_REAL8, MPI_SUM, comm, ierr )
     !         Check that all results are correct
         do i=1, count
             if (vout(i) .ne. i * size) then

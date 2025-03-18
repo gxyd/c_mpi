@@ -14,11 +14,7 @@ $FC -c ../src/mpi.f90
 
 for file in *.f90; do
   filename=$(basename "$file" .f90)
-  # TODO: currently "allreduce.f90" fails to compile, hence
-  # we skip that test for now
-  if [ "$filename" == "allreduce" ]; then
-    continue
-  fi
+
   $FC -c $file
   $FC mpi_wrapper.o mpi_c_bindings.o mpi.o $filename.o -o $filename -L$CONDA_PREFIX/lib -lmpi -Wl,-rpath,$CONDA_PREFIX/lib
 
