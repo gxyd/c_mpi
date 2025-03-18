@@ -41,6 +41,12 @@ jobs:
           cd tests/pot3d
           FC="gfortran" ./build_and_run_gfortran.sh
 
+      - name: Run standalone tests with GFortran
+        shell: bash -e -x -l {0}
+        run: |
+          cd tests
+          FC="gfortran" ./run_tests.sh
+
   Compile_POT3D_with_LFortran:
     name: "Build POT3D and validate with LFortran"
     runs-on: ${{ matrix.os }}
