@@ -31,9 +31,6 @@ jobs:
       - name: POT3D Build and validation with GFortran with optimization (MPI only)
         shell: bash -e -x -l {0}
         run: |
-          cp src/mpi.f90 tests/pot3d/src/
-          cp src/mpi_c_bindings.f90 tests/pot3d/src/
-          cp src/mpi_wrapper.c tests/pot3d/src/
           cd tests/pot3d
           FC="gfortran -O3 -march=native" ./build_and_run_gfortran.sh
 
@@ -41,9 +38,6 @@ jobs:
       - name: POT3D Build and validation with GFortran without optimization (MPI only)
         shell: bash -e -x -l {0}
         run: |
-          cp src/mpi.f90 tests/pot3d/src/
-          cp src/mpi_c_bindings.f90 tests/pot3d/src/
-          cp src/mpi_wrapper.c tests/pot3d/src/
           cd tests/pot3d
           FC="gfortran" ./build_and_run_gfortran.sh
 
@@ -66,9 +60,6 @@ jobs:
       - name: POT3D Build and validation with LFortran with optimization (MPI only)
         shell: bash -e -x -l {0}
         run: |
-          cp src/mpi.f90 tests/pot3d/src/
-          cp src/mpi_c_bindings.f90 tests/pot3d/src/
-          cp src/mpi_wrapper.c tests/pot3d/src/
           cd tests/pot3d
           FC="lfortran --fast" ./build_and_run_lfortran.sh
 
@@ -76,8 +67,5 @@ jobs:
       - name: POT3D Build and validation with GFortran without optimization (MPI only)
         shell: bash -e -x -l {0}
         run: |
-          cp src/mpi.f90 tests/pot3d/src/
-          cp src/mpi_c_bindings.f90 tests/pot3d/src/
-          cp src/mpi_wrapper.c tests/pot3d/src/
           cd tests/pot3d
           FC="lfortran" ./build_and_run_lfortran.sh
