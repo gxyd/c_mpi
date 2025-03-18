@@ -14,7 +14,9 @@ $FC -c ../src/mpi.f90
 
 for file in *.f90; do
   filename=$(basename "$file" .f90)
-
+  if [ "$filename" == "allreduce" ] && ([ "$FC" == "lfortran" ] || [ "$FC" == "lfortran --fast" ]); then
+    FC='lfortran --implicit-interface'
+  fi
   $FC -c $file
   $FC mpi_wrapper.o mpi_c_bindings.o mpi.o $filename.o -o $filename -L$CONDA_PREFIX/lib -lmpi -Wl,-rpath,$CONDA_PREFIX/lib
 

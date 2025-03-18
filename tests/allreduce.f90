@@ -1,4 +1,4 @@
-subroutine uop( cin, cout, count, datatype )
+subroutine uop( cin, cout, count)
     use mpi
     integer cin(*), cout(*)
     integer count
