@@ -1,5 +1,4 @@
 set -ex
-git clean -dfx
 
 if [[ "$(uname)" == "Linux" ]]; then
   CC=gcc
