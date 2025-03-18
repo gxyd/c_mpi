@@ -1,0 +1,8 @@
+name: c_mpi_lfortran_env
+channels:
+  - conda-forge
+dependencies:
+  - lfortran=0.49.0
+  - make
+  - cmake
+  - openmpi=5.0.6
