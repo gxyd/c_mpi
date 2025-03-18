@@ -34,41 +34,22 @@ jobs:
           which gfortran || { echo "gfortran not found"; exit 1; }
           which mpif90 || { echo "mpif90 not found"; exit 1; }
 
-      # build and validation without GFortran's optimization
-      - name: POT3D Build with GFortran without optimization (MPI only)
+      # build and validation with GFortran's optimization
+      - name: POT3D Build and validation with GFortran with optimization (MPI only)
         shell: bash -e -x -l {0}
         run: |
           cp src/mpi.f90 tests/pot3d/src/
           cp src/mpi_c_bindings.f90 tests/pot3d/src/
           cp src/mpi_wrapper.c tests/pot3d/src/
           cd tests/pot3d
-          FC="gfortran" ./build_and_run.sh
+          FC="gfortran -O3" ./build_and_run_gfortran.sh
 
-      - name: POT3D Validation with GFortran without optimization
+      # build and validation without GFortran's optimization
+      - name: POT3D Build and validation with GFortran without optimization (MPI only)
         shell: bash -e -x -l {0}
-        run: ./validate.sh
-
-    #   # build and validation with GFortran's optimization
-    #   - name: POT3D Build with GFortran with optimization (MPI only)
-    #     shell: bash -e -x -l {0}
-    #     run: |
-    #       echo "RUNNER_OS is set to: $RUNNER_OS"
-    #       ./build_examples/build_cpu_mpi-only_gcc_gfortran_fast.sh
-    #       export PATH=$PWD/bin:$PATH
-
-    #   - name: POT3D Validation with GFortran with optimization
-    #     shell: bash -e -x -l {0}
-    #     run: ./validate.sh
-
-    #   - name: POT3D Build (MPI + Multithreaded) [Ubuntu only]
-    #     if: matrix.os == 'ubuntu-20.04'
-    #     shell: bash -e -x -l {0}
-    #     run: |
-    #       export OMP_NUM_THREADS=2
-    #       ./build_examples/build_cpu_mpi+multithread_gcc_ubuntu20.04_lf.sh
-    #       export PATH=$PWD/bin:$PATH
-
-    #   - name: POT3D Validation (MPI + Multithreaded) [Ubuntu only]
-    #     if: matrix.os == 'ubuntu-20.04'
-    #     shell: bash -e -x -l {0}
-    #     run: ./validate.sh
+        run: |
+          cp src/mpi.f90 tests/pot3d/src/
+          cp src/mpi_c_bindings.f90 tests/pot3d/src/
+          cp src/mpi_wrapper.c tests/pot3d/src/
+          cd tests/pot3d
+          FC="gfortran" ./build_and_run_gfortran.sh
