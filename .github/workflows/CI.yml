@@ -13,7 +13,7 @@ env:
 
 jobs:
   Compile_POT3D_with_GFortran:
-    name: "Build POT3D and validate"
+    name: "Build POT3D and validate with GFortran"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -26,13 +26,6 @@ jobs:
         with:
           micromamba-version: '2.0.4-0'
           environment-file: ci/environment_gfortran.yml
-
-      - name: Verify Environment
-        shell: bash -e -x -l {0}
-        run: |
-          echo "Active Environment: $MAMBA_DEFAULT_ENV"
-          which gfortran || { echo "gfortran not found"; exit 1; }
-          which mpif90 || { echo "mpif90 not found"; exit 1; }
 
       # build and validation with GFortran's optimization
       - name: POT3D Build and validation with GFortran with optimization (MPI only)
@@ -53,3 +46,38 @@ jobs:
           cp src/mpi_wrapper.c tests/pot3d/src/
           cd tests/pot3d
           FC="gfortran" ./build_and_run_gfortran.sh
+
+  Compile_POT3D_with_LFortran:
+    name: "Build POT3D and validate with LFortran"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["macos-latest", "ubuntu-20.04"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Micromamba
+        uses: mamba-org/setup-micromamba@v2.0.2
+        with:
+          micromamba-version: '2.0.4-0'
+          environment-file: ci/environment_lfortran.yml
+
+      # build and validation with LFortran's optimization
+      - name: POT3D Build and validation with LFortran with optimization (MPI only)
+        shell: bash -e -x -l {0}
+        run: |
+          cp src/mpi.f90 tests/pot3d/src/
+          cp src/mpi_c_bindings.f90 tests/pot3d/src/
+          cp src/mpi_wrapper.c tests/pot3d/src/
+          cd tests/pot3d
+          FC="lfortran --fast" ./build_and_run_lfortran.sh
+
+      # build and validation without LFortran's optimization
+      - name: POT3D Build and validation with GFortran without optimization (MPI only)
+        shell: bash -e -x -l {0}
+        run: |
+          cp src/mpi.f90 tests/pot3d/src/
+          cp src/mpi_c_bindings.f90 tests/pot3d/src/
+          cp src/mpi_wrapper.c tests/pot3d/src/
+          cd tests/pot3d
+          FC="lfortran" ./build_and_run_lfortran.sh
