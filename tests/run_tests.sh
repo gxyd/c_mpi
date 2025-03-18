@@ -22,11 +22,11 @@ for file in *.f90; do
   $FC -c $file
   $FC mpi_wrapper.o mpi_c_bindings.o mpi.o $filename.o -o $filename -L$CONDA_PREFIX/lib -lmpi -Wl,-rpath,$CONDA_PREFIX/lib
 
-  echo "Running cart_sub with 1 MPI rank..."
+  echo "Running $filename with 1 MPI rank..."
   ${MPIEXEC} -np 1 $filename
   echo "Done!"
 
-  echo "Running cart_sub with 2 MPI rank..."
+  echo "Running $filename with 2 MPI rank..."
   ${MPIEXEC} -np 2 $filename
   echo "Done!"
 done
