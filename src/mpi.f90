@@ -147,14 +147,15 @@ module mpi
         use mpi_c_bindings, only: c_mpi_finalize
         use iso_c_binding, only: c_int
         integer, optional, intent(out) :: ierr
-        integer :: local_ierr
+        integer(c_int) :: local_ierr
+
+        !> assigns the status code to integer of kind 'c_int'
+        local_ierr = c_mpi_finalize()
         if (present(ierr)) then
-            call c_mpi_finalize(ierr)
-        else
-            call c_mpi_finalize(local_ierr)
-            if (local_ierr /= 0) then
-                print *, "MPI_Finalize failed with error code: ", local_ierr
-            end if
+            !> we need to cast it to a Fortran integer, hence the use of 'int'
+            ierr = int(local_ierr)
+        else if (local_ierr /= 0) then
+            print *, "MPI_Finalize failed with error code: ", int(local_ierr)
         end if
     end subroutine
 

@@ -14,10 +14,9 @@ module mpi_c_bindings
             integer(c_int), intent(out) :: ierr
         end subroutine c_mpi_init_thread
 
-        subroutine c_mpi_finalize(ierr) bind(C, name="mpi_finalize_wrapper")
+        integer(c_int) function c_mpi_finalize() bind(C, name="MPI_Finalize")
             use iso_c_binding, only : c_int
-            integer(c_int), intent(out) :: ierr
-        end subroutine c_mpi_finalize
+        end function c_mpi_finalize
 
         subroutine c_mpi_comm_size(comm, size, ierr) bind(C, name="mpi_comm_size_wrapper")
             use iso_c_binding, only: c_int
