@@ -1,19 +1,23 @@
-subroutine uop( cin, cout, count, datatype )
-    use mpi
-    integer cin(*), cout(*)
-    integer count
-    integer i
+module mod_uop
+    contains
+    subroutine uop( cin, cout, count)
+        use mpi
+        integer cin(*), cout(*)
+        integer count
+        integer i
 
-    do i=1, count
-        cout(i) = cin(i) + cout(i)
-    enddo
-end subroutine
+        do i=1, count
+            cout(i) = cin(i) + cout(i)
+        end do
+    end subroutine
+end module mod_uop
   
 program main
     use mpi
-    external uop
+    use mod_uop
     integer ierr, errs
-    integer count, vin(65000), vout(65000), i, size
+    real(8)  :: vin(65000),vout(65000)
+    integer :: i, count, size
     integer :: comm
 
     errs = 0
@@ -23,25 +27,22 @@ program main
     comm = MPI_COMM_WORLD
     call mpi_comm_size( comm, size, ierr )
     count = 1
-    do while (count .lt. 65000)
+    do while (count < 65000)
         do i=1, count
             vin(i) = i
             vout(i) = -1
-        enddo
-        call mpi_allreduce( vin, vout, count, MPI_INTEGER, MPI_SUM,  &
-    &                       comm, ierr )
+        end do
+        call mpi_allreduce( vin, vout, count, MPI_REAL8, MPI_SUM, comm, ierr )
     !         Check that all results are correct
         do i=1, count
-            if (vout(i) .ne. i * size) then
+            if (vout(i) /= i * size) then
                 errs = errs + 1
-                if (errs .lt. 10) print *, "vout(",i,") = ", vout(i)
-            endif
-        enddo
+                if (errs < 10) print *, "vout(",i,") = ", vout(i)
+            end if
+        end do
         count = count + count
-    enddo
+    end do
 
     print *, "Allreduce test completed with ", errs, " errors."
-
-
     call mpi_finalize(errs)
 end
