@@ -2,7 +2,7 @@ module mpi
     implicit none
     integer, parameter :: MPI_THREAD_FUNNELED = 1
     ! not sure if this is correct really
-    integer, parameter :: MPI_INTEGER = 0
+    integer, parameter :: MPI_INTEGER = 2
     integer, parameter :: MPI_REAL4 = 0
     integer, parameter :: MPI_REAL8 = 1
     integer, parameter :: MPI_COMM_TYPE_SHARED = 1
@@ -58,7 +58,8 @@ module mpi
     interface MPI_Allreduce
         module procedure MPI_Allreduce_scalar
         module procedure MPI_Allreduce_1d
-        module procedure MPI_Allreduce_array
+        module procedure MPI_Allreduce_array_real
+        module procedure MPI_Allreduce_array_int
     end interface
 
     interface MPI_Wtime
@@ -282,15 +283,25 @@ module mpi
         call c_mpi_allreduce_1d(sendbuf, recvbuf, count, datatype, op, comm, ierror)
     end subroutine
 
-    subroutine MPI_Allreduce_array(sendbuf, recvbuf, count, datatype, op, comm, ierror)
-        use mpi_c_bindings, only: c_mpi_allreduce_array
+    subroutine MPI_Allreduce_array_real(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+        use mpi_c_bindings, only: c_mpi_allreduce_array_real
         ! Declare both send and recv as arrays:
         real(8), dimension(:), intent(in)  :: sendbuf
         real(8), dimension(:), intent(out) :: recvbuf
         integer, intent(in) :: count, datatype, op, comm
         integer, intent(out), optional :: ierror
-        call c_mpi_allreduce_array(sendbuf, recvbuf, count, datatype, op, comm, ierror)
-    end subroutine MPI_Allreduce_array
+        call c_mpi_allreduce_array_real(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+    end subroutine MPI_Allreduce_array_real
+
+    subroutine MPI_Allreduce_array_int(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+        use mpi_c_bindings, only: c_mpi_allreduce_array_int
+        ! Declare both send and recv as arrays:
+        integer, dimension(:), intent(in)  :: sendbuf
+        integer, dimension(:), intent(out) :: recvbuf
+        integer, intent(in) :: count, datatype, op, comm
+        integer, intent(out), optional :: ierror
+        call c_mpi_allreduce_array_int(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+    end subroutine MPI_Allreduce_array_int
 
     function MPI_Wtime_proc() result(time)
         use mpi_c_bindings, only: c_mpi_wtime
