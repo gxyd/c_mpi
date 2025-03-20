@@ -10,14 +10,6 @@ void mpi_init_wrapper(int *ierr) {
     *ierr = MPI_Init(&argc, &argv);
 }
 
-void mpi_init_thread_wrapper(int *required, int *provided, int *ierr) {
-    int argc = 0;
-    char **argv = NULL;
-
-    int thread_support = (*required == 1) ? MPI_THREAD_FUNNELED : *required;
-    *ierr = MPI_Init_thread(&argc, &argv, thread_support, provided);
-}
-
 void mpi_comm_size_wrapper(int *comm_f, int *size, int *ierr) {
     MPI_Comm comm = MPI_Comm_f2c(*comm_f);
     *ierr = MPI_Comm_size(comm, size);
