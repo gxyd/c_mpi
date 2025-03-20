@@ -108,7 +108,7 @@ jobs:
           FC="lfortran --fast" ./build_and_run_lfortran.sh
 
       # build and validation without LFortran's optimization
-      - name: POT3D Build and validation with GFortran without optimization (MPI only)
+      - name: POT3D Build and validation with LFortran without optimization (MPI only)
         shell: bash -e -x -l {0}
         run: |
           cd tests/pot3d
