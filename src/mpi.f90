@@ -130,21 +130,32 @@ module mpi
     end subroutine MPI_Init_proc
 
     subroutine MPI_Init_thread_proc(required, provided, ierr)
-        use mpi_c_bindings, only : c_mpi_init_thread
-        use iso_c_binding, only: c_int
+        use mpi_c_bindings, only: c_mpi_init_thread
+        use iso_c_binding, only: c_int, c_ptr, c_null_ptr
         integer, intent(in) :: required
         integer, intent(out) :: provided
         integer, optional, intent(out) :: ierr
-        integer :: local_ierr
+        integer(c_int) :: local_ierr
+        integer(c_int) :: argc = 0
+        type(c_ptr) :: argv = c_null_ptr
+        integer(c_int) :: c_required
+        integer(c_int) :: c_provided
+        
+        ! Map Fortran MPI_THREAD_FUNNELED to C MPI_THREAD_FUNNELED if needed
+        c_required = int(required, c_int)
+        
+        ! Call C MPI_Init_thread directly
+        local_ierr = c_mpi_init_thread(argc, argv, required, provided)
+        
+        ! Copy output values back to Fortran
+        provided = int(c_provided)
+        
         if (present(ierr)) then
-            call c_mpi_init_thread(required, provided, ierr)
-        else
-            call c_mpi_init_thread(required, provided, local_ierr)
-            if (local_ierr /= 0) then
-                print *, "MPI_Init_thread failed with error code: ", local_ierr
-            end if
+            ierr = int(local_ierr)
+        else if (local_ierr /= 0) then
+            print *, "MPI_Init_thread failed with error code: ", local_ierr
         end if
-    end subroutine
+    end subroutine MPI_Init_thread_proc
 
     subroutine MPI_Finalize_proc(ierr)
         use mpi_c_bindings, only: c_mpi_finalize

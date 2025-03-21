@@ -12,12 +12,14 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_init
         end function c_mpi_init
 
-        subroutine c_mpi_init_thread(required, provided, ierr) bind(C, name="mpi_init_thread_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int), intent(in) :: required
+        function c_mpi_init_thread(argc, argv, required, provided) bind(C, name="MPI_Init_thread")
+            use iso_c_binding, only: c_int, c_ptr
+            integer(c_int) :: argc
+            type(c_ptr) :: argv
+            integer(c_int), value :: required
             integer(c_int), intent(out) :: provided
-            integer(c_int), intent(out) :: ierr
-        end subroutine c_mpi_init_thread
+            integer(c_int) :: c_mpi_init_thread
+        end function c_mpi_init_thread
 
         integer(c_int) function c_mpi_finalize() bind(C, name="MPI_Finalize")
             use iso_c_binding, only : c_int
