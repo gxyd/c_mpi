@@ -1,4 +1,4 @@
-program main
+program init_2
     use mpi, only: MPI_Init_thread, MPI_Finalize, MPI_THREAD_FUNNELED
     implicit none
     
@@ -9,10 +9,10 @@ program main
     
     if (ierr /= 0) then
         print *, "Error initializing MPI with threads"
-        stop
+        error stop
     end if
     print *, "Running MPI with thread support"
 
     ! Finalize MPI
     call MPI_Finalize(ierr)
-end program main
+end program init_2
