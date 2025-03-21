@@ -203,10 +203,6 @@ void mpi_allreduce_wrapper(const double *sendbuf, double *recvbuf, int *count,
    }
 }
 
-double mpi_wtime_wrapper() {
-    return MPI_Wtime();
-}
-
 void mpi_barrier_wrapper(int *comm_f, int *ierror) {
     MPI_Comm comm = MPI_Comm_f2c(*comm_f);
     *ierror = MPI_Barrier(comm);
