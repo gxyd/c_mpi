@@ -116,7 +116,7 @@ module mpi_c_bindings
             integer(c_int), intent(out), optional :: ierror
         end subroutine c_mpi_allreduce_array
 
-        function c_mpi_wtime() result(time) bind(C, name="mpi_wtime_wrapper")
+        function c_mpi_wtime() result(time) bind(C, name="MPI_Wtime")
             use iso_c_binding, only: c_double
             real(c_double) :: time
         end function
