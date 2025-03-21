@@ -2,10 +2,15 @@ module mpi_c_bindings
     implicit none
 
     interface
-        subroutine c_mpi_init(ierr) bind(C, name="mpi_init_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int), intent(out) :: ierr
-        end subroutine c_mpi_init
+        function c_mpi_init(argc, argv) bind(C, name="MPI_Init")
+            use iso_c_binding, only : c_int, c_ptr
+            !> TODO: is the intent need to be explicitly specified
+            !> as 'intent(inout)'? Though, currently LFortran
+            !> errors with this
+            integer(c_int) :: argc
+            type(c_ptr) :: argv
+            integer(c_int) :: c_mpi_init
+        end function c_mpi_init
 
         subroutine c_mpi_init_thread(required, provided, ierr) bind(C, name="mpi_init_thread_wrapper")
             use iso_c_binding, only: c_int
