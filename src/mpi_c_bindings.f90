@@ -4,8 +4,11 @@ module mpi_c_bindings
     interface
         function c_mpi_init(argc, argv) bind(C, name="MPI_Init")
             use iso_c_binding, only : c_int, c_ptr
-            integer(c_int), value :: argc
-            type(c_ptr), value :: argv
+            !> TODO: is the intent need to be explicitly specified
+            !> as 'intent(inout)'? Though, currently LFortran
+            !> errors with this
+            integer(c_int) :: argc
+            type(c_ptr) :: argv
             integer(c_int) :: c_mpi_init
         end function c_mpi_init
 
