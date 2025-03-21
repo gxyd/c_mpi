@@ -19,13 +19,13 @@ void mpi_bcast_int_wrapper(int *buffer, int *count, int *datatype_f, int *root, 
     MPI_Comm comm = MPI_Comm_f2c(*comm_f);
     MPI_Datatype datatype;
     switch (*datatype_f) {
-        case 0:
+        case 2:
             datatype = MPI_INT;
             break;
-        case 1:
+        case 0:
             datatype = MPI_FLOAT;
             break;
-        case 2:
+        case 1:
             datatype = MPI_DOUBLE;
             break;
         default:
@@ -59,7 +59,7 @@ void mpi_allgather_int_wrapper(const int *sendbuf, int *sendcount, int *sendtype
 
     MPI_Datatype sendtype, recvtype;
     switch (*sendtype_f) {
-        case 0:
+        case 2:
             sendtype = MPI_INT;
             break;
         default:
@@ -68,7 +68,7 @@ void mpi_allgather_int_wrapper(const int *sendbuf, int *sendcount, int *sendtype
     }
 
     switch (*recvtype_f) {
-        case 0:
+        case 2:
             recvtype = MPI_INT;
             break;
         default:
@@ -158,7 +158,7 @@ void mpi_irecv_wrapper(double *buf, int *count, int *datatype_f,
     *request_f = MPI_Request_c2f(request);
 }
 
-void mpi_allreduce_wrapper(const double *sendbuf, double *recvbuf, int *count,
+void mpi_allreduce_wrapper_real(const double *sendbuf, double *recvbuf, int *count,
                             int *datatype_f, int *op_f, int *comm_f, int *ierror) {
     MPI_Comm comm = MPI_Comm_f2c(*comm_f);
     MPI_Datatype datatype;
@@ -189,6 +189,21 @@ void mpi_allreduce_wrapper(const double *sendbuf, double *recvbuf, int *count,
    } else {
         *ierror = MPI_Allreduce(sendbuf , recvbuf, *count, datatype, MPI_SUM, comm);
    }
+}
+
+void mpi_allreduce_wrapper_int(const int *sendbuf, int *recvbuf, int *count,
+                            int *datatype_f, int *op_f, int *comm_f, int *ierror) {
+    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Datatype datatype;
+    datatype = MPI_INT;
+
+    MPI_Op op = MPI_Op_f2c(*op_f);
+
+    if (*sendbuf == -1) {
+    *ierror = MPI_Allreduce(MPI_IN_PLACE , recvbuf, *count, datatype, MPI_SUM, comm);
+    } else {
+    *ierror = MPI_Allreduce(sendbuf , recvbuf, *count, datatype, MPI_SUM, comm);
+    }
 }
 
 void mpi_barrier_wrapper(int *comm_f, int *ierror) {
