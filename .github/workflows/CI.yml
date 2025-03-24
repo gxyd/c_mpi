@@ -78,6 +78,28 @@ jobs:
           FC="lfortran" ./run_tests.sh
           FC="lfortran --fast" ./run_tests.sh
 
+  Run_standalone_tests_with_LFortran_with_MPICH:
+    name: "Run standalone tests with LFortran with MPICH"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["macos-latest", "ubuntu-20.04"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Micromamba
+        uses: mamba-org/setup-micromamba@v2.0.2
+        with:
+          micromamba-version: '2.0.4-0'
+          environment-file: ci/environment_lfortran_mpich.yml
+
+      - name: Run standalone tests with LFortran with and without optimization
+        shell: bash -e -x -l {0}
+        run: |
+          cd tests
+          FC="lfortran" ./run_tests.sh
+          FC="lfortran --fast" ./run_tests.sh
+
   Compile_POT3D_with_GFortran:
     name: "Build POT3D and validate with GFortran"
     runs-on: ${{ matrix.os }}
