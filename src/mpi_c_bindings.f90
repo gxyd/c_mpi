@@ -132,12 +132,17 @@ module mpi_c_bindings
             use iso_c_binding, only: c_double
             real(c_double) :: time
         end function
+        function c_mpi_comm_f2c(comm_f) bind(C, name="MPI_Comm_f2c")
+            use iso_c_binding, only: c_int, c_ptr
+            integer(c_int), value :: comm_f
+            type(c_ptr) :: c_mpi_comm_f2c  ! MPI_Comm as pointer
+        end function c_mpi_comm_f2c
 
-        subroutine c_mpi_barrier(comm, ierror) bind(C, name="mpi_barrier_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int), intent(in) :: comm
-            integer(c_int), intent(out), optional :: ierror
-        end subroutine
+        function c_mpi_barrier(comm) bind(C, name="MPI_Barrier")
+            use iso_c_binding, only: c_ptr, c_int
+            type(c_ptr), value :: comm      ! MPI_Comm as pointer
+            integer(c_int) :: c_mpi_barrier
+        end function c_mpi_barrier
 
         subroutine c_mpi_comm_rank(comm, rank, ierror) bind(C, name="mpi_comm_rank_wrapper")
             use iso_c_binding, only: c_int
