@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #define MPI_STATUS_SIZE 5
+#define FORTRAN_MPI_COMM_WORLD -1000
 
 // void mpi_init_wrapper(int *ierr) {
 //     int argc = 0;
@@ -212,7 +213,12 @@ void mpi_barrier_wrapper(int *comm_f, int *ierror) {
 }
 
 void mpi_comm_rank_wrapper(int *comm_f, int *rank, int *ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm;
+    if (*comm_f == FORTRAN_MPI_COMM_WORLD) {
+        comm = MPI_COMM_WORLD;
+    } else {
+        comm = MPI_Comm_f2c(*comm_f);
+    }
     *ierror = MPI_Comm_rank(comm, rank);
 }
 
