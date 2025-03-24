@@ -4,12 +4,21 @@
 
 #define MPI_STATUS_SIZE 5
 #define FORTRAN_MPI_COMM_WORLD -1000
+#define FORTRAN_MPI_INFO_NULL -2000
 
 // void mpi_init_wrapper(int *ierr) {
 //     int argc = 0;
 //     char **argv = NULL;
 //     *ierr = MPI_Init(&argc, &argv);
 // }
+
+MPI_Info get_c_info_from_fortran(int info) {
+    if (info == FORTRAN_MPI_INFO_NULL) {
+        return MPI_INFO_NULL;
+    } else {
+        return MPI_Info_f2c(info);
+    }
+}
 
 MPI_Comm get_c_comm_from_fortran(int comm_f) {
     if (comm_f == FORTRAN_MPI_COMM_WORLD) {
@@ -228,7 +237,7 @@ void mpi_comm_rank_wrapper(int *comm_f, int *rank, int *ierror) {
 void mpi_comm_split_type_wrapper(int *comm_f, int *split_type, int *key,
                                 int *info_f, int *newcomm_f, int *ierror) {
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    MPI_Info info = MPI_Info_f2c(*info_f);
+    MPI_Info info = get_c_info_from_fortran(*info_f);
     MPI_Comm newcomm = get_c_comm_from_fortran(*newcomm_f);
     *ierror = MPI_Comm_split_type( comm, *split_type, *key , info, &newcomm);
 }
