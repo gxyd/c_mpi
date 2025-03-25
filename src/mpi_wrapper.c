@@ -6,12 +6,6 @@
 #define FORTRAN_MPI_COMM_WORLD -1000
 #define FORTRAN_MPI_INFO_NULL -2000
 
-// void mpi_init_wrapper(int *ierr) {
-//     int argc = 0;
-//     char **argv = NULL;
-//     *ierr = MPI_Init(&argc, &argv);
-// }
-
 MPI_Info get_c_info_from_fortran(int info) {
     if (info == FORTRAN_MPI_INFO_NULL) {
         return MPI_INFO_NULL;
