@@ -37,3 +37,5 @@ for file in *.f90; do
   done
 
 done
+
+git clean -dfx
