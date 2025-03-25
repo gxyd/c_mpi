@@ -26,7 +26,7 @@ for file in *.f90; do
   $FC -c $file
   $FC mpi_wrapper.o mpi_c_bindings.o mpi.o $filename.o -o $filename -L$CONDA_PREFIX/lib -lmpi -Wl,-rpath,$CONDA_PREFIX/lib
 
-  for np in 1 2; do
+  for np in 1 2 4; do
     echo -e "${YELLOW}Running $filename with $np MPI ranks...${NC}"
     if ${MPIEXEC} -np $np ./$filename; then
       echo -e "${GREEN}Test $filename with $np MPI ranks PASSED!${NC}"
