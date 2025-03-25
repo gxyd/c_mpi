@@ -25,3 +25,26 @@ OR via MPIRUN
  New communicator rank:           1 New communicator size:           2
  New communicator rank:           2 New communicator size:           2
 ```
+
+## How to run a new MPI program with custom MPI wrappers
+
+```console
+> pwd
+/Users/gxyd/OpenSource/c_mpi
+> ls test.f90
+test.f90
+> ./run_with_mpi_wrappers.sh test.f90 -np 2
+Configuration results
+---------------------
+Using C compiler: /usr/bin/clang
+Using Fortran compiler: /Users/gxyd/miniforge3/envs/pot3d_build/bin/arm64-apple-darwin20.0.0-gfortran
+
+Compiling src/mpi_wrapper.c with /usr/bin/clang...
+Compiling src/mpi_c_bindings.f90 with /Users/gxyd/miniforge3/envs/pot3d_build/bin/arm64-apple-darwin20.0.0-gfortran...
+Compiling src/mpi.f90 with /Users/gxyd/miniforge3/envs/pot3d_build/bin/arm64-apple-darwin20.0.0-gfortran...
+Compiling test.f90 with /Users/gxyd/miniforge3/envs/pot3d_build/bin/arm64-apple-darwin20.0.0-gfortran...
+Linking objects to create executable: test
+Running: mpiexec -np 2 ./test
+ Hello from rank            0  of            2
+ Hello from rank            1  of            2
+```
