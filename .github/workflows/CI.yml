@@ -100,8 +100,8 @@ jobs:
           FC="lfortran" ./run_tests.sh
           FC="lfortran --fast" ./run_tests.sh
 
-  Compile_POT3D_with_GFortran:
-    name: "Build POT3D and validate with GFortran"
+  Compile_POT3D_with_GFortran_with_OpenMPI:
+    name: "Build POT3D and validate with GFortran with Open MPI"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -116,14 +116,14 @@ jobs:
           environment-file: ci/environment_gfortran_openmpi.yml
 
       # build and validation with GFortran's optimization
-      - name: POT3D Build and validation with GFortran with optimization (MPI only)
+      - name: POT3D Build and validation with GFortran with optimization using Open MPI (MPI only)
         shell: bash -e -x -l {0}
         run: |
           cd tests/pot3d
           FC="gfortran -O3 -march=native" ./build_and_run_gfortran.sh
 
       # build and validation without GFortran's optimization
-      - name: POT3D Build and validation with GFortran without optimization (MPI only)
+      - name: POT3D Build and validation with GFortran without optimization using Open MPI (MPI only)
         shell: bash -e -x -l {0}
         run: |
           cd tests/pot3d
