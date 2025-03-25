@@ -238,8 +238,9 @@ void mpi_comm_split_type_wrapper(int *comm_f, int *split_type, int *key,
                                 int *info_f, int *newcomm_f, int *ierror) {
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     MPI_Info info = get_c_info_from_fortran(*info_f);
-    MPI_Comm newcomm = get_c_comm_from_fortran(*newcomm_f);
+    MPI_Comm newcomm;
     *ierror = MPI_Comm_split_type( comm, *split_type, *key , info, &newcomm);
+    *newcomm_f = MPI_Comm_c2f(newcomm);
 }
 
 void mpi_recv_wrapper(double *buf, int *count, int *datatype_f, int *source,
