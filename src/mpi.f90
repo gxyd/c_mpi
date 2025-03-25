@@ -9,10 +9,10 @@ module mpi
     integer, parameter :: MPI_PROC_NULL = -1
     integer, parameter :: MPI_SUCCESS = 0
 
-    integer, parameter :: MPI_COMM_WORLD = 0
+    integer, parameter :: MPI_COMM_WORLD = -1000
     real(8), parameter :: MPI_IN_PLACE = -1
     integer, parameter :: MPI_SUM = 1
-    integer, parameter :: MPI_INFO_NULL = 0
+    integer, parameter :: MPI_INFO_NULL = -2000
     integer :: MPI_STATUS_IGNORE = 0
     ! NOTE: I've no idea for how to implement this, refer
     ! see section 2.5.4 page 21 of mpi40-report.pdf
@@ -141,16 +141,16 @@ module mpi
         type(c_ptr) :: argv = c_null_ptr
         integer(c_int) :: c_required
         integer(c_int) :: c_provided
-        
+
         ! Map Fortran MPI_THREAD_FUNNELED to C MPI_THREAD_FUNNELED if needed
         c_required = int(required, c_int)
-        
+
         ! Call C MPI_Init_thread directly
         local_ierr = c_mpi_init_thread(argc, argv, required, provided)
-        
+
         ! Copy output values back to Fortran
         provided = int(c_provided)
-        
+
         if (present(ierr)) then
             ierr = int(local_ierr)
         else if (local_ierr /= 0) then

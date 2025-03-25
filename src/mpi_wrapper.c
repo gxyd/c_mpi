@@ -3,20 +3,32 @@
 #include <stdio.h>
 
 #define MPI_STATUS_SIZE 5
+#define FORTRAN_MPI_COMM_WORLD -1000
+#define FORTRAN_MPI_INFO_NULL -2000
 
-// void mpi_init_wrapper(int *ierr) {
-//     int argc = 0;
-//     char **argv = NULL;
-//     *ierr = MPI_Init(&argc, &argv);
-// }
+MPI_Info get_c_info_from_fortran(int info) {
+    if (info == FORTRAN_MPI_INFO_NULL) {
+        return MPI_INFO_NULL;
+    } else {
+        return MPI_Info_f2c(info);
+    }
+}
+
+MPI_Comm get_c_comm_from_fortran(int comm_f) {
+    if (comm_f == FORTRAN_MPI_COMM_WORLD) {
+        return MPI_COMM_WORLD;
+    } else {
+        return MPI_Comm_f2c(comm_f);
+    }
+}
 
 void mpi_comm_size_wrapper(int *comm_f, int *size, int *ierr) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     *ierr = MPI_Comm_size(comm, size);
 }
 
 void mpi_bcast_int_wrapper(int *buffer, int *count, int *datatype_f, int *root, int *comm_f, int *ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     MPI_Datatype datatype;
     switch (*datatype_f) {
         case 2:
@@ -36,7 +48,7 @@ void mpi_bcast_int_wrapper(int *buffer, int *count, int *datatype_f, int *root, 
 }
 
 void mpi_bcast_real_wrapper(double *buffer, int *count, int *datatype_f, int *root, int *comm_f, int *ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     MPI_Datatype datatype;
     switch (*datatype_f) {
         case 0:
@@ -55,7 +67,7 @@ void mpi_bcast_real_wrapper(double *buffer, int *count, int *datatype_f, int *ro
 void mpi_allgather_int_wrapper(const int *sendbuf, int *sendcount, int *sendtype_f,
                                int *recvbuf, int *recvcount, int *recvtype_f, 
                                int *comm_f, int *ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
 
     MPI_Datatype sendtype, recvtype;
     switch (*sendtype_f) {
@@ -83,7 +95,7 @@ void mpi_allgather_int_wrapper(const int *sendbuf, int *sendcount, int *sendtype
 void mpi_allgather_real_wrapper(const double *sendbuf, int *sendcount, int *sendtype_f,
                                double *recvbuf, int *recvcount, int *recvtype_f, 
                                int *comm_f, int *ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
 
     MPI_Datatype sendtype, recvtype;
     switch (*sendtype_f) {
@@ -117,7 +129,7 @@ void mpi_allgather_real_wrapper(const double *sendbuf, int *sendcount, int *send
 void mpi_isend_wrapper(const double *buf, int *count, int *datatype_f,
                         int *dest, int *tag, int *comm_f, int *request_f,
                         int *ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     MPI_Datatype datatype;
     switch (*datatype_f) {
         case 0:
@@ -139,7 +151,7 @@ void mpi_isend_wrapper(const double *buf, int *count, int *datatype_f,
 void mpi_irecv_wrapper(double *buf, int *count, int *datatype_f,
                         int *source, int *tag, int *comm_f, int *request_f,
                         int *ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     MPI_Datatype datatype;
     switch (*datatype_f) {
         case 0:
@@ -160,7 +172,7 @@ void mpi_irecv_wrapper(double *buf, int *count, int *datatype_f,
 
 void mpi_allreduce_wrapper_real(const double *sendbuf, double *recvbuf, int *count,
                             int *datatype_f, int *op_f, int *comm_f, int *ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     MPI_Datatype datatype;
     switch (*datatype_f) {
         case 0:
@@ -193,7 +205,7 @@ void mpi_allreduce_wrapper_real(const double *sendbuf, double *recvbuf, int *cou
 
 void mpi_allreduce_wrapper_int(const int *sendbuf, int *recvbuf, int *count,
                             int *datatype_f, int *op_f, int *comm_f, int *ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     MPI_Datatype datatype;
     datatype = MPI_INT;
 
@@ -207,21 +219,22 @@ void mpi_allreduce_wrapper_int(const int *sendbuf, int *recvbuf, int *count,
 }
 
 void mpi_barrier_wrapper(int *comm_f, int *ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     *ierror = MPI_Barrier(comm);
 }
 
 void mpi_comm_rank_wrapper(int *comm_f, int *rank, int *ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     *ierror = MPI_Comm_rank(comm, rank);
 }
 
 void mpi_comm_split_type_wrapper(int *comm_f, int *split_type, int *key,
                                 int *info_f, int *newcomm_f, int *ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
-    MPI_Info info = MPI_Info_f2c(*info_f);
-    MPI_Comm newcomm = MPI_Comm_f2c(*newcomm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
+    MPI_Info info = get_c_info_from_fortran(*info_f);
+    MPI_Comm newcomm;
     *ierror = MPI_Comm_split_type( comm, *split_type, *key , info, &newcomm);
+    *newcomm_f = MPI_Comm_c2f(newcomm);
 }
 
 void mpi_recv_wrapper(double *buf, int *count, int *datatype_f, int *source,
@@ -239,7 +252,7 @@ void mpi_recv_wrapper(double *buf, int *count, int *datatype_f, int *source,
             return;
     }
 
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     MPI_Status status;
     *ierror = MPI_Recv(buf, *count, datatype, *source, *tag, comm, &status);
     if (*ierror == MPI_SUCCESS) {
@@ -289,26 +302,26 @@ void mpi_ssend_wrapper(double *buf, int *count, int *datatype_f, int *dest,
             return;
     }
 
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     *ierror = MPI_Ssend(buf, *count, datatype, *dest, *tag, comm);
 }
 
 void mpi_cart_create_wrapper(int * comm_f, int * ndims, int * dims, int * periods, int * reorder, int * newcomm_f, int * ierror){
     MPI_Comm newcomm = MPI_COMM_NULL;
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     *ierror = MPI_Cart_create(comm, *ndims, dims, periods, *reorder, &newcomm);
     *newcomm_f = MPI_Comm_c2f(newcomm);
 }
 
 void mpi_cart_coords_wrapper(int * comm_f, int * rank, int * maxdims, int * coords, int * ierror)
 {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     *ierror = MPI_Cart_coords(comm, *rank, *maxdims, coords);
 }
 
 void mpi_cart_shift_wrapper(int * comm_f, int * dir, int * disp, int * rank_source, int * rank_dest, int * ierror)
 {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     *ierror = MPI_Cart_shift(comm, *dir, *disp, rank_source, rank_dest);
 }
 
@@ -318,7 +331,7 @@ void mpi_dims_create_wrapper(int * nnodes, int * ndims, int * dims, int * ierror
 }
 
 void mpi_cart_sub_wrapper(int *  comm_f, int * rmains_dims, int * newcomm_f, int * ierror) {
-    MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     MPI_Comm newcomm = MPI_COMM_NULL;
     *ierror = MPI_Cart_sub(comm, rmains_dims, &newcomm);
     *newcomm_f = MPI_Comm_c2f(newcomm);
