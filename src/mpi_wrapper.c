@@ -24,19 +24,6 @@ MPI_Op get_c_op_from_fortran(int op) {
     }
 }
 
-// MPI_Datatype get_c_datatype_from_fortran(int datatype) {
-//     if (datatype == 2) {
-//         return MPI_Int;
-//     } else if (datatype == 0) {
-//         return MPI_FLOAT;
-//     } else if (datatype == 1) {
-//         return MPI_DOUBLE;
-//     } else {
-//         printf("Unsupported datatype provided\n");
-//         exit 1;
-//     }
-// }
-
 MPI_Comm get_c_comm_from_fortran(int comm_f) {
     if (comm_f == FORTRAN_MPI_COMM_WORLD) {
         return MPI_COMM_WORLD;
@@ -361,8 +348,8 @@ void mpi_cart_sub_wrapper(int *  comm_f, int * rmains_dims, int * newcomm_f, int
 }
 
 void mpi_reduce_wrapper(const int* sendbuf, int* recvbuf, int* count, int* datatype_f,
-    int* op_f, int* root, int* comm_f, int* ierror
-) {
+                        int* op_f, int* root, int* comm_f, int* ierror)
+{
     MPI_Datatype datatype;
     switch (*datatype_f) {
         case 2:

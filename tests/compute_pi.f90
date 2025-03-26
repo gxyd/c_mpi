@@ -47,6 +47,10 @@ program compute_pi
         print *, 'Number of processes:', num_procs
         print *, 'Total number of points:', total_N
         print *, 'Approximation of pi:', pi_approx
+        ! ensure the computed pi is within a reasonable range
+        if (pi_approx < 3.1d0 .or. pi_approx > 3.2d0) then
+            error stop 'Computed pi value is out of expected range (3.1 to 3.2)!'
+        end if
     end if
 
     ! Finalize MPI
