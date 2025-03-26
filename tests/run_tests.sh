@@ -9,6 +9,21 @@ NC='\033[0m' # No Color
 
 MPIEXEC=${CONDA_PREFIX}/bin/mpiexec
 
+# Detect MPI implementation
+# NOTE: I've noticed that using '--oversubscribe' with Open MPI takes a
+# lot of time to run on local machine, than without it
+MPI_VERSION=$($MPIEXEC --version 2>&1)
+if echo "$MPI_VERSION" | grep -q "Open MPI"; then
+  MPI_TYPE="openmpi"
+  MPIEXEC_ARGS="--oversubscribe"
+elif echo "$MPI_VERSION" | grep -q "MPICH"; then
+  MPI_TYPE="mpich"
+  MPIEXEC_ARGS=""  # MPICH usually allows oversubscription by default
+else
+  echo -e "${RED}Unknown MPI implementation!${NC}"
+  exit 1
+fi
+
 if [[ "$(uname)" == "Linux" ]]; then
   CC=gcc
 else
@@ -28,7 +43,7 @@ for file in *.f90; do
 
   for np in 1 2 4; do
     echo -e "${YELLOW}Running $filename with $np MPI ranks...${NC}"
-    if ${MPIEXEC} -np $np ./$filename; then
+    if ${MPIEXEC} -np $np $MPIEXEC_ARGS ./$filename; then
       echo -e "${GREEN}Test $filename with $np MPI ranks PASSED!${NC}"
     else
       echo -e "${RED}Test $filename with $np MPI ranks FAILED!${NC}"
