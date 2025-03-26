@@ -9,17 +9,15 @@ NC='\033[0m' # No Color
 
 MPIEXEC=${CONDA_PREFIX}/bin/mpiexec
 
-# Detect MPI implementation
-# NOTE: I've noticed that using '--oversubscribe' with Open MPI takes a
-# lot of time to run on local machine, than without it
+# detect MPI implementation
 MPI_VERSION=$($MPIEXEC --version 2>&1)
 if echo "$MPI_VERSION" | grep -q "Open MPI"; then
   MPI_TYPE="openmpi"
-  MPIEXEC_ARGS="--oversubscribe"
 elif echo "$MPI_VERSION" | grep -q "MPICH"; then
   MPI_TYPE="mpich"
-  MPIEXEC_ARGS=""  # MPICH usually allows oversubscription by default
 else
+  # we don't yet support other MPI implementations
+  # like intel MPI etc.0
   echo -e "${RED}Unknown MPI implementation!${NC}"
   exit 1
 fi
@@ -30,7 +28,7 @@ else
   CC=clang
 fi
 
-# Compile C and Fortran sources
+# compile C and Fortran sources
 $CC -I$CONDA_PREFIX/include -c ../src/mpi_wrapper.c
 $FC -c ../src/mpi_c_bindings.f90
 $FC -c ../src/mpi.f90
@@ -42,6 +40,15 @@ for file in *.f90; do
   $FC mpi_wrapper.o mpi_c_bindings.o mpi.o $filename.o -o $filename -L$CONDA_PREFIX/lib -lmpi -Wl,-rpath,$CONDA_PREFIX/lib
 
   for np in 1 2 4; do
+    # set MPIEXEC_ARGS based on MPI type and number of ranks
+    # `--oversubscribe` isn't needed with Open MPI when running
+    # with 1 or 2 ranks
+    if [[ "$MPI_TYPE" == "openmpi" && $np -gt 2 ]]; then
+      MPIEXEC_ARGS="--oversubscribe"
+    else
+      MPIEXEC_ARGS=""
+    fi
+
     echo -e "${YELLOW}Running $filename with $np MPI ranks...${NC}"
     if ${MPIEXEC} -np $np $MPIEXEC_ARGS ./$filename; then
       echo -e "${GREEN}Test $filename with $np MPI ranks PASSED!${NC}"
