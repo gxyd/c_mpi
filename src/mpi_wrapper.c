@@ -15,6 +15,19 @@ MPI_Info get_c_info_from_fortran(int info) {
     }
 }
 
+// MPI_Datatype get_c_datatype_from_fortran(int datatype) {
+//     if (datatype == 2) {
+//         return MPI_Int;
+//     } else if (datatype == 0) {
+//         return MPI_FLOAT;
+//     } else if (datatype == 1) {
+//         return MPI_DOUBLE;
+//     } else {
+//         printf("Unsupported datatype provided\n");
+//         exit 1;
+//     }
+// }
+
 MPI_Comm get_c_comm_from_fortran(int comm_f) {
     if (comm_f == FORTRAN_MPI_COMM_WORLD) {
         return MPI_COMM_WORLD;
@@ -336,4 +349,27 @@ void mpi_cart_sub_wrapper(int *  comm_f, int * rmains_dims, int * newcomm_f, int
     MPI_Comm newcomm = MPI_COMM_NULL;
     *ierror = MPI_Cart_sub(comm, rmains_dims, &newcomm);
     *newcomm_f = MPI_Comm_c2f(newcomm);
+}
+
+void mpi_reduce_wrapper(const int* sendbuf, int* recvbuf, int* count, int* datatype_f,
+    int* op_f, int* root, int* comm_f, int* ierror
+) {
+    MPI_Datatype datatype;
+    switch (*datatype_f) {
+        case 2:
+            datatype = MPI_INT;
+            break;
+        case 0:
+            datatype = MPI_FLOAT;
+            break;
+        case 1:
+            datatype = MPI_DOUBLE;
+            break;
+        default:
+            *ierror = -1;
+            return;
+    }
+    MPI_Op op = MPI_Op_f2c(*op_f);
+    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
+    *ierror = MPI_Reduce(sendbuf, recvbuf, *count, datatype, op, *root, comm);
 }
