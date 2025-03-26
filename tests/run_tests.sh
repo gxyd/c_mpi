@@ -20,6 +20,7 @@ $CC -I$CONDA_PREFIX/include -c ../src/mpi_wrapper.c
 $FC -c ../src/mpi_c_bindings.f90
 $FC -c ../src/mpi.f90
 
+start_time=$(date +%s)
 for file in *.f90; do
   filename=$(basename "$file" .f90)
   echo -e "${YELLOW}Compiling $filename...${NC}"
@@ -37,5 +38,11 @@ for file in *.f90; do
   done
 
 done
+
+end_time=$(date +%s)
+elapsed_time=$((end_time - start_time))
+echo ""
+echo -e "${YELLOW}... Running standalone tests took ${elapsed_time} seconds ...${NC}"
+echo ""
 
 git clean -dfx
