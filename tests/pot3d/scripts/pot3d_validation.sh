@@ -49,6 +49,7 @@ else
   echo " "
   echo "RUN1 BP: $bp1"
   echo "RUN2 BP: $bp2"
+  exit 1
 fi
 
 exit 0
