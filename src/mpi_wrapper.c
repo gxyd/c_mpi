@@ -6,12 +6,21 @@
 #define FORTRAN_MPI_COMM_WORLD -1000
 #define FORTRAN_MPI_INFO_NULL -2000
 #define FORTRAN_MPI_IN_PLACE -1002
+#define FORTRAN_MPI_SUM -2300
 
 MPI_Info get_c_info_from_fortran(int info) {
     if (info == FORTRAN_MPI_INFO_NULL) {
         return MPI_INFO_NULL;
     } else {
         return MPI_Info_f2c(info);
+    }
+}
+
+MPI_Op get_c_op_from_fortran(int op) {
+    if (op == FORTRAN_MPI_SUM) {
+        return MPI_SUM;
+    } else {
+        return MPI_Op_f2c(op);
     }
 }
 
@@ -369,7 +378,7 @@ void mpi_reduce_wrapper(const int* sendbuf, int* recvbuf, int* count, int* datat
             *ierror = -1;
             return;
     }
-    MPI_Op op = MPI_Op_f2c(*op_f);
+    MPI_Op op = get_c_op_from_fortran(*op_f);
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     *ierror = MPI_Reduce(sendbuf, recvbuf, *count, datatype, op, *root, comm);
 }

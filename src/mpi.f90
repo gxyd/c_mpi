@@ -11,7 +11,7 @@ module mpi
 
     integer, parameter :: MPI_COMM_WORLD = -1000
     real(8), parameter :: MPI_IN_PLACE = -1002
-    integer, parameter :: MPI_SUM = 1
+    integer, parameter :: MPI_SUM = -2300
     integer, parameter :: MPI_INFO_NULL = -2000
     integer :: MPI_STATUS_IGNORE = 0
     ! NOTE: I've no idea for how to implement this, refer
