@@ -5,6 +5,7 @@
 #define MPI_STATUS_SIZE 5
 #define FORTRAN_MPI_COMM_WORLD -1000
 #define FORTRAN_MPI_INFO_NULL -2000
+#define FORTRAN_MPI_IN_PLACE -1002
 
 MPI_Info get_c_info_from_fortran(int info) {
     if (info == FORTRAN_MPI_INFO_NULL) {
@@ -196,7 +197,7 @@ void mpi_allreduce_wrapper_real(const double *sendbuf, double *recvbuf, int *cou
     2. the first argument (i.e. sendbuf) as "MPI_IN_PLACE" for now as it's always
        used as such in POT3D codebase
     */
-   if (*sendbuf == -1) {
+   if (*sendbuf == FORTRAN_MPI_IN_PLACE) {
         *ierror = MPI_Allreduce(MPI_IN_PLACE , recvbuf, *count, datatype, MPI_SUM, comm);
    } else {
         *ierror = MPI_Allreduce(sendbuf , recvbuf, *count, datatype, MPI_SUM, comm);
@@ -211,10 +212,10 @@ void mpi_allreduce_wrapper_int(const int *sendbuf, int *recvbuf, int *count,
 
     MPI_Op op = MPI_Op_f2c(*op_f);
 
-    if (*sendbuf == -1) {
-    *ierror = MPI_Allreduce(MPI_IN_PLACE , recvbuf, *count, datatype, MPI_SUM, comm);
+    if (*sendbuf == FORTRAN_MPI_IN_PLACE) {
+        *ierror = MPI_Allreduce(MPI_IN_PLACE , recvbuf, *count, datatype, MPI_SUM, comm);
     } else {
-    *ierror = MPI_Allreduce(sendbuf , recvbuf, *count, datatype, MPI_SUM, comm);
+        *ierror = MPI_Allreduce(sendbuf , recvbuf, *count, datatype, MPI_SUM, comm);
     }
 }
 
