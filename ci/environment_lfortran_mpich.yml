@@ -3,6 +3,4 @@ channels:
   - conda-forge
 dependencies:
   - lfortran=0.49.0
-  - make
-  - cmake
   - mpich=4.3.0

@@ -44,5 +44,3 @@ elapsed_time=$((end_time - start_time))
 echo ""
 echo -e "${YELLOW}... Running standalone tests took ${elapsed_time} seconds ...${NC}"
 echo ""
-
-git clean -dfx
