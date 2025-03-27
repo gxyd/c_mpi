@@ -213,5 +213,13 @@ module mpi_c_bindings
             integer(c_int), intent(in) :: remain_dims(*)
             integer(c_int), intent(out) :: newcomm, ierror
         end subroutine
+
+        subroutine c_mpi_reduce(sendbuf, recvbuf, count, datatype, op, root, comm, ierror) bind(C, name="mpi_reduce_wrapper")
+            use iso_c_binding, only: c_int
+            integer(c_int), intent(in) :: sendbuf
+            integer(c_int), intent(out) :: recvbuf
+            integer(c_int), intent(in) :: count, datatype, op, root, comm
+            integer(c_int), intent(out), optional :: ierror
+        end subroutine
     end interface
 end module mpi_c_bindings

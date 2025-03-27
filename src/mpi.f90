@@ -11,7 +11,7 @@ module mpi
 
     integer, parameter :: MPI_COMM_WORLD = -1000
     real(8), parameter :: MPI_IN_PLACE = -1002
-    integer, parameter :: MPI_SUM = 1
+    integer, parameter :: MPI_SUM = -2300
     integer, parameter :: MPI_INFO_NULL = -2000
     integer :: MPI_STATUS_IGNORE = 0
     ! NOTE: I've no idea for how to implement this, refer
@@ -108,6 +108,10 @@ module mpi
 
     interface MPI_Cart_coords
         module procedure MPI_Cart_coords_proc
+    end interface
+
+    interface MPI_Reduce
+        module procedure MPI_Reduce_scalar_int
     end interface
 
    contains
@@ -427,5 +431,17 @@ module mpi
             remain_dims_i = 0
         end where
         call c_mpi_cart_sub(comm, remain_dims_i, newcomm, ierror)
+    end subroutine
+
+    subroutine MPI_Reduce_scalar_int(sendbuf, recvbuf, count, datatype, op, root, comm, ierror)
+        use mpi_c_bindings, only: c_mpi_reduce
+        integer, intent(in) :: sendbuf
+        integer, intent(out) :: recvbuf
+        integer, intent(in) :: count, root
+        integer, intent(in) :: datatype
+        integer, intent(in) :: op
+        integer, intent(in) :: comm
+        integer, intent(out), optional :: ierror
+        call c_mpi_reduce(sendbuf, recvbuf, count, datatype, op, root, comm, ierror)
     end subroutine
 end module mpi
