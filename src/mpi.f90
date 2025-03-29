@@ -9,7 +9,7 @@ module mpi
     integer, parameter :: MPI_PROC_NULL = -1
     integer, parameter :: MPI_SUCCESS = 0
 
-    integer, parameter :: MPI_COMM_WORLD = -1000
+    integer, parameter :: MPI_COMM_WORLD = 91
     real(8), parameter :: MPI_IN_PLACE = -1002
     integer, parameter :: MPI_SUM = -2300
     integer, parameter :: MPI_INFO_NULL = -2000
