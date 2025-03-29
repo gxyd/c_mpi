@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #define MPI_STATUS_SIZE 5
-#define FORTRAN_MPI_COMM_WORLD -1000
+#define FORTRAN_MPI_COMM_WORLD 91
 #define FORTRAN_MPI_INFO_NULL -2000
 #define FORTRAN_MPI_IN_PLACE -1002
 #define FORTRAN_MPI_SUM -2300
@@ -228,10 +228,10 @@ void mpi_allreduce_wrapper_int(const int *sendbuf, int *recvbuf, int *count,
     }
 }
 
-void mpi_barrier_wrapper(int *comm_f, int *ierror) {
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    *ierror = MPI_Barrier(comm);
-}
+// void mpi_barrier_wrapper(int *comm_f, int *ierror) {
+//     MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+//     *ierror = MPI_Barrier(comm);
+// }
 
 void mpi_comm_rank_wrapper(int *comm_f, int *rank, int *ierror) {
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
