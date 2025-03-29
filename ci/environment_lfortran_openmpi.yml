@@ -2,5 +2,5 @@ name: c_openmpi_lfortran_env
 channels:
   - conda-forge
 dependencies:
-  - lfortran=0.49.0
+  - lfortran=0.50.0
   - openmpi=5.0.6
