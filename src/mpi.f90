@@ -1,10 +1,11 @@
 module mpi
     implicit none
     integer, parameter :: MPI_THREAD_FUNNELED = 1
-    ! not sure if this is correct really
-    integer, parameter :: MPI_INTEGER = 2
-    integer, parameter :: MPI_REAL4 = 0
-    integer, parameter :: MPI_REAL8 = 1
+
+    integer, parameter :: MPI_INTEGER = -10002
+    integer, parameter :: MPI_REAL4 = -10013
+    integer, parameter :: MPI_REAL8 = -10014
+
     integer, parameter :: MPI_COMM_TYPE_SHARED = 1
     integer, parameter :: MPI_PROC_NULL = -1
     integer, parameter :: MPI_SUCCESS = 0

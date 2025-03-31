@@ -10,9 +10,9 @@
 
 #define FORTRAN_MPI_SUM -2300
 
-#define FORTRAN_MPI_INTEGER 2
-#define FORTRAN_MPI_REAL4 0
-#define FORTRAN_MPI_REAL8 1
+#define FORTRAN_MPI_INTEGER -10002
+#define FORTRAN_MPI_REAL4 -10013
+#define FORTRAN_MPI_REAL8 -10014
 
 
 MPI_Datatype get_c_datatype_from_fortran(int datatype) {
