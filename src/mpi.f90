@@ -470,11 +470,21 @@ module mpi
     end subroutine
 
     subroutine MPI_Dims_create_proc(nnodes, ndims, dims, ierror)
+        use iso_c_binding, only: c_int, c_ptr
         use mpi_c_bindings, only: c_mpi_dims_create
         integer, intent(in) :: nnodes, ndims
         integer, intent(out) :: dims(ndims)
         integer, optional, intent(out) :: ierror
-        call c_mpi_dims_create(nnodes, ndims, dims, ierror)
+        integer(c_int) :: local_ierr
+
+        local_ierr = c_mpi_dims_create(nnodes, ndims, dims)
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Dims_create failed with error code: ", local_ierr
+            end if
+        end if
     end subroutine
 
     subroutine MPI_Cart_sub_proc (comm, remain_dims, newcomm, ierror)
