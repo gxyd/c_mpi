@@ -38,8 +38,8 @@ module mpi
     end interface MPI_Comm_size
 
     interface MPI_Bcast
-        module procedure MPI_Bcast_int
-        module procedure MPI_Bcast_real
+        module procedure MPI_Bcast_int_scalar
+        module procedure MPI_Bcast_real_2D
     end interface MPI_Bcast
 
     interface MPI_Allgather
@@ -199,7 +199,7 @@ module mpi
         end if
     end subroutine
 
-    subroutine MPI_Bcast_int(buffer, count, datatype, root, comm, ierror)
+    subroutine MPI_Bcast_int_scalar(buffer, count, datatype, root, comm, ierror)
         use mpi_c_bindings, only: c_mpi_bcast, c_mpi_comm_f2c, c_mpi_datatype_f2c
         use iso_c_binding, only: c_int, c_ptr, c_loc
         integer, target :: buffer
@@ -223,9 +223,9 @@ module mpi
                 print *, "MPI_Bcast_int failed with error code: ", local_ierr
             end if
         end if
-    end subroutine MPI_Bcast_int
+    end subroutine MPI_Bcast_int_scalar
 
-    subroutine MPI_Bcast_real(buffer, count, datatype, root, comm, ierror)
+    subroutine MPI_Bcast_real_2D(buffer, count, datatype, root, comm, ierror)
         use mpi_c_bindings, only: c_mpi_bcast, c_mpi_comm_f2c, c_mpi_datatype_f2c
         use iso_c_binding, only: c_int, c_ptr, c_loc
         real(8), dimension(:, :), target :: buffer
@@ -249,7 +249,7 @@ module mpi
                 print *, "MPI_Bcast_real failed with error code: ", local_ierr
             end if
         end if
-    end subroutine MPI_Bcast_real
+    end subroutine MPI_Bcast_real_2D
 
     subroutine MPI_Allgather_int(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm, ierror)
         use mpi_c_bindings, only: c_mpi_allgather_int
