@@ -3,10 +3,33 @@
 #include <stdio.h>
 
 #define MPI_STATUS_SIZE 5
+
 #define FORTRAN_MPI_COMM_WORLD -1000
 #define FORTRAN_MPI_INFO_NULL -2000
 #define FORTRAN_MPI_IN_PLACE -1002
+
 #define FORTRAN_MPI_SUM -2300
+
+#define FORTRAN_MPI_INTEGER 2
+#define FORTRAN_MPI_REAL4 0
+#define FORTRAN_MPI_REAL8 1
+
+
+MPI_Datatype get_c_datatype_from_fortran(int datatype) {
+    MPI_Datatype c_datatype;
+    switch (datatype) {
+        case FORTRAN_MPI_REAL4:
+            c_datatype = MPI_FLOAT;
+            break;
+        case FORTRAN_MPI_REAL8:
+            c_datatype = MPI_DOUBLE;
+            break;
+        case FORTRAN_MPI_INTEGER:
+            c_datatype = MPI_INT;
+            break;
+    }
+    return c_datatype;
+}
 
 MPI_Info get_c_info_from_fortran(int info) {
     if (info == FORTRAN_MPI_INFO_NULL) {
