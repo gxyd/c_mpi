@@ -400,15 +400,20 @@ module mpi
         call c_mpi_ssend(buf, count, datatype, dest, tag, comm, ierror)
     end subroutine
 
-    subroutine MPI_Cart_create_proc(comm, ndims, dims, periods, reorder, newcomm, ierror)
-        use mpi_c_bindings, only: c_mpi_cart_create
-        use iso_c_binding, only: c_int
+    subroutine MPI_Cart_create_proc(comm_old, ndims, dims, periods, reorder, comm_cart, ierror)
+        use iso_c_binding, only: c_int, c_ptr
+        use mpi_c_bindings, only: c_mpi_cart_create, c_mpi_comm_f2c, c_mpi_comm_c2f
         integer, intent(in) :: ndims, dims(ndims)
         logical, intent(in) :: periods(ndims), reorder
-        integer, intent(in) :: comm
-        integer, intent(out) :: newcomm
+        integer, intent(in) :: comm_old
+        integer, intent(out) :: comm_cart
         integer, optional, intent(out) :: ierror
         integer(c_int) :: ndims_c, reorder_c, dims_c(ndims), periods_c(ndims)
+        type(c_ptr) :: c_comm_old
+        type(c_ptr) :: c_comm_cart
+        integer(c_int) :: local_ierr
+
+        c_comm_old = c_mpi_comm_f2c(comm_old)
             ndims_c = ndims
             if (reorder) then
                 reorder_c = 1
@@ -421,7 +426,16 @@ module mpi
             elsewhere
                 periods_c = 0
             end where
-        call c_mpi_cart_create(comm, ndims, dims_c, periods_c, reorder_c, newcomm, ierror)
+        local_ierr = c_mpi_cart_create(c_comm_old, ndims, dims_c, periods_c, reorder_c, c_comm_cart)
+        comm_cart = c_mpi_comm_c2f(c_comm_cart)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Cart_create failed with error code: ", local_ierr
+            end if
+        end if
     end subroutine
 
     subroutine MPI_Cart_coords_proc(comm, rank, maxdims, coords, ierror)

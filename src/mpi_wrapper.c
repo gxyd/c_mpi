@@ -206,13 +206,6 @@ void mpi_ssend_wrapper(double *buf, int *count, int *datatype_f, int *dest,
     *ierror = MPI_Ssend(buf, *count, datatype, *dest, *tag, comm);
 }
 
-void mpi_cart_create_wrapper(int * comm_f, int * ndims, int * dims, int * periods, int * reorder, int * newcomm_f, int * ierror){
-    MPI_Comm newcomm = MPI_COMM_NULL;
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    *ierror = MPI_Cart_create(comm, *ndims, dims, periods, *reorder, &newcomm);
-    *newcomm_f = MPI_Comm_c2f(newcomm);
-}
-
 void mpi_cart_shift_wrapper(int * comm_f, int * dir, int * disp, int * rank_source, int * rank_dest, int * ierror)
 {
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
