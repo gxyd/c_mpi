@@ -297,7 +297,7 @@ module mpi
 
     subroutine MPI_Irecv_proc(buf, count, datatype, source, tag, comm, request, ierror)
         use iso_c_binding, only: c_int, c_ptr
-        use mpi_c_bindings, only: c_mpi_irecv, c_mpi_comm_f2c, get_c_datatype_from_fortran, c_mpi_request_c2f
+        use mpi_c_bindings, only: c_mpi_irecv, c_mpi_comm_f2c, c_mpi_datatype_f2c, c_mpi_request_c2f
         real(8), dimension(:,:) :: buf
         integer, intent(in) :: count, source, tag
         integer, intent(in) :: datatype
@@ -310,7 +310,7 @@ module mpi
         type(c_ptr) :: c_request
 
         c_comm = c_mpi_comm_f2c(comm)
-        c_datatype = get_c_datatype_from_fortran(datatype)
+        c_datatype = c_mpi_datatype_f2c(datatype)
         local_ierr = c_mpi_irecv(buf, count, c_datatype, source, tag, c_comm, c_request)
         request = c_mpi_request_c2f(c_request)
 
