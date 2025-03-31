@@ -144,12 +144,12 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_barrier
         end function c_mpi_barrier
 
-        subroutine c_mpi_comm_rank(comm, rank, ierror) bind(C, name="mpi_comm_rank_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int), intent(in) :: comm
+        function c_mpi_comm_rank(comm, rank) bind(C, name="MPI_Comm_rank")
+            use iso_c_binding, only: c_int, c_ptr
+            type(c_ptr), value :: comm
             integer(c_int), intent(out) :: rank
-            integer(c_int), optional, intent(out) :: ierror
-        end subroutine
+            integer(c_int) :: c_mpi_comm_rank
+        end function c_mpi_comm_rank
 
         subroutine c_mpi_comm_split_type(comm, split_type, key, info, newcomm, ierror) bind(C, name="mpi_comm_split_type_wrapper")
             use iso_c_binding, only: c_int
