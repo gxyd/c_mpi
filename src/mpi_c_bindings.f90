@@ -14,12 +14,6 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_comm_c2f
         end function
 
-        function get_c_datatype_from_fortran(datatype) bind(C, name="get_c_datatype_from_fortran")
-            use iso_c_binding, only: c_int, c_ptr
-            integer(c_int), value :: datatype
-            type(c_ptr) :: get_c_datatype_from_fortran
-        end function get_c_datatype_from_fortran
-
         function c_mpi_request_c2f(request) bind(C, name="MPI_Request_c2f")
             use iso_c_binding, only: c_int, c_ptr
             type(c_ptr), value :: request
