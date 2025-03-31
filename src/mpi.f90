@@ -178,17 +178,21 @@ module mpi
         end if
     end subroutine
 
-    subroutine MPI_Comm_size_proc(comm, size, ierr)
-        use mpi_c_bindings, only: c_mpi_comm_size
+    subroutine MPI_Comm_size_proc(comm, size, ierror)
+        use mpi_c_bindings, only: c_mpi_comm_size, c_mpi_comm_f2c
+        use iso_c_binding, only: c_int, c_ptr
         integer, intent(in) :: comm
         integer, intent(out) :: size
-        integer, optional, intent(out) :: ierr
+        integer, optional, intent(out) :: ierror
         integer :: local_ierr
-        if (present(ierr)) then
-            call c_mpi_comm_size(comm, size, ierr)
+        type(c_ptr) :: c_comm
+
+        c_comm = c_mpi_comm_f2c(comm)
+        local_ierr = c_mpi_comm_size(c_comm, size)
+        if (present(ierror)) then
+            ierror = local_ierr
         else
-            call c_mpi_comm_size(comm, size, local_ierr)
-            if (local_ierr /= 0) then
+            if (local_ierr /= MPI_SUCCESS) then
                 print *, "MPI_Comm_size failed with error code: ", local_ierr
             end if
         end if

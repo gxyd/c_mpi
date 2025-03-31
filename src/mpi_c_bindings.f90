@@ -2,6 +2,12 @@ module mpi_c_bindings
     implicit none
 
     interface
+        function c_mpi_comm_f2c(comm_f) bind(C, name="get_c_comm_from_fortran")
+            use iso_c_binding, only: c_int, c_ptr
+            integer(c_int), value :: comm_f
+            type(c_ptr) :: c_mpi_comm_f2c  ! MPI_Comm as pointer
+        end function c_mpi_comm_f2c
+
         function c_mpi_init(argc, argv) bind(C, name="MPI_Init")
             use iso_c_binding, only : c_int, c_ptr
             !> TODO: is the intent need to be explicitly specified
@@ -25,12 +31,12 @@ module mpi_c_bindings
             use iso_c_binding, only : c_int
         end function c_mpi_finalize
 
-        subroutine c_mpi_comm_size(comm, size, ierr) bind(C, name="mpi_comm_size_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int), intent(in) :: comm
+        function c_mpi_comm_size(comm, size) bind(C, name="MPI_Comm_size")
+            use iso_c_binding, only: c_int, c_ptr
+            type(c_ptr), value :: comm
             integer(c_int), intent(out) :: size
-            integer(c_int), intent(out) :: ierr
-        end subroutine c_mpi_comm_size
+            integer(c_int) :: c_mpi_comm_size
+        end function c_mpi_comm_size
 
         subroutine c_mpi_bcast_int(buffer, count, datatype, root, comm, ierror) bind(C, name="mpi_bcast_int_wrapper")
             use iso_c_binding, only: c_int
@@ -132,11 +138,6 @@ module mpi_c_bindings
             use iso_c_binding, only: c_double
             real(c_double) :: time
         end function
-        function c_mpi_comm_f2c(comm_f) bind(C, name="get_c_comm_from_fortran")
-            use iso_c_binding, only: c_int, c_ptr
-            integer(c_int), value :: comm_f
-            type(c_ptr) :: c_mpi_comm_f2c  ! MPI_Comm as pointer
-        end function c_mpi_comm_f2c
 
         function c_mpi_barrier(comm) bind(C, name="MPI_Barrier")
             use iso_c_binding, only: c_ptr, c_int
