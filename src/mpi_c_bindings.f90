@@ -195,11 +195,13 @@ module mpi_c_bindings
             integer(c_int), intent(out) :: newcomm, ierror
         end subroutine
 
-        subroutine c_mpi_cart_coords(comm, rank, maxdims, coords, ierror) bind(C, name="mpi_cart_coords_wrapper")
-            use iso_c_binding,  only: c_int
-            integer(c_int), intent(in) :: comm, rank, maxdims
-            integer(c_int), intent(out) :: coords(*), ierror
-        end subroutine 
+        function c_mpi_cart_coords(comm, rank, maxdims, coords) bind(C, name="MPI_Cart_coords")
+            use iso_c_binding,  only: c_int, c_ptr
+            type(c_ptr), value :: comm
+            integer(c_int), value :: rank, maxdims
+            integer(c_int), intent(out) :: coords(*)
+            integer(c_int) :: c_mpi_cart_coords
+        end function
 
         subroutine c_mpi_cart_shift(comm, direction, disp, rank_source, rank_dest, ierror) bind(C, name="mpi_cart_shift_wrapper")
             use iso_c_binding, only: c_int

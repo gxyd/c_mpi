@@ -308,12 +308,6 @@ void mpi_cart_create_wrapper(int * comm_f, int * ndims, int * dims, int * period
     *newcomm_f = MPI_Comm_c2f(newcomm);
 }
 
-void mpi_cart_coords_wrapper(int * comm_f, int * rank, int * maxdims, int * coords, int * ierror)
-{
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    *ierror = MPI_Cart_coords(comm, *rank, *maxdims, coords);
-}
-
 void mpi_cart_shift_wrapper(int * comm_f, int * dir, int * disp, int * rank_source, int * rank_dest, int * ierror)
 {
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
