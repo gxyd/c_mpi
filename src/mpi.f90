@@ -339,11 +339,24 @@ module mpi
     end subroutine MPI_Barrier_proc
 
     subroutine MPI_Comm_rank_proc(comm, rank, ierror)
-        use mpi_c_bindings, only: c_mpi_comm_rank
+        use iso_c_binding, only: c_int, c_ptr
+        use mpi_c_bindings, only: c_mpi_comm_rank, c_mpi_comm_f2c
         integer, intent(in) :: comm
         integer, intent(out) :: rank
         integer, optional, intent(out) :: ierror
-        call c_mpi_comm_rank(comm, rank, ierror)
+        type(c_ptr) :: c_comm
+        integer(c_int) :: local_ierr
+
+        c_comm = c_mpi_comm_f2c(comm)
+        local_ierr = c_mpi_comm_rank(c_comm, rank)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Comm_rank failed with error code: ", local_ierr
+            end if
+        end if
     end subroutine
 
     subroutine MPI_Comm_split_type_proc(comm, split_type, key, info, newcomm, ierror)
