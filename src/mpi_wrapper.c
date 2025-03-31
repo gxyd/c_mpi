@@ -200,7 +200,7 @@ void mpi_waitall_wrapper(int *count, int *array_of_requests_f,
 
 void mpi_ssend_wrapper(double *buf, int *count, int *datatype_f, int *dest,
                        int *tag, int *comm_f, int *ierror) {
-    MPI_Datatype datatype = get_c_comm_from_fortran(*datatype_f);
+    MPI_Datatype datatype = get_c_datatype_from_fortran(*datatype_f);
 
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     *ierror = MPI_Ssend(buf, *count, datatype, *dest, *tag, comm);

@@ -11,7 +11,19 @@ module mpi_c_bindings
         function c_mpi_comm_c2f(comm_c) bind(C, name="MPI_Comm_c2f")
             use iso_c_binding, only: c_int, c_ptr
             type(c_ptr), value :: comm_c
-            integer :: c_mpi_comm_c2f
+            integer(c_int) :: c_mpi_comm_c2f
+        end function
+
+        function get_c_datatype_from_fortran(datatype) bind(C, name="get_c_datatype_from_fortran")
+            use iso_c_binding, only: c_int, c_ptr
+            integer(c_int), value :: datatype
+            type(c_ptr) :: get_c_datatype_from_fortran
+        end function get_c_datatype_from_fortran
+
+        function c_mpi_request_c2f(request) bind(C, name="MPI_Request_c2f")
+            use iso_c_binding, only: c_int, c_ptr
+            type(c_ptr), value :: request
+            integer(c_int) :: c_mpi_request_c2f
         end function
 
         function c_mpi_init(argc, argv) bind(C, name="MPI_Init")
@@ -94,15 +106,15 @@ module mpi_c_bindings
             integer(c_int), optional, intent(out) :: ierror
         end subroutine
 
-        subroutine c_mpi_irecv(buf, count, datatype, source, tag, comm, request, ierror) bind(C, name="mpi_irecv_wrapper")
-            use iso_c_binding, only: c_int, c_double
-            real(c_double), dimension(*) :: buf
-            integer(c_int), intent(in) :: count, source, tag
-            integer(c_int), intent(in) :: datatype
-            integer(c_int), intent(in) :: comm
-            integer(c_int), intent(out) :: request
-            integer(c_int), optional, intent(out) :: ierror
-        end subroutine
+        function c_mpi_irecv(buf, count, datatype, source, tag, comm, request) bind(C, name="MPI_Irecv")
+            use iso_c_binding, only: c_int, c_double, c_ptr
+            real(c_double), dimension(*), intent(out) :: buf
+            integer(c_int), value :: count, source, tag
+            type(c_ptr), value :: datatype
+            type(c_ptr), value :: comm
+            type(c_ptr), intent(out) :: request
+            integer(c_int) :: c_mpi_irecv
+        end function
 
         subroutine c_mpi_allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm, ierror) &
                                                     bind(C, name="mpi_allreduce_wrapper_real")
