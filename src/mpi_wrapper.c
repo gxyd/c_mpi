@@ -228,10 +228,10 @@ void mpi_allreduce_wrapper_int(const int *sendbuf, int *recvbuf, int *count,
     }
 }
 
-void mpi_barrier_wrapper(int *comm_f, int *ierror) {
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    *ierror = MPI_Barrier(comm);
-}
+// void mpi_barrier_wrapper(int *comm_f, int *ierror) {
+//     MPI_Comm comm = MPI_Comm_f2c(*comm_f);
+//     *ierror = MPI_Barrier(comm);
+// }
 
 void mpi_comm_rank_wrapper(int *comm_f, int *rank, int *ierror) {
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);

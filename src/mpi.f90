@@ -314,11 +314,25 @@ module mpi
     end function
 
     subroutine MPI_Barrier_proc(comm, ierror)
-        use mpi_c_bindings, only: c_mpi_barrier
+        use mpi_c_bindings, only: c_mpi_barrier, c_mpi_comm_f2c
+        use iso_c_binding, only: c_int, c_ptr
         integer, intent(in) :: comm
         integer, intent(out), optional :: ierror
-        call c_mpi_barrier(comm, ierror)
-    end subroutine
+        type(c_ptr) :: c_comm
+        integer(c_int) :: local_ierr
+
+        ! Convert Fortran handle to C handle
+        c_comm = c_mpi_comm_f2c(comm)
+        local_ierr = c_mpi_barrier(c_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Barrier failed with error code: ", local_ierr
+            end if
+        end if
+    end subroutine MPI_Barrier_proc
 
     subroutine MPI_Comm_rank_proc(comm, rank, ierror)
         use mpi_c_bindings, only: c_mpi_comm_rank
