@@ -8,6 +8,12 @@ module mpi_c_bindings
             type(c_ptr) :: c_mpi_comm_f2c  ! MPI_Comm as pointer
         end function c_mpi_comm_f2c
 
+        function c_mpi_comm_c2f(comm_c) bind(C, name="MPI_Comm_c2f")
+            use iso_c_binding, only: c_int, c_ptr
+            type(c_ptr), value :: comm_c
+            integer :: c_mpi_comm_c2f
+        end function
+
         function c_mpi_init(argc, argv) bind(C, name="MPI_Init")
             use iso_c_binding, only : c_int, c_ptr
             !> TODO: is the intent need to be explicitly specified
@@ -188,12 +194,14 @@ module mpi_c_bindings
             integer(c_int), optional, intent(out) :: ierror
         end subroutine
 
-        subroutine c_mpi_cart_create(comm, ndims, dims, periods, reorder, newcomm, ierror) bind(C, name="mpi_cart_create_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int), intent(in) :: comm, ndims, reorder
+        function c_mpi_cart_create(comm_old, ndims, dims, periods, reorder, comm_cart) bind(C, name="MPI_Cart_create")
+            use iso_c_binding, only: c_int, c_ptr
+            type(c_ptr), value :: comm_old
+            integer(c_int), value :: ndims, reorder
             integer(c_int), intent(in) :: dims(*), periods(*)
-            integer(c_int), intent(out) :: newcomm, ierror
-        end subroutine
+            type(c_ptr), intent(out) :: comm_cart
+            integer(c_int) :: c_mpi_cart_create
+        end function
 
         function c_mpi_cart_coords(comm, rank, maxdims, coords) bind(C, name="MPI_Cart_coords")
             use iso_c_binding,  only: c_int, c_ptr
