@@ -141,11 +141,11 @@ module mpi
         integer, intent(out) :: provided
         integer, optional, intent(out) :: ierr
         integer(c_int) :: local_ierr
-        integer(c_int) :: argc = 0
+        integer(c_int) :: argc
         type(c_ptr) :: argv = c_null_ptr
         integer(c_int) :: c_required
         integer(c_int) :: c_provided
-
+        argc = 0
         ! Map Fortran MPI_THREAD_FUNNELED to C MPI_THREAD_FUNNELED if needed
         c_required = int(required, c_int)
 
