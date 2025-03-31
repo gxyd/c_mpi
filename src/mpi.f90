@@ -552,14 +552,34 @@ module mpi
     end subroutine
 
     subroutine MPI_Reduce_scalar_int(sendbuf, recvbuf, count, datatype, op, root, comm, ierror)
-        use mpi_c_bindings, only: c_mpi_reduce
-        integer, intent(in) :: sendbuf
-        integer, intent(out) :: recvbuf
-        integer, intent(in) :: count, root
-        integer, intent(in) :: datatype
-        integer, intent(in) :: op
-        integer, intent(in) :: comm
-        integer, intent(out), optional :: ierror
-        call c_mpi_reduce(sendbuf, recvbuf, count, datatype, op, root, comm, ierror)
-    end subroutine
+        use mpi_c_bindings, only: c_mpi_reduce, c_mpi_comm_f2c, c_mpi_datatype_f2c, c_mpi_op_f2c
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        integer, target, intent(in)  :: sendbuf
+        integer, target, intent(out) :: recvbuf
+        integer, intent(in)  :: count, datatype, op, root, comm
+        integer, optional, intent(out) :: ierror
+
+        type(c_ptr)    :: c_comm, c_dtype, c_op
+        type(c_ptr)    :: c_sendbuf, c_recvbuf
+        integer(c_int) :: local_ierr
+
+        ! Convert Fortran integer handles => C pointers
+        c_comm  = c_mpi_comm_f2c(comm)
+        c_dtype = c_mpi_datatype_f2c(datatype)
+        c_op    = c_mpi_op_f2c(op)
+
+        ! Pass pointer to the actual data
+        c_sendbuf = c_loc(sendbuf)
+        c_recvbuf = c_loc(recvbuf)
+
+        local_ierr = c_mpi_reduce(c_sendbuf, c_recvbuf, count, c_dtype, c_op, root, c_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Reduce failed with error code: ", local_ierr
+            end if
+        end if
+    end subroutine MPI_Reduce_scalar_int
 end module mpi
