@@ -209,11 +209,12 @@ module mpi_c_bindings
             integer(c_int), intent(out) :: rank_source, rank_dest, ierror
         end subroutine
 
-        subroutine c_mpi_dims_create(nnodes, ndims, dims, ierror) bind(C, name="mpi_dims_create_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int), intent(in) :: nnodes, ndims
-            integer(c_int), intent(inout) :: dims(*), ierror
-        end subroutine
+        function c_mpi_dims_create(nnodes, ndims, dims) bind(C, name="MPI_Dims_create")
+            use iso_c_binding, only: c_int, c_ptr
+            integer(c_int), value :: nnodes, ndims
+            integer(c_int), intent(inout) :: dims(*)
+            integer(c_int) :: c_mpi_dims_create
+        end function
 
         subroutine c_mpi_cart_sub(comm, remain_dims, newcomm, ierror) bind(C, name ="mpi_cart_sub_wrapper")
             use iso_c_binding, only: c_int

@@ -219,11 +219,6 @@ void mpi_cart_shift_wrapper(int * comm_f, int * dir, int * disp, int * rank_sour
     *ierror = MPI_Cart_shift(comm, *dir, *disp, rank_source, rank_dest);
 }
 
-void mpi_dims_create_wrapper(int * nnodes, int * ndims, int * dims, int * ierror)
-{
-    *ierror = MPI_Dims_create(*nnodes, *ndims, dims);
-}
-
 void mpi_cart_sub_wrapper(int *  comm_f, int * rmains_dims, int * newcomm_f, int * ierror) {
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     MPI_Comm newcomm = MPI_COMM_NULL;
