@@ -32,11 +32,6 @@ MPI_Comm get_c_comm_from_fortran(int comm_f) {
     }
 }
 
-void mpi_comm_size_wrapper(int *comm_f, int *size, int *ierr) {
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    *ierr = MPI_Comm_size(comm, size);
-}
-
 void mpi_bcast_int_wrapper(int *buffer, int *count, int *datatype_f, int *root, int *comm_f, int *ierror) {
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
     MPI_Datatype datatype;
