@@ -200,24 +200,56 @@ module mpi
     end subroutine
 
     subroutine MPI_Bcast_int(buffer, count, datatype, root, comm, ierror)
-        use mpi_c_bindings, only: c_mpi_bcast_int
-        integer :: buffer
+        use mpi_c_bindings, only: c_mpi_bcast, c_mpi_comm_f2c, c_mpi_datatype_f2c
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        integer, target :: buffer
         integer, intent(in) :: count, root
         integer, intent(in) :: datatype
         integer, intent(in) :: comm
         integer, optional, intent(out) :: ierror
-        call c_mpi_bcast_int(buffer, count, datatype, root, comm, ierror)
-    end subroutine
+        type(c_ptr) :: c_comm, c_datatype
+        integer :: local_ierr
+        type(c_ptr) :: buffer_ptr
+
+        c_comm = c_mpi_comm_f2c(comm)
+        c_datatype = c_mpi_datatype_f2c(datatype)   
+        buffer_ptr = c_loc(buffer)
+        local_ierr = c_mpi_bcast(buffer_ptr, count, c_datatype, root, c_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Bcast_int failed with error code: ", local_ierr
+            end if
+        end if
+    end subroutine MPI_Bcast_int
 
     subroutine MPI_Bcast_real(buffer, count, datatype, root, comm, ierror)
-        use mpi_c_bindings, only: c_mpi_bcast_real
-        real(8), dimension(:, :) :: buffer
+        use mpi_c_bindings, only: c_mpi_bcast, c_mpi_comm_f2c, c_mpi_datatype_f2c
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        real(8), dimension(:, :), target :: buffer
         integer, intent(in) :: count, root
         integer, intent(in) :: datatype
         integer, intent(in) :: comm
         integer, optional, intent(out) :: ierror
-        call c_mpi_bcast_real(buffer, count, datatype, root, comm, ierror)
-    end subroutine
+        type(c_ptr) :: c_comm, c_datatype
+        integer :: local_ierr
+        type(c_ptr) :: buffer_ptr
+
+        c_comm = c_mpi_comm_f2c(comm)
+        c_datatype = c_mpi_datatype_f2c(datatype)
+        buffer_ptr = c_loc(buffer)
+        local_ierr = c_mpi_bcast(buffer_ptr, count, c_datatype, root, c_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Bcast_real failed with error code: ", local_ierr
+            end if
+        end if
+    end subroutine MPI_Bcast_real
 
     subroutine MPI_Allgather_int(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm, ierror)
         use mpi_c_bindings, only: c_mpi_allgather_int
