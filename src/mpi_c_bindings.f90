@@ -26,6 +26,12 @@ module mpi_c_bindings
             type(c_ptr) :: c_mpi_datatype_f2c
         end function c_mpi_datatype_f2c
 
+        function c_mpi_op_f2c(op_f) bind(C, name="get_c_op_from_fortran")
+            use iso_c_binding, only: c_ptr, c_int
+            integer(c_int), value :: op_f
+            type(c_ptr)           :: c_mpi_op_f2c
+        end function c_mpi_op_f2c
+
         function c_mpi_init(argc, argv) bind(C, name="MPI_Init")
             use iso_c_binding, only : c_int, c_ptr
             !> TODO: is the intent need to be explicitly specified
@@ -235,12 +241,19 @@ module mpi_c_bindings
             integer(c_int), intent(out) :: newcomm, ierror
         end subroutine
 
-        subroutine c_mpi_reduce(sendbuf, recvbuf, count, datatype, op, root, comm, ierror) bind(C, name="mpi_reduce_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int), intent(in) :: sendbuf
-            integer(c_int), intent(out) :: recvbuf
-            integer(c_int), intent(in) :: count, datatype, op, root, comm
-            integer(c_int), intent(out), optional :: ierror
-        end subroutine
+        function c_mpi_reduce(sendbuf, recvbuf, count, c_dtype, c_op, root, c_comm) &
+            bind(C, name="MPI_Reduce")
+            use iso_c_binding, only: c_ptr, c_int
+
+            type(c_ptr), value :: sendbuf
+            type(c_ptr), value :: recvbuf
+            integer(c_int), value :: count
+            type(c_ptr), value :: c_dtype
+            type(c_ptr), value :: c_op 
+            integer(c_int), value :: root
+            type(c_ptr), value :: c_comm
+           integer(c_int) :: c_mpi_reduce
+        end function c_mpi_reduce
+
     end interface
 end module mpi_c_bindings

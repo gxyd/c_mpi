@@ -195,13 +195,3 @@ void mpi_cart_sub_wrapper(int *  comm_f, int * rmains_dims, int * newcomm_f, int
     *ierror = MPI_Cart_sub(comm, rmains_dims, &newcomm);
     *newcomm_f = MPI_Comm_c2f(newcomm);
 }
-
-void mpi_reduce_wrapper(const int* sendbuf, int* recvbuf, int* count, int* datatype_f,
-                        int* op_f, int* root, int* comm_f, int* ierror)
-{
-    MPI_Datatype datatype = get_c_datatype_from_fortran(*datatype_f);
-
-    MPI_Op op = get_c_op_from_fortran(*op_f);
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    *ierror = MPI_Reduce(sendbuf, recvbuf, *count, datatype, op, *root, comm);
-}
