@@ -14,6 +14,7 @@ module mpi
     real(8), parameter :: MPI_IN_PLACE = -1002
     integer, parameter :: MPI_SUM = -2300
     integer, parameter :: MPI_INFO_NULL = -2000
+    integer, parameter :: MPI_STATUS_SIZE = 5
     integer :: MPI_STATUS_IGNORE = 0
     ! NOTE: I've no idea for how to implement this, refer
     ! see section 2.5.4 page 21 of mpi40-report.pdf
@@ -458,15 +459,41 @@ module mpi
     end subroutine
 
     subroutine MPI_Recv_proc(buf, count, datatype, source, tag, comm, status, ierror)
-        use mpi_c_bindings, only: c_mpi_recv
-        real(8), dimension(:) :: buf
-        integer, intent(in) :: count, source, tag
-        integer, intent(in) :: datatype
-        integer, intent(in) :: comm
-        integer, intent(out) :: status
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        use mpi_c_bindings, only: c_mpi_recv, c_mpi_comm_f2c, c_mpi_datatype_f2c, c_mpi_status_c2f
+        real(8), dimension(:), target, intent(inout) :: buf
+        integer, intent(in)  :: count, source, tag, datatype, comm
+        integer, intent(out) :: status(MPI_STATUS_SIZE)
         integer, optional, intent(out) :: ierror
-        call c_mpi_recv(buf, count, datatype, source, tag, comm, status, ierror)
-    end subroutine
+    
+        integer(c_int) :: local_ierr, status_ierr
+        type(c_ptr) :: c_buf, c_dtype, c_comm, c_status
+        integer(c_int), dimension(MPI_STATUS_SIZE), target :: tmp_status
+    
+        ! Convert Fortran handles to C handles.
+        c_dtype = c_mpi_datatype_f2c(datatype)
+        c_comm  = c_mpi_comm_f2c(comm)
+    
+        ! Get the pointer to the buffer.
+        c_buf = c_loc(buf)
+        ! Use a local temporary MPI_Status (as an array of c_int)
+        c_status = c_loc(tmp_status)
+    
+        ! Call the native MPI_Recv.
+        local_ierr = c_mpi_recv(c_buf, count, c_dtype, source, tag, c_comm, c_status)
+    
+        ! Convert the C MPI_Status to Fortran status.
+        if (local_ierr == MPI_SUCCESS) then
+          status_ierr =  c_mpi_status_c2f(c_status, status)
+        end if
+    
+        if (present(ierror)) then
+          ierror = local_ierr
+        else if (local_ierr /= MPI_SUCCESS) then
+          print *, "MPI_Recv failed with error code: ", local_ierr
+        end if
+    
+      end subroutine MPI_Recv_proc
 
     subroutine MPI_Waitall_proc(count, array_of_requests, array_of_statuses, ierror)
         use mpi_c_bindings, only: c_mpi_waitall
