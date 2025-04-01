@@ -234,12 +234,13 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_dims_create
         end function
 
-        subroutine c_mpi_cart_sub(comm, remain_dims, newcomm, ierror) bind(C, name ="mpi_cart_sub_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int), intent(in) :: comm
-            integer(c_int), intent(in) :: remain_dims(*)
-            integer(c_int), intent(out) :: newcomm, ierror
-        end subroutine
+        function c_mpi_cart_sub(comm, remain_dims, newcomm) bind(C, name ="MPI_Cart_sub")
+            use iso_c_binding, only: c_int, c_ptr
+            type(c_ptr), value :: comm
+            type(c_ptr), value :: remain_dims
+            type(c_ptr), intent(out) :: newcomm
+            integer(c_int) :: c_mpi_cart_sub
+        end function
 
         function c_mpi_reduce(sendbuf, recvbuf, count, c_dtype, c_op, root, c_comm) &
             bind(C, name="MPI_Reduce")
