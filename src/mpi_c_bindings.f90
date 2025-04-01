@@ -32,6 +32,12 @@ module mpi_c_bindings
             type(c_ptr)           :: c_mpi_op_f2c
         end function c_mpi_op_f2c
 
+        function c_mpi_info_f2c(info_f) bind(C, name="get_c_info_from_fortran")
+            use iso_c_binding, only: c_int, c_ptr
+            integer(c_int), value :: info_f
+            type(c_ptr) :: c_mpi_info_f2c
+        end function c_mpi_info_f2c
+
         function c_mpi_init(argc, argv) bind(C, name="MPI_Init")
             use iso_c_binding, only : c_int, c_ptr
             !> TODO: is the intent need to be explicitly specified
@@ -168,14 +174,15 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_comm_rank
         end function c_mpi_comm_rank
 
-        subroutine c_mpi_comm_split_type(comm, split_type, key, info, newcomm, ierror) bind(C, name="mpi_comm_split_type_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int) :: comm
-            integer(c_int), intent(in) :: split_type, key
-            integer(c_int), intent(in) :: info
-            integer(c_int), intent(out) :: newcomm
-            integer(c_int), optional, intent(out) :: ierror
-        end subroutine
+        function c_mpi_comm_split_type(c_comm, split_type, key, c_info, new_comm) bind(C, name="MPI_Comm_split_type")
+            use iso_c_binding, only: c_ptr, c_int
+            type(c_ptr), value :: c_comm 
+            integer(c_int), value :: split_type
+            integer(c_int), value :: key
+            type(c_ptr), value :: c_info
+            type(c_ptr) :: new_comm
+            integer(c_int) :: c_mpi_comm_split_type
+        end function c_mpi_comm_split_type
 
         subroutine c_mpi_recv(buf, count, datatype, source, tag, comm, status, ierror) bind(C, name="mpi_recv_wrapper")
             use iso_c_binding, only: c_int, c_double

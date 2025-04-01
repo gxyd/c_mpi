@@ -448,14 +448,36 @@ module mpi
     end subroutine
 
     subroutine MPI_Comm_split_type_proc(comm, split_type, key, info, newcomm, ierror)
-        use mpi_c_bindings, only: c_mpi_comm_split_type
-        integer :: comm
+        use iso_c_binding, only: c_int, c_ptr
+        use mpi_c_bindings, only: c_mpi_comm_split_type, c_mpi_comm_f2c, c_mpi_comm_c2f, c_mpi_info_f2c
+        integer, intent(in) :: comm
         integer, intent(in) :: split_type, key
         integer, intent(in) :: info
         integer, intent(out) :: newcomm
         integer, optional, intent(out) :: ierror
-        call c_mpi_comm_split_type(comm, split_type, key, info, newcomm, ierror)
-    end subroutine
+    
+        integer(c_int) :: local_ierr
+        type(c_ptr) :: c_comm, c_info, c_new_comm
+    
+        ! Convert Fortran communicator and info handles to C pointers.
+        c_comm = c_mpi_comm_f2c(comm)
+        c_info = c_mpi_info_f2c(info)
+    
+        ! Call the native MPI_Comm_split_type.
+        local_ierr = c_mpi_comm_split_type(c_comm, split_type, key, c_info, c_new_comm)
+    
+        ! Convert the new communicator C handle back to a Fortran integer handle.
+        newcomm = c_mpi_comm_c2f(c_new_comm)
+    
+        if (present(ierror)) then
+          ierror = local_ierr
+        else
+          if (local_ierr /= 0) then
+            print *, "MPI_Comm_split_type failed with error code: ", local_ierr
+          end if
+        end if
+    
+      end subroutine MPI_Comm_split_type_proc
 
     subroutine MPI_Recv_proc(buf, count, datatype, source, tag, comm, status, ierror)
         use mpi_c_bindings, only: c_mpi_recv
