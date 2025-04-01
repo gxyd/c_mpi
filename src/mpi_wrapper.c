@@ -55,30 +55,6 @@ MPI_Comm get_c_comm_from_fortran(int comm_f) {
     }
 }
 
-void mpi_allgather_int_wrapper(const int *sendbuf, int *sendcount, int *sendtype_f,
-                               int *recvbuf, int *recvcount, int *recvtype_f, 
-                               int *comm_f, int *ierror) {
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-
-    MPI_Datatype sendtype = get_c_datatype_from_fortran(*sendtype_f);
-    MPI_Datatype recvtype = get_c_datatype_from_fortran(*recvtype_f);
-
-    *ierror = MPI_Allgather(sendbuf, *sendcount, sendtype,
-                            recvbuf, *recvcount, recvtype, comm);
-}
-
-void mpi_allgather_real_wrapper(const double *sendbuf, int *sendcount, int *sendtype_f,
-                               double *recvbuf, int *recvcount, int *recvtype_f, 
-                               int *comm_f, int *ierror) {
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-
-    MPI_Datatype sendtype = get_c_datatype_from_fortran(*sendtype_f);
-    MPI_Datatype recvtype = get_c_datatype_from_fortran(*recvtype_f);
-
-    *ierror = MPI_Allgather(sendbuf, *sendcount, sendtype,
-                            recvbuf, *recvcount, recvtype, comm);
-}
-
 void mpi_isend_wrapper(const double *buf, int *count, int *datatype_f,
                         int *dest, int *tag, int *comm_f, int *request_f,
                         int *ierror) {

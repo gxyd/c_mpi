@@ -252,25 +252,63 @@ module mpi
     end subroutine MPI_Bcast_real_2D
 
     subroutine MPI_Allgather_int(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm, ierror)
-        use mpi_c_bindings, only: c_mpi_allgather_int
-        integer, dimension(:), intent(in) :: sendbuf
-        integer, dimension(:, :) :: recvbuf
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        use mpi_c_bindings, only: c_mpi_allgather_int, c_mpi_comm_f2c, c_mpi_datatype_f2c
+        integer, dimension(:), intent(in), target :: sendbuf
+        integer, dimension(:, :), intent(out), target :: recvbuf
         integer, intent(in) :: sendcount, recvcount
         integer, intent(in) :: sendtype, recvtype
         integer, intent(in) :: comm
         integer, optional, intent(out) :: ierror
-        call c_mpi_allgather_int(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm, ierror)
+        type(c_ptr) :: c_comm
+        integer(c_int) :: local_ierr
+        type(c_ptr) :: c_sendtype, c_recvtype
+        type(c_ptr) :: sendbuf_ptr, recvbuf_ptr
+
+        c_comm = c_mpi_comm_f2c(comm)
+        c_sendtype = c_mpi_datatype_f2c(sendtype)
+        c_recvtype = c_mpi_datatype_f2c(recvtype)
+        sendbuf_ptr = c_loc(sendbuf)
+        recvbuf_ptr = c_loc(recvbuf)
+        local_ierr = c_mpi_allgather_int(sendbuf_ptr, sendcount, c_sendtype, recvbuf_ptr, recvcount, c_recvtype, c_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Allgather_int failed with error code: ", local_ierr
+            end if
+        end if
     end subroutine
 
     subroutine MPI_Allgather_real(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm, ierror)
-        use mpi_c_bindings, only: c_mpi_allgather_real
-        real(8), dimension(:), intent(in) :: sendbuf
-        real(8), dimension(:, :) :: recvbuf
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        use mpi_c_bindings, only: c_mpi_allgather_real, c_mpi_comm_f2c, c_mpi_datatype_f2c
+        real(8), dimension(:), intent(in), target :: sendbuf
+        real(8), dimension(:, :), intent(out), target :: recvbuf
         integer, intent(in) :: sendcount, recvcount
         integer, intent(in) :: sendtype, recvtype
         integer, intent(in) :: comm
         integer, optional, intent(out) :: ierror
-        call c_mpi_allgather_real(sendbuf, sendcount, sendtype, recvbuf, recvcount, recvtype, comm, ierror)
+        type(c_ptr) :: c_comm
+        integer(c_int) :: local_ierr
+        type(c_ptr) :: c_sendtype, c_recvtype
+        type(c_ptr) :: sendbuf_ptr, recvbuf_ptr
+
+        c_comm = c_mpi_comm_f2c(comm)
+        c_sendtype = c_mpi_datatype_f2c(sendtype)
+        c_recvtype = c_mpi_datatype_f2c(recvtype)
+        sendbuf_ptr = c_loc(sendbuf)
+        recvbuf_ptr = c_loc(recvbuf)
+        local_ierr = c_mpi_allgather_real(sendbuf_ptr, sendcount, c_sendtype, recvbuf_ptr, recvcount, c_recvtype, c_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Allgather_int failed with error code: ", local_ierr
+            end if
+        end if
     end subroutine
 
     subroutine MPI_Isend_2d(buf, count, datatype, dest, tag, comm, request, ierror)
