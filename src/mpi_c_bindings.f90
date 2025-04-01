@@ -76,7 +76,7 @@ module mpi_c_bindings
             recvcount, recvtype, comm) bind(C, name="MPI_Allgather")
             use iso_c_binding, only: c_int, c_ptr
             type(c_ptr), value :: sendbuf
-            type(c_ptr), dimension(*), intent(out) :: recvbuf
+            type(c_ptr), value :: recvbuf
             integer(c_int), value :: sendcount, recvcount
             type(c_ptr), value :: sendtype, recvtype
             type(c_ptr), value :: comm
