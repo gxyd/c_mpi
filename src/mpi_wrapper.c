@@ -10,6 +10,8 @@
 
 #define FORTRAN_MPI_SUM -2300
 
+#define FORTRAN_MPI_COMM_NULL -10
+
 #define FORTRAN_MPI_INTEGER -10002
 #define FORTRAN_MPI_REAL4 -10013
 #define FORTRAN_MPI_REAL8 -10014
@@ -50,6 +52,8 @@ MPI_Op get_c_op_from_fortran(int op) {
 MPI_Comm get_c_comm_from_fortran(int comm_f) {
     if (comm_f == FORTRAN_MPI_COMM_WORLD) {
         return MPI_COMM_WORLD;
+    } else if (comm_f == FORTRAN_MPI_COMM_NULL) {
+        return MPI_COMM_NULL;
     } else {
         return MPI_Comm_f2c(comm_f);
     }

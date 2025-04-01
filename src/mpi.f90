@@ -6,6 +6,8 @@ module mpi
     integer, parameter :: MPI_REAL4 = -10013
     integer, parameter :: MPI_REAL8 = -10014
 
+    integer, parameter :: MPI_COMM_NULL = -10
+
     integer, parameter :: MPI_COMM_TYPE_SHARED = 1
     integer, parameter :: MPI_PROC_NULL = -1
     integer, parameter :: MPI_SUCCESS = 0
