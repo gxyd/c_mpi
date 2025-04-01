@@ -8,6 +8,8 @@
 #define FORTRAN_MPI_INFO_NULL -2000
 #define FORTRAN_MPI_IN_PLACE -1002
 
+#define FORTRAN_MPI_COMM_NULL -10
+
 #define FORTRAN_MPI_SUM -2300
 
 #define FORTRAN_MPI_INTEGER -10002
@@ -50,6 +52,8 @@ MPI_Op get_c_op_from_fortran(int op) {
 MPI_Comm get_c_comm_from_fortran(int comm_f) {
     if (comm_f == FORTRAN_MPI_COMM_WORLD) {
         return MPI_COMM_WORLD;
+    } else if (comm_f == FORTRAN_MPI_COMM_NULL) {
+        return MPI_COMM_NULL;
     } else {
         return MPI_Comm_f2c(comm_f);
     }
@@ -149,10 +153,4 @@ void mpi_waitall_wrapper(int *count, int *array_of_requests_f,
 
     free(array_of_requests);
     free(array_of_statuses);
-}
-
-void mpi_cart_shift_wrapper(int * comm_f, int * dir, int * disp, int * rank_source, int * rank_dest, int * ierror)
-{
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    *ierror = MPI_Cart_shift(comm, *dir, *disp, rank_source, rank_dest);
 }
