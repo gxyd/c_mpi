@@ -537,18 +537,34 @@ module mpi
     end subroutine
 
     subroutine MPI_Cart_sub_proc (comm, remain_dims, newcomm, ierror)
-        use mpi_c_bindings, only: c_mpi_cart_sub
+        use iso_c_binding, only: c_int, c_ptr
+        use mpi_c_bindings, only: c_mpi_cart_sub, c_mpi_comm_f2c, c_mpi_comm_c2f
         integer, intent(in) :: comm
         logical, intent(in) :: remain_dims(:)
         integer, intent(out) :: newcomm
         integer, optional, intent(out) :: ierror
         integer :: remain_dims_i(size(remain_dims))
+        type(c_ptr) :: c_comm, c_newcomm
+        integer :: local_ierr
+
+        c_comm = c_mpi_comm_f2c(comm)
+
         where (remain_dims)
             remain_dims_i = 1
         elsewhere
             remain_dims_i = 0
         end where
-        call c_mpi_cart_sub(comm, remain_dims_i, newcomm, ierror)
+        local_ierr = c_mpi_cart_sub(c_comm, remain_dims_i, c_newcomm)
+
+        newcomm = c_mpi_comm_c2f(c_newcomm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Cart_sub failed with error code: ", local_ierr
+            end if
+        end if
     end subroutine
 
     subroutine MPI_Reduce_scalar_int(sendbuf, recvbuf, count, datatype, op, root, comm, ierror)
