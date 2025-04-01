@@ -12,6 +12,27 @@ env:
   MACOSX_DEPLOYMENT_TARGET: 14.0
 
 jobs:
+  Run_standalone_tests_without_custom_MPI_wrappers:
+    name: "Run standalone tests without custom MPI Wrappers"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: ["macos-latest", "ubuntu-20.04"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Micromamba
+        uses: mamba-org/setup-micromamba@v2.0.2
+        with:
+          micromamba-version: '2.0.4-0'
+          environment-file: ci/environment_gfortran_openmpi.yml
+
+      - name: Run standalone tests with OpenMPI and without MPI wrappers
+        shell: bash -e -x -l {0}
+        run: |
+          cd tests
+          ./run_tests.sh --without-wrappers
+
   Run_standalone_tests_with_GFortran_with_OpenMPI:
     name: "Run standalone tests with GFortran with Open MPI"
     runs-on: ${{ matrix.os }}
