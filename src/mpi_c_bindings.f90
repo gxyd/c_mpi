@@ -238,7 +238,7 @@ module mpi_c_bindings
             use iso_c_binding, only: c_int, c_ptr
             type(c_ptr), value :: comm
             type(c_ptr), value :: remain_dims
-            type(c_ptr) :: newcomm
+            type(c_ptr), intent(out) :: newcomm
             integer(c_int) :: c_mpi_cart_sub
         end function
 
