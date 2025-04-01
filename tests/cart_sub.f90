@@ -1,4 +1,4 @@
-program main
+program cart_sub
     use mpi
     implicit none
 
@@ -34,7 +34,7 @@ program main
     call MPI_Init_thread(MPI_THREAD_FUNNELED, tcheck, ierr)
     if (ierr /= MPI_SUCCESS) then
         print *, "Error initializing MPI"
-        stop
+        error stop
     end if
 
     ! Get rank and size in the global communicator
@@ -45,14 +45,14 @@ program main
     call MPI_Dims_create(size, 2, dims, ierr)
     if (ierr /= MPI_SUCCESS) then
         print *, "Error creating dimensions"
-        stop
+        error stop
     end if
 
     ! Create a Cartesian communicator
     call MPI_Cart_create(MPI_COMM_WORLD, 2, dims, periods, reorder, comm_cart, ierr)
     if (ierr /= MPI_SUCCESS) then
         print *, "Error creating Cartesian communicator"
-        stop
+        error stop
     end if
 
     ! Get new rank in the Cartesian communicator
@@ -68,7 +68,7 @@ program main
     call MPI_Cart_sub(comm_cart, remain_dims, comm_new, ierr)
     if (ierr /= MPI_SUCCESS) then
         print *, "Error creating sub-communicator"
-        stop
+        error stop
     end if
 
     ! Get the size of the new communicator
@@ -81,7 +81,7 @@ program main
     call MPI_Finalize(errs)
     if (errs /= MPI_SUCCESS) then
         print *, "Error finalizing MPI"
-        stop
+        error stop
     end if
 
-end program main
+end program cart_sub

@@ -237,8 +237,8 @@ module mpi_c_bindings
         function c_mpi_cart_sub(comm, remain_dims, newcomm) bind(C, name ="MPI_Cart_sub")
             use iso_c_binding, only: c_int, c_ptr
             type(c_ptr), value :: comm
-            integer(c_int), intent(in) :: remain_dims(*)
-            type(c_ptr), value :: newcomm
+            type(c_ptr), value :: remain_dims
+            type(c_ptr) :: newcomm
             integer(c_int) :: c_mpi_cart_sub
         end function
 
