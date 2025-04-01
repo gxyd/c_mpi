@@ -151,14 +151,6 @@ void mpi_waitall_wrapper(int *count, int *array_of_requests_f,
     free(array_of_statuses);
 }
 
-void mpi_ssend_wrapper(double *buf, int *count, int *datatype_f, int *dest,
-                       int *tag, int *comm_f, int *ierror) {
-    MPI_Datatype datatype = get_c_datatype_from_fortran(*datatype_f);
-
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    *ierror = MPI_Ssend(buf, *count, datatype, *dest, *tag, comm);
-}
-
 void mpi_cart_shift_wrapper(int * comm_f, int * dir, int * disp, int * rank_source, int * rank_dest, int * ierror)
 {
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);

@@ -478,13 +478,19 @@ module mpi
     end subroutine
 
     subroutine MPI_Ssend_proc(buf, count, datatype, dest, tag, comm, ierror)
-        use mpi_c_bindings, only: c_mpi_ssend
+        use iso_c_binding, only: c_int, c_ptr
+        use mpi_c_bindings, only: c_mpi_ssend, c_mpi_datatype_f2c, c_mpi_comm_f2c
         real(8), dimension(*), intent(in) :: buf
         integer, intent(in) :: count, dest, tag
         integer, intent(in) :: datatype
         integer, intent(in) :: comm
         integer, optional, intent(out) :: ierror
-        call c_mpi_ssend(buf, count, datatype, dest, tag, comm, ierror)
+        type(c_ptr) :: c_datatype, c_comm
+        integer :: local_ierr
+
+        c_datatype = c_mpi_datatype_f2c(datatype)
+        c_comm = c_mpi_comm_f2c(comm)
+        local_ierr = c_mpi_ssend(buf, count, c_datatype, dest, tag, c_comm)
     end subroutine
 
     subroutine MPI_Cart_create_proc(comm_old, ndims, dims, periods, reorder, comm_cart, ierror)

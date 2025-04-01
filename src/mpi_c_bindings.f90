@@ -195,14 +195,14 @@ module mpi_c_bindings
             integer(c_int), optional, intent(out) :: ierror
         end subroutine
 
-        subroutine c_mpi_ssend(buf, count, datatype, dest, tag, comm, ierror) bind(C, name="mpi_ssend_wrapper")
-            use iso_c_binding, only: c_int, c_double
+        function c_mpi_ssend(buf, count, datatype, dest, tag, comm) bind(C, name="MPI_Ssend")
+            use iso_c_binding, only: c_int, c_double, c_ptr
             real(c_double), dimension(*), intent(in) :: buf
-            integer(c_int), intent(in) :: count, dest, tag
-            integer(c_int), intent(in) :: datatype
-            integer(c_int), intent(in) :: comm
-            integer(c_int), optional, intent(out) :: ierror
-        end subroutine
+            integer(c_int), value :: count, dest, tag
+            type(c_ptr), value :: datatype
+            type(c_ptr), value :: comm
+            integer(c_int) :: c_mpi_ssend
+        end function
 
         function c_mpi_cart_create(comm_old, ndims, dims, periods, reorder, comm_cart) bind(C, name="MPI_Cart_create")
             use iso_c_binding, only: c_int, c_ptr
