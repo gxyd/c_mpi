@@ -6,6 +6,7 @@ program ssend_example
     integer :: rank, size, ierr, i
     real(8) :: buffer(10)
     integer :: tag = 100
+    integer, dimension(MPI_STATUS_SIZE) :: status
     
     ! allocate(buffer(10))
     ! Initialize MPI environment
@@ -47,7 +48,7 @@ program ssend_example
         buffer = 0
         
         ! Receive the message
-        call MPI_Recv(buffer, 10, MPI_REAL8, 0, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE, ierr)
+        call MPI_Recv(buffer, 10, MPI_REAL8, 0, tag, MPI_COMM_WORLD, status, ierr)
         
         print *, "Process 1: Received data:"
         ! write(*, '(10I5)') buffer

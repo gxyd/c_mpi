@@ -32,6 +32,12 @@ module mpi_c_bindings
             type(c_ptr)           :: c_mpi_op_f2c
         end function c_mpi_op_f2c
 
+        function c_mpi_status_c2f(c_status, f_status) bind(C, name="MPI_Status_c2f")
+            use iso_c_binding, only: c_ptr, c_int
+            type(c_ptr) :: c_status
+            integer(c_int) :: f_status(*)  ! assumed-size array
+            integer(c_int) :: c_mpi_status_c2f
+        end function c_mpi_status_c2f
         function c_mpi_info_f2c(info_f) bind(C, name="get_c_info_from_fortran")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: info_f
@@ -184,15 +190,17 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_comm_split_type
         end function c_mpi_comm_split_type
 
-        subroutine c_mpi_recv(buf, count, datatype, source, tag, comm, status, ierror) bind(C, name="mpi_recv_wrapper")
-            use iso_c_binding, only: c_int, c_double
-            real(c_double), dimension(*) :: buf
-            integer(c_int), intent(in) :: count, source, tag
-            integer(c_int), intent(in) :: datatype
-            integer(c_int), intent(in) :: comm
-            integer(c_int), intent(out) :: status
-            integer(c_int), optional, intent(out) :: ierror
-        end subroutine
+        function c_mpi_recv(buf, count, c_dtype, source, tag, c_comm, status) bind(C, name="MPI_Recv")
+            use iso_c_binding, only: c_ptr, c_int, c_double
+            real(c_double), dimension(*), intent(out) :: buf
+            integer(c_int), value :: count
+            type(c_ptr), value :: c_dtype
+            integer(c_int), value :: source
+            integer(c_int), value :: tag
+            type(c_ptr), value :: c_comm
+            type(c_ptr) :: status
+            integer(c_int) :: c_mpi_recv
+        end function c_mpi_recv
 
         subroutine c_mpi_waitall(count, array_of_requests, array_of_statuses, ierror) bind(C, name="mpi_waitall_wrapper")
             use iso_c_binding, only: c_int
