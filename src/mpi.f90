@@ -3,6 +3,7 @@ module mpi
     integer, parameter :: MPI_THREAD_FUNNELED = 1
 
     integer, parameter :: MPI_INTEGER = -10002
+    integer, parameter :: MPI_DOUBLE_PRECISION = -10004
     integer, parameter :: MPI_REAL4 = -10013
     integer, parameter :: MPI_REAL8 = -10014
 
@@ -313,25 +314,61 @@ module mpi
     end subroutine
 
     subroutine MPI_Isend_2d(buf, count, datatype, dest, tag, comm, request, ierror)
-        use mpi_c_bindings, only: c_mpi_isend
-        real(8), dimension(:, :), intent(in) :: buf
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        use mpi_c_bindings, only: c_mpi_isend, c_mpi_datatype_f2c, c_mpi_comm_f2c, c_mpi_request_c2f
+        real(8), dimension(:, :), intent(in), target :: buf
         integer, intent(in) :: count, dest, tag
         integer, intent(in) :: datatype
         integer, intent(in) :: comm
         integer, intent(out) :: request
         integer, optional, intent(out) :: ierror
-        call c_mpi_isend(buf, count, datatype, dest, tag, comm, request, ierror)
+        type(c_ptr) :: buf_ptr
+        type(c_ptr) :: c_datatype, c_comm, c_request
+        integer(c_int) :: local_ierr
+
+        buf_ptr = c_loc(buf)
+        c_datatype = c_mpi_datatype_f2c(datatype)
+        c_comm = c_mpi_comm_f2c(comm)
+        local_ierr = c_mpi_isend(buf_ptr, count, c_datatype, dest, tag, c_comm, c_request)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Isend_2d failed with error code: ", local_ierr
+            end if
+        end if
+
+        request = c_mpi_request_c2f(c_request)
     end subroutine
 
     subroutine MPI_Isend_3d(buf, count, datatype, dest, tag, comm, request, ierror)
-        use mpi_c_bindings, only: c_mpi_isend
-        real(8), dimension(:, :, :), intent(in) :: buf
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        use mpi_c_bindings, only: c_mpi_isend, c_mpi_datatype_f2c, c_mpi_comm_f2c, c_mpi_request_c2f
+        real(8), dimension(:, :, :), intent(in), target :: buf
         integer, intent(in) :: count, dest, tag
         integer, intent(in) :: datatype
         integer, intent(in) :: comm
         integer, intent(out) :: request
         integer, optional, intent(out) :: ierror
-        call c_mpi_isend(buf, count, datatype, dest, tag, comm, request, ierror)
+        type(c_ptr) :: buf_ptr
+        type(c_ptr) :: c_datatype, c_comm, c_request
+        integer(c_int) :: local_ierr
+
+        buf_ptr = c_loc(buf)
+        c_datatype = c_mpi_datatype_f2c(datatype)
+        c_comm = c_mpi_comm_f2c(comm)
+        local_ierr = c_mpi_isend(buf_ptr, count, c_datatype, dest, tag, c_comm, c_request)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Isend_2d failed with error code: ", local_ierr
+            end if
+        end if
+
+        request = c_mpi_request_c2f(c_request)
     end subroutine
 
     subroutine MPI_Irecv_proc(buf, count, datatype, source, tag, comm, request, ierror)
@@ -449,14 +486,36 @@ module mpi
     end subroutine
 
     subroutine MPI_Comm_split_type_proc(comm, split_type, key, info, newcomm, ierror)
-        use mpi_c_bindings, only: c_mpi_comm_split_type
-        integer :: comm
+        use iso_c_binding, only: c_int, c_ptr
+        use mpi_c_bindings, only: c_mpi_comm_split_type, c_mpi_comm_f2c, c_mpi_comm_c2f, c_mpi_info_f2c
+        integer, intent(in) :: comm
         integer, intent(in) :: split_type, key
         integer, intent(in) :: info
         integer, intent(out) :: newcomm
         integer, optional, intent(out) :: ierror
-        call c_mpi_comm_split_type(comm, split_type, key, info, newcomm, ierror)
-    end subroutine
+    
+        integer(c_int) :: local_ierr
+        type(c_ptr) :: c_comm, c_info, c_new_comm
+    
+        ! Convert Fortran communicator and info handles to C pointers.
+        c_comm = c_mpi_comm_f2c(comm)
+        c_info = c_mpi_info_f2c(info)
+    
+        ! Call the native MPI_Comm_split_type.
+        local_ierr = c_mpi_comm_split_type(c_comm, split_type, key, c_info, c_new_comm)
+    
+        ! Convert the new communicator C handle back to a Fortran integer handle.
+        newcomm = c_mpi_comm_c2f(c_new_comm)
+    
+        if (present(ierror)) then
+          ierror = local_ierr
+        else
+          if (local_ierr /= 0) then
+            print *, "MPI_Comm_split_type failed with error code: ", local_ierr
+          end if
+        end if
+    
+      end subroutine MPI_Comm_split_type_proc
 
     subroutine MPI_Recv_proc(buf, count, datatype, source, tag, comm, status, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
@@ -579,12 +638,25 @@ module mpi
     end subroutine
 
     subroutine MPI_Cart_shift_proc(comm, direction, disp, rank_source, rank_dest, ierror)
-        use mpi_c_bindings, only: c_mpi_cart_shift
+        use iso_c_binding, only: c_int, c_ptr
+        use mpi_c_bindings, only: c_mpi_cart_shift, c_mpi_comm_f2c
         integer, intent(in) :: comm
         integer, intent(in) :: direction, disp
         integer, intent(out) :: rank_source, rank_dest
         integer, optional, intent(out) :: ierror
-        call c_mpi_cart_shift(comm, direction, disp, rank_source, rank_dest, ierror)
+        type(c_ptr) :: c_comm
+        integer(c_int) :: local_ierr
+
+        c_comm = c_mpi_comm_f2c(comm)
+        local_ierr = c_mpi_cart_shift(c_comm, direction, disp, rank_source, rank_dest)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Cart_shift failed with error code: ", local_ierr
+            end if
+        end if
     end subroutine
 
     subroutine MPI_Dims_create_proc(nnodes, ndims, dims, ierror)

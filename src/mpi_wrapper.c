@@ -11,6 +11,7 @@
 #define FORTRAN_MPI_SUM -2300
 
 #define FORTRAN_MPI_INTEGER -10002
+#define FORTRAN_MPI_DOUBLE_PRECISION -10004
 #define FORTRAN_MPI_REAL4 -10013
 #define FORTRAN_MPI_REAL8 -10014
 
@@ -22,6 +23,7 @@ MPI_Datatype get_c_datatype_from_fortran(int datatype) {
             c_datatype = MPI_FLOAT;
             break;
         case FORTRAN_MPI_REAL8:
+        case FORTRAN_MPI_DOUBLE_PRECISION:
             c_datatype = MPI_DOUBLE;
             break;
         case FORTRAN_MPI_INTEGER:
@@ -53,17 +55,6 @@ MPI_Comm get_c_comm_from_fortran(int comm_f) {
     } else {
         return MPI_Comm_f2c(comm_f);
     }
-}
-
-void mpi_isend_wrapper(const double *buf, int *count, int *datatype_f,
-                        int *dest, int *tag, int *comm_f, int *request_f,
-                        int *ierror) {
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    MPI_Datatype datatype = get_c_datatype_from_fortran(*datatype_f);
-
-    MPI_Request request;
-    *ierror = MPI_Isend(buf, *count, datatype, *dest, *tag, comm, &request);
-    *request_f = MPI_Request_c2f(request);
 }
 
 void mpi_allreduce_wrapper_real(const double *sendbuf, double *recvbuf, int *count,
@@ -103,15 +94,6 @@ void mpi_allreduce_wrapper_int(const int *sendbuf, int *recvbuf, int *count,
     }
 }
 
-void mpi_comm_split_type_wrapper(int *comm_f, int *split_type, int *key,
-                                int *info_f, int *newcomm_f, int *ierror) {
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    MPI_Info info = get_c_info_from_fortran(*info_f);
-    MPI_Comm newcomm;
-    *ierror = MPI_Comm_split_type( comm, *split_type, *key , info, &newcomm);
-    *newcomm_f = MPI_Comm_c2f(newcomm);
-}
-
 void mpi_recv_wrapper(double *buf, int *count, int *datatype_f, int *source,
                     int *tag, int *comm_f, int *status_f, int *ierror) {
     MPI_Datatype datatype = get_c_datatype_from_fortran(*datatype_f);
@@ -149,10 +131,4 @@ void mpi_waitall_wrapper(int *count, int *array_of_requests_f,
 
     free(array_of_requests);
     free(array_of_statuses);
-}
-
-void mpi_cart_shift_wrapper(int * comm_f, int * dir, int * disp, int * rank_source, int * rank_dest, int * ierror)
-{
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    *ierror = MPI_Cart_shift(comm, *dir, *disp, rank_source, rank_dest);
 }

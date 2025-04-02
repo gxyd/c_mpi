@@ -12,7 +12,7 @@ module mod_uop
     end subroutine
 end module mod_uop
   
-program main
+program allreduce_1
     use mpi
     use mod_uop
     integer ierr, errs
@@ -45,4 +45,4 @@ program main
 
     print *, "Allreduce test completed with ", errs, " errors."
     call mpi_finalize(errs)
-end
+end program allreduce_1

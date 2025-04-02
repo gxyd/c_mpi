@@ -38,6 +38,11 @@ module mpi_c_bindings
             integer(c_int) :: f_status(*)  ! assumed-size array
             integer(c_int) :: c_mpi_status_c2f
         end function c_mpi_status_c2f
+        function c_mpi_info_f2c(info_f) bind(C, name="get_c_info_from_fortran")
+            use iso_c_binding, only: c_int, c_ptr
+            integer(c_int), value :: info_f
+            type(c_ptr) :: c_mpi_info_f2c
+        end function c_mpi_info_f2c
 
         function c_mpi_init(argc, argv) bind(C, name="MPI_Init")
             use iso_c_binding, only : c_int, c_ptr
@@ -101,15 +106,15 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_allgather_real
         end function
 
-        subroutine c_mpi_isend(buf, count, datatype, dest, tag, comm, request, ierror) bind(C, name="mpi_isend_wrapper")
-            use iso_c_binding, only: c_int, c_double
-            real(c_double), dimension(*), intent(in) :: buf
-            integer(c_int), intent(in) :: count, dest, tag
-            integer(c_int), intent(in) :: datatype
-            integer(c_int), intent(in) :: comm
-            integer(c_int), intent(out) :: request
-            integer(c_int), optional, intent(out) :: ierror
-        end subroutine
+        function c_mpi_isend(buf, count, datatype, dest, tag, comm, request) bind(C, name="MPI_Isend")
+            use iso_c_binding, only: c_int, c_double, c_ptr
+            type(c_ptr), value :: buf
+            integer(c_int), value :: count, dest, tag
+            type(c_ptr), value :: datatype
+            type(c_ptr), value :: comm
+            type(c_ptr), intent(out) :: request
+            integer(c_int) :: c_mpi_isend
+        end function
 
         function c_mpi_irecv(buf, count, datatype, source, tag, comm, request) bind(C, name="MPI_Irecv")
             use iso_c_binding, only: c_int, c_double, c_ptr
@@ -175,14 +180,15 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_comm_rank
         end function c_mpi_comm_rank
 
-        subroutine c_mpi_comm_split_type(comm, split_type, key, info, newcomm, ierror) bind(C, name="mpi_comm_split_type_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int) :: comm
-            integer(c_int), intent(in) :: split_type, key
-            integer(c_int), intent(in) :: info
-            integer(c_int), intent(out) :: newcomm
-            integer(c_int), optional, intent(out) :: ierror
-        end subroutine
+        function c_mpi_comm_split_type(c_comm, split_type, key, c_info, new_comm) bind(C, name="MPI_Comm_split_type")
+            use iso_c_binding, only: c_ptr, c_int
+            type(c_ptr), value :: c_comm 
+            integer(c_int), value :: split_type
+            integer(c_int), value :: key
+            type(c_ptr), value :: c_info
+            type(c_ptr) :: new_comm
+            integer(c_int) :: c_mpi_comm_split_type
+        end function c_mpi_comm_split_type
 
         function c_mpi_recv(buf, count, c_dtype, source, tag, c_comm, status) bind(C, name="MPI_Recv")
             use iso_c_binding, only: c_ptr, c_int, c_double
@@ -230,11 +236,13 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_cart_coords
         end function
 
-        subroutine c_mpi_cart_shift(comm, direction, disp, rank_source, rank_dest, ierror) bind(C, name="mpi_cart_shift_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int), intent(in) :: comm, direction, disp
-            integer(c_int), intent(out) :: rank_source, rank_dest, ierror
-        end subroutine
+        function c_mpi_cart_shift(comm, direction, disp, rank_source, rank_dest) bind(C, name="MPI_Cart_shift")
+            use iso_c_binding, only: c_int, c_ptr
+            type(c_ptr), value :: comm
+            integer(c_int), value :: direction, disp
+            integer(c_int), intent(out) :: rank_source, rank_dest
+            integer(c_int) :: c_mpi_cart_shift
+        end function
 
         function c_mpi_dims_create(nnodes, ndims, dims) bind(C, name="MPI_Dims_create")
             use iso_c_binding, only: c_int, c_ptr
