@@ -91,7 +91,8 @@ module mpi
     end interface
 
     interface MPI_Ssend
-        module procedure MPI_Ssend_proc
+        module procedure MPI_Ssend_2D_proc
+        module procedure MPI_Ssend_1D_proc
     end interface
 
     interface MPI_Cart_create
@@ -675,10 +676,26 @@ module mpi
         call c_mpi_waitall(count, array_of_requests, array_of_statuses, ierror)
     end subroutine
 
-    subroutine MPI_Ssend_proc(buf, count, datatype, dest, tag, comm, ierror)
+    subroutine MPI_Ssend_1D_proc(buf, count, datatype, dest, tag, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr
         use mpi_c_bindings, only: c_mpi_ssend, c_mpi_datatype_f2c, c_mpi_comm_f2c
         real(8), dimension(*), intent(in) :: buf
+        integer, intent(in) :: count, dest, tag
+        integer, intent(in) :: datatype
+        integer, intent(in) :: comm
+        integer, optional, intent(out) :: ierror
+        type(c_ptr) :: c_datatype, c_comm
+        integer :: local_ierr
+
+        c_datatype = c_mpi_datatype_f2c(datatype)
+        c_comm = c_mpi_comm_f2c(comm)
+        local_ierr = c_mpi_ssend(buf, count, c_datatype, dest, tag, c_comm)
+    end subroutine
+
+    subroutine MPI_Ssend_2D_proc(buf, count, datatype, dest, tag, comm, ierror)
+        use iso_c_binding, only: c_int, c_ptr
+        use mpi_c_bindings, only: c_mpi_ssend, c_mpi_datatype_f2c, c_mpi_comm_f2c
+        real(8), dimension(:,:), intent(in) :: buf
         integer, intent(in) :: count, dest, tag
         integer, intent(in) :: datatype
         integer, intent(in) :: comm
