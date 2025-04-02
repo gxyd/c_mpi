@@ -94,18 +94,6 @@ void mpi_allreduce_wrapper_int(const int *sendbuf, int *recvbuf, int *count,
     }
 }
 
-void mpi_recv_wrapper(double *buf, int *count, int *datatype_f, int *source,
-                    int *tag, int *comm_f, int *status_f, int *ierror) {
-    MPI_Datatype datatype = get_c_datatype_from_fortran(*datatype_f);
-
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    MPI_Status status;
-    *ierror = MPI_Recv(buf, *count, datatype, *source, *tag, comm, &status);
-    if (*ierror == MPI_SUCCESS) {
-        MPI_Status_c2f(&status, status_f);
-    }
-}
-
 void mpi_waitall_wrapper(int *count, int *array_of_requests_f,
                         int *array_of_statuses_f, int *ierror) {
     MPI_Request *array_of_requests;
