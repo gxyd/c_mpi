@@ -132,14 +132,14 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_irecv
         end function
 
-        function c_mpi_allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm) &
+        function c_mpi_allreduce(sendbuf, recvbuf, count, datatype, op, comm) &
                                                     bind(C, name="MPI_Allreduce")
             use iso_c_binding, only: c_int, c_double, c_ptr
             type(c_ptr), value :: sendbuf
             type(c_ptr), value :: recvbuf
             integer(c_int), value :: count
             type(c_ptr), value :: datatype, op, comm
-            integer(c_int) :: c_mpi_allreduce_scalar
+            integer(c_int) :: c_mpi_allreduce
         end function
 
         subroutine c_mpi_allreduce_1d(sendbuf, recvbuf, count, datatype, op, comm, ierror) &
