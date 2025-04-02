@@ -61,21 +61,6 @@ void* get_c_mpi_inplace_from_fortran(double sendbuf) {
     return MPI_IN_PLACE;
 }
 
-void mpi_allreduce_wrapper_int(const int *sendbuf, int *recvbuf, int *count,
-                            int *datatype_f, int *op_f, int *comm_f, int *ierror) {
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    MPI_Datatype datatype;
-    datatype = MPI_INT;
-
-    MPI_Op op = MPI_Op_f2c(*op_f);
-
-    if (*sendbuf == FORTRAN_MPI_IN_PLACE) {
-        *ierror = MPI_Allreduce(MPI_IN_PLACE , recvbuf, *count, datatype, MPI_SUM, comm);
-    } else {
-        *ierror = MPI_Allreduce(sendbuf , recvbuf, *count, datatype, MPI_SUM, comm);
-    }
-}
-
 void mpi_waitall_wrapper(int *count, int *array_of_requests_f,
                         int *array_of_statuses_f, int *ierror) {
     MPI_Request *array_of_requests;
