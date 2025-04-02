@@ -141,25 +141,6 @@ module mpi_c_bindings
             type(c_ptr), value :: datatype, op, comm
             integer(c_int) :: c_mpi_allreduce
         end function
-        
-
-        subroutine c_mpi_allreduce_array_real(sendbuf, recvbuf, count, datatype, op, comm, ierror) &
-                                                    bind(C, name="mpi_allreduce_wrapper_real")
-            use iso_c_binding, only: c_int, c_double
-            real(c_double), dimension(*), intent(in)  :: sendbuf
-            real(c_double), dimension(*), intent(out) :: recvbuf
-            integer(c_int), intent(in) :: count, datatype, op, comm
-            integer(c_int), intent(out), optional :: ierror
-        end subroutine c_mpi_allreduce_array_real
-
-        subroutine c_mpi_allreduce_array_int(sendbuf, recvbuf, count, datatype, op, comm, ierror) &
-                                                    bind(C, name="mpi_allreduce_wrapper_int")
-            use iso_c_binding, only: c_int, c_double
-            integer(c_int), dimension(*), intent(in)  :: sendbuf
-            integer(c_int), dimension(*), intent(out) :: recvbuf
-            integer(c_int), intent(in) :: count, datatype, op, comm
-            integer(c_int), intent(out), optional :: ierror
-        end subroutine c_mpi_allreduce_array_int
 
         function c_mpi_wtime() result(time) bind(C, name="MPI_Wtime")
             use iso_c_binding, only: c_double
