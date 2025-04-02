@@ -3,6 +3,7 @@ module mpi
     integer, parameter :: MPI_THREAD_FUNNELED = 1
 
     integer, parameter :: MPI_INTEGER = -10002
+    integer, parameter :: MPI_DOUBLE_PRECISION = -10004
     integer, parameter :: MPI_REAL4 = -10013
     integer, parameter :: MPI_REAL8 = -10014
 
