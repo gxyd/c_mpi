@@ -100,15 +100,15 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_allgather_real
         end function
 
-        subroutine c_mpi_isend(buf, count, datatype, dest, tag, comm, request, ierror) bind(C, name="mpi_isend_wrapper")
-            use iso_c_binding, only: c_int, c_double
-            real(c_double), dimension(*), intent(in) :: buf
-            integer(c_int), intent(in) :: count, dest, tag
-            integer(c_int), intent(in) :: datatype
-            integer(c_int), intent(in) :: comm
-            integer(c_int), intent(out) :: request
-            integer(c_int), optional, intent(out) :: ierror
-        end subroutine
+        function c_mpi_isend(buf, count, datatype, dest, tag, comm, request) bind(C, name="MPI_Isend")
+            use iso_c_binding, only: c_int, c_double, c_ptr
+            type(c_ptr), value :: buf
+            integer(c_int), value :: count, dest, tag
+            type(c_ptr), value :: datatype
+            type(c_ptr), value :: comm
+            type(c_ptr), intent(out) :: request
+            integer(c_int) :: c_mpi_isend
+        end function
 
         function c_mpi_irecv(buf, count, datatype, source, tag, comm, request) bind(C, name="MPI_Irecv")
             use iso_c_binding, only: c_int, c_double, c_ptr
