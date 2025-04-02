@@ -185,8 +185,8 @@ module mpi_c_bindings
         end subroutine
 
         function c_mpi_recv(buf, count, c_dtype, source, tag, c_comm, status) bind(C, name="MPI_Recv")
-            use iso_c_binding, only: c_ptr, c_int
-            type(c_ptr), value :: buf
+            use iso_c_binding, only: c_ptr, c_int, c_double
+            real(c_double), dimension(*), intent(out) :: buf
             integer(c_int), value :: count
             type(c_ptr), value :: c_dtype
             integer(c_int), value :: source

@@ -461,26 +461,24 @@ module mpi
     subroutine MPI_Recv_proc(buf, count, datatype, source, tag, comm, status, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
         use mpi_c_bindings, only: c_mpi_recv, c_mpi_comm_f2c, c_mpi_datatype_f2c, c_mpi_status_c2f
-        real(8), dimension(:), target, intent(inout) :: buf
+        real(8), dimension(*), intent(inout) :: buf
         integer, intent(in)  :: count, source, tag, datatype, comm
         integer, intent(out) :: status(MPI_STATUS_SIZE)
         integer, optional, intent(out) :: ierror
     
         integer(c_int) :: local_ierr, status_ierr
-        type(c_ptr) :: c_buf, c_dtype, c_comm, c_status
+        type(c_ptr) :: c_dtype, c_comm, c_status
         integer(c_int), dimension(MPI_STATUS_SIZE), target :: tmp_status
     
         ! Convert Fortran handles to C handles.
         c_dtype = c_mpi_datatype_f2c(datatype)
         c_comm  = c_mpi_comm_f2c(comm)
     
-        ! Get the pointer to the buffer.
-        c_buf = c_loc(buf)
         ! Use a local temporary MPI_Status (as an array of c_int)
         c_status = c_loc(tmp_status)
     
         ! Call the native MPI_Recv.
-        local_ierr = c_mpi_recv(c_buf, count, c_dtype, source, tag, c_comm, c_status)
+        local_ierr = c_mpi_recv(buf, count, c_dtype, source, tag, c_comm, c_status)
     
         ! Convert the C MPI_Status to Fortran status.
         if (local_ierr == MPI_SUCCESS) then
