@@ -53,8 +53,9 @@ module mpi
         module procedure MPI_Isend_3d
     end interface
 
-    interface MPI_IRecv
-        module procedure MPI_IRecv_proc
+    interface MPI_Irecv
+        module procedure MPI_Irecv_2d
+        module procedure MPI_Irecv_3d
     end interface
 
     interface MPI_Allreduce
@@ -370,7 +371,7 @@ module mpi
         request = c_mpi_request_c2f(c_request)
     end subroutine
 
-    subroutine MPI_Irecv_proc(buf, count, datatype, source, tag, comm, request, ierror)
+    subroutine MPI_Irecv_2d(buf, count, datatype, source, tag, comm, request, ierror)
         use iso_c_binding, only: c_int, c_ptr
         use mpi_c_bindings, only: c_mpi_irecv, c_mpi_comm_f2c, c_mpi_datatype_f2c, c_mpi_request_c2f
         real(8), dimension(:,:) :: buf
@@ -398,6 +399,33 @@ module mpi
         end if
     end subroutine
 
+    subroutine MPI_Irecv_3d(buf, count, datatype, source, tag, comm, request, ierror)
+        use iso_c_binding, only: c_int, c_ptr
+        use mpi_c_bindings, only: c_mpi_irecv, c_mpi_comm_f2c, c_mpi_datatype_f2c, c_mpi_request_c2f
+        real(8), dimension(:,:,:) :: buf
+        integer, intent(in) :: count, source, tag
+        integer, intent(in) :: datatype
+        integer, intent(in) :: comm
+        integer, intent(out) :: request
+        integer, optional, intent(out) :: ierror
+        type(c_ptr) :: c_comm
+        integer(c_int) :: local_ierr
+        type(c_ptr) :: c_datatype
+        type(c_ptr) :: c_request
+
+        c_comm = c_mpi_comm_f2c(comm)
+        c_datatype = c_mpi_datatype_f2c(datatype)
+        local_ierr = c_mpi_irecv(buf, count, c_datatype, source, tag, c_comm, c_request)
+        request = c_mpi_request_c2f(c_request)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Irecv failed with error code: ", local_ierr
+            end if
+        end if
+    end subroutine
     subroutine MPI_Allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use mpi_c_bindings, only: c_mpi_allreduce_scalar
         real(8), intent(in) :: sendbuf
