@@ -1,0 +1,37 @@
+program cart_shift_1
+    use mpi
+    implicit none
+
+    integer :: ierr, rank, size
+    integer :: comm_cart
+    integer :: dims(2)
+    logical :: periods(2)
+    integer :: coords(2)
+    integer :: left, right, up, down
+
+    call MPI_INIT(ierr)
+    call MPI_COMM_RANK(MPI_COMM_WORLD, rank, ierr)
+    call MPI_COMM_SIZE(MPI_COMM_WORLD, size, ierr)
+
+    dims(1) = 0
+    dims(2) = 0
+    periods(1) = .true.
+    periods(2) = .false.
+
+    call MPI_DIMS_CREATE(size, 2, dims, ierr)
+    call MPI_CART_CREATE(MPI_COMM_WORLD, 2, dims, periods, &
+                        .true., comm_cart, ierr)
+
+    call MPI_CART_COORDS(comm_cart, rank, 2, coords, ierr)
+
+    call MPI_CART_SHIFT(comm_cart, 0, 1, left, right, ierr)
+
+    call MPI_CART_SHIFT(comm_cart, 1, 1, up, down, ierr)
+
+    print *, &
+          'Rank ', rank, ' at coords (', coords(1), ',', coords(2), &
+          ') neighbors: left=', left, ' right=', right, &
+          ' up=', up, ' down=', down
+
+    call MPI_FINALIZE(ierr)
+end program cart_shift_1
