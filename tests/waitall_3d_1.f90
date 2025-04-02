@@ -27,7 +27,7 @@ program waitall_3d_1
     ! Allocate request array
     num_requests = 2
     allocate(requests(num_requests))
-    ! requests = MPI_REQUEST_NULL
+    requests = MPI_REQUEST_NULL
 
     ! Initialize send buffer (3D array) on rank 0
     if (rank == 0) then
