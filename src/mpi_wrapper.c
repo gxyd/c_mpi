@@ -57,6 +57,10 @@ MPI_Comm get_c_comm_from_fortran(int comm_f) {
     }
 }
 
+void* get_c_mpi_inplace_from_fortran(double sendbuf) {
+    return MPI_IN_PLACE;
+}
+
 void mpi_allreduce_wrapper_real(const double *sendbuf, double *recvbuf, int *count,
                             int *datatype_f, int *op_f, int *comm_f, int *ierror) {
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);

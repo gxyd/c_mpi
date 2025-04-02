@@ -400,7 +400,7 @@ module mpi
 
     subroutine MPI_Allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
-        use mpi_c_bindings, only: c_mpi_allreduce_scalar, c_mpi_datatype_f2c, c_mpi_op_f2c, c_mpi_comm_f2c
+        use mpi_c_bindings, only: c_mpi_allreduce_scalar, c_mpi_datatype_f2c, c_mpi_op_f2c, c_mpi_comm_f2c, c_mpi_in_place_f2c
         real(8), intent(in), target :: sendbuf
         real(8), intent(out), target :: recvbuf
         integer, intent(in) :: count, datatype, op, comm
@@ -408,7 +408,11 @@ module mpi
         type(c_ptr) :: sendbuf_ptr, recvbuf_ptr, c_datatype, c_op, c_comm
         integer(c_int) :: local_ierr
 
-        sendbuf_ptr = c_loc(sendbuf)
+        if (sendbuf == MPI_IN_PLACE) then
+            sendbuf_ptr = c_mpi_in_place_f2c(sendbuf)
+        else
+            sendbuf_ptr = c_loc(sendbuf)
+        end if
         recvbuf_ptr = c_loc(recvbuf)
         c_datatype = c_mpi_datatype_f2c(datatype)
         c_op = c_mpi_op_f2c(op)

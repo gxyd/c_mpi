@@ -38,6 +38,12 @@ module mpi_c_bindings
             type(c_ptr) :: c_mpi_info_f2c
         end function c_mpi_info_f2c
 
+        function c_mpi_in_place_f2c(in_place_f) bind(C,name="get_c_mpi_inplace_from_fortran")
+            use iso_c_binding, only: c_double, c_ptr
+            real(c_double), value :: in_place_f
+            type(c_ptr) :: c_mpi_in_place_f2c
+        end function c_mpi_in_place_f2c
+
         function c_mpi_init(argc, argv) bind(C, name="MPI_Init")
             use iso_c_binding, only : c_int, c_ptr
             !> TODO: is the intent need to be explicitly specified
