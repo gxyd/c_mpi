@@ -2,7 +2,7 @@ program test_waitall
     use mpi  
     implicit none  
 
-    integer :: ierr, rank, size, comm, tag  
+    integer :: ierr, rank, size, tag  
     integer, parameter :: num_reqs = 2  
     integer, dimension(num_reqs) :: reqs  
     ! For statuses, we need an array of size num_reqs * MPI_STATUS_SIZE.  
@@ -10,12 +10,11 @@ program test_waitall
     real(8), dimension(3,3) :: buf1, buf2  
     integer :: i  
 
-    comm = 0       ! Assume MPI_COMM_WORLD is represented by 0  
     tag  = 100  
 
     call MPI_Init(ierr)  
-    call MPI_Comm_rank(comm, rank, ierr)  
-    call MPI_Comm_size(comm, size, ierr)  
+    call MPI_Comm_rank(MPI_COMM_WORLD, rank, ierr)  
+    call MPI_Comm_size(MPI_COMM_WORLD, size, ierr)  
 
     if (size < 2) then  
         print *, "This test requires at least 2 MPI processes."  
@@ -26,13 +25,13 @@ program test_waitall
             ! Rank 0 sends two messages using MPI_Ssend.  
             buf1 = reshape([(i, i=1, 9)], shape=(/3,3/)) 
             buf2 = reshape([(i, i=1, 9)], shape=(/3,3/)) 
-            call MPI_Ssend(buf1, 10, MPI_REAL8, 1, tag, comm, ierr)  
-            call MPI_Ssend(buf2, 10, MPI_REAL8, 1, tag, comm, ierr)  
+            call MPI_Ssend(buf1, 10, MPI_REAL8, 1, tag, MPI_COMM_WORLD, ierr)  
+            call MPI_Ssend(buf2, 10, MPI_REAL8, 1, tag, MPI_COMM_WORLD, ierr)  
             print *, "Rank 0 sent two messages."  
         else if (rank == 1) then  
             ! Rank 1 posts two nonblocking receives.  
-            call MPI_Irecv(buf1, 10, MPI_REAL8, 0, tag, comm, reqs(1), ierr) 
-            call MPI_Irecv(buf2, 10, MPI_REAL8, 0, tag, comm, reqs(2), ierr)
+            call MPI_Irecv(buf1, 10, MPI_REAL8, 0, tag, MPI_COMM_WORLD, reqs(1), ierr) 
+            call MPI_Irecv(buf2, 10, MPI_REAL8, 0, tag, MPI_COMM_WORLD, reqs(2), ierr)
 
             ! Wait on both requests.  
             call MPI_Waitall(num_reqs, reqs, statuses, ierr)  
