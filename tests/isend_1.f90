@@ -36,8 +36,6 @@ program isend_1
 
     print *, 'Rank ', rank, ' continuing work while sending to ', dest
 
-    call sleep(1)
-
     print *, 'Rank ', rank, ' finished work, send may still be in progress'
 
     call MPI_FINALIZE(ierr)
