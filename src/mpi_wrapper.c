@@ -130,9 +130,3 @@ void mpi_waitall_wrapper(int *count, int *array_of_requests_f,
     free(array_of_requests);
     free(array_of_statuses);
 }
-
-void mpi_cart_shift_wrapper(int * comm_f, int * dir, int * disp, int * rank_source, int * rank_dest, int * ierror)
-{
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    *ierror = MPI_Cart_shift(comm, *dir, *disp, rank_source, rank_dest);
-}
