@@ -401,12 +401,34 @@ module mpi
     end subroutine
 
     subroutine MPI_Allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm, ierror)
-        use mpi_c_bindings, only: c_mpi_allreduce_scalar
-        real(8), intent(in) :: sendbuf
-        real(8), intent(out) :: recvbuf
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        use mpi_c_bindings, only: c_mpi_allreduce_scalar, c_mpi_datatype_f2c, c_mpi_op_f2c, c_mpi_comm_f2c, c_mpi_in_place_f2c
+        real(8), intent(in), target :: sendbuf
+        real(8), intent(out), target :: recvbuf
         integer, intent(in) :: count, datatype, op, comm
         integer, intent(out), optional :: ierror
-        call c_mpi_allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+        type(c_ptr) :: sendbuf_ptr, recvbuf_ptr, c_datatype, c_op, c_comm
+        integer(c_int) :: local_ierr
+
+        if (sendbuf == MPI_IN_PLACE) then
+            sendbuf_ptr = c_mpi_in_place_f2c(sendbuf)
+        else
+            sendbuf_ptr = c_loc(sendbuf)
+        end if
+        recvbuf_ptr = c_loc(recvbuf)
+        c_datatype = c_mpi_datatype_f2c(datatype)
+        c_op = c_mpi_op_f2c(op)
+        c_comm = c_mpi_comm_f2c(comm)
+
+        local_ierr = c_mpi_allreduce_scalar(sendbuf_ptr, recvbuf_ptr, count, c_datatype, c_op, c_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Allreduce_scalar failed with error code: ", local_ierr
+            end if
+        end if
     end subroutine
 
     subroutine MPI_Allreduce_1d(sendbuf, recvbuf, count, datatype, op, comm, ierror)

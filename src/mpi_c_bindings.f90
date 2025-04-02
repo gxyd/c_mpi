@@ -44,6 +44,12 @@ module mpi_c_bindings
             type(c_ptr) :: c_mpi_info_f2c
         end function c_mpi_info_f2c
 
+        function c_mpi_in_place_f2c(in_place_f) bind(C,name="get_c_mpi_inplace_from_fortran")
+            use iso_c_binding, only: c_double, c_ptr
+            real(c_double), value :: in_place_f
+            type(c_ptr) :: c_mpi_in_place_f2c
+        end function c_mpi_in_place_f2c
+
         function c_mpi_init(argc, argv) bind(C, name="MPI_Init")
             use iso_c_binding, only : c_int, c_ptr
             !> TODO: is the intent need to be explicitly specified
@@ -126,14 +132,15 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_irecv
         end function
 
-        subroutine c_mpi_allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm, ierror) &
-                                                    bind(C, name="mpi_allreduce_wrapper_real")
-            use iso_c_binding, only: c_int, c_double
-            real(c_double), intent(in) :: sendbuf
-            real(c_double), intent(out) :: recvbuf
-            integer(c_int), intent(in) :: count, datatype, op, comm
-            integer(c_int), intent(out), optional :: ierror
-        end subroutine
+        function c_mpi_allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm) &
+                                                    bind(C, name="MPI_Allreduce")
+            use iso_c_binding, only: c_int, c_double, c_ptr
+            type(c_ptr), value :: sendbuf
+            type(c_ptr), value :: recvbuf
+            integer(c_int), value :: count
+            type(c_ptr), value :: datatype, op, comm
+            integer(c_int) :: c_mpi_allreduce_scalar
+        end function
 
         subroutine c_mpi_allreduce_1d(sendbuf, recvbuf, count, datatype, op, comm, ierror) &
                                                     bind(C, name="mpi_allreduce_wrapper_real")
