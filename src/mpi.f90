@@ -61,7 +61,7 @@ module mpi
     interface MPI_Allreduce
         module procedure MPI_Allreduce_scalar
         module procedure MPI_Allreduce_1D_recv_proc
-        module procedure MPI_Allreduce_array_real
+        module procedure MPI_Allreduce_1D_real_proc
         module procedure MPI_Allreduce_array_int
     end interface
 
@@ -462,15 +462,32 @@ module mpi
         end if
     end subroutine MPI_Allreduce_1D_recv_proc
 
-    subroutine MPI_Allreduce_array_real(sendbuf, recvbuf, count, datatype, op, comm, ierror)
-        use mpi_c_bindings, only: c_mpi_allreduce_array_real
-        ! Declare both send and recv as arrays:
-        real(8), dimension(:), intent(in)  :: sendbuf
-        real(8), dimension(:), intent(out) :: recvbuf
+    subroutine MPI_Allreduce_1D_real_proc(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, c_mpi_comm_f2c, c_mpi_in_place_f2c
+        real(8), dimension(:), intent(in), target :: sendbuf
+        real(8), dimension(:), intent(out), target :: recvbuf
         integer, intent(in) :: count, datatype, op, comm
         integer, intent(out), optional :: ierror
-        call c_mpi_allreduce_array_real(sendbuf, recvbuf, count, datatype, op, comm, ierror)
-    end subroutine MPI_Allreduce_array_real
+        type(c_ptr) :: sendbuf_ptr, recvbuf_ptr, c_datatype, c_op, c_comm
+        integer(c_int) :: local_ierr
+
+        sendbuf_ptr = c_loc(sendbuf)
+        recvbuf_ptr = c_loc(recvbuf)
+        c_datatype = c_mpi_datatype_f2c(datatype)
+        c_op = c_mpi_op_f2c(op)
+        c_comm = c_mpi_comm_f2c(comm)
+
+        local_ierr = c_mpi_allreduce(sendbuf_ptr, recvbuf_ptr, count, c_datatype, c_op, c_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Allreduce_1D_recv_proc failed with error code: ", local_ierr
+            end if
+        end if
+    end subroutine MPI_Allreduce_1D_real_proc
 
     subroutine MPI_Allreduce_array_int(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use mpi_c_bindings, only: c_mpi_allreduce_array_int
