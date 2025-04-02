@@ -61,28 +61,6 @@ void* get_c_mpi_inplace_from_fortran(double sendbuf) {
     return MPI_IN_PLACE;
 }
 
-void mpi_allreduce_wrapper_real(const double *sendbuf, double *recvbuf, int *count,
-                            int *datatype_f, int *op_f, int *comm_f, int *ierror) {
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    MPI_Datatype datatype = get_c_datatype_from_fortran(*datatype_f);
-
-    // I'm a little doubtful: as how would it identify that this part
-    // is supposed to be for MPI_SUM?
-    MPI_Op op = MPI_Op_f2c(*op_f);
-    /*
-    hard-code values here:
-    1. We've hard-coded op as "MPI_SUM" for now, as in POT3D codebase, it's always
-       used as MPI_SUM
-    2. the first argument (i.e. sendbuf) as "MPI_IN_PLACE" for now as it's always
-       used as such in POT3D codebase
-    */
-   if (*sendbuf == FORTRAN_MPI_IN_PLACE) {
-        *ierror = MPI_Allreduce(MPI_IN_PLACE , recvbuf, *count, datatype, MPI_SUM, comm);
-   } else {
-        *ierror = MPI_Allreduce(sendbuf , recvbuf, *count, datatype, MPI_SUM, comm);
-   }
-}
-
 void mpi_allreduce_wrapper_int(const int *sendbuf, int *recvbuf, int *count,
                             int *datatype_f, int *op_f, int *comm_f, int *ierror) {
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
