@@ -55,17 +55,6 @@ MPI_Comm get_c_comm_from_fortran(int comm_f) {
     }
 }
 
-void mpi_isend_wrapper(const double *buf, int *count, int *datatype_f,
-                        int *dest, int *tag, int *comm_f, int *request_f,
-                        int *ierror) {
-    MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
-    MPI_Datatype datatype = get_c_datatype_from_fortran(*datatype_f);
-
-    MPI_Request request;
-    *ierror = MPI_Isend(buf, *count, datatype, *dest, *tag, comm, &request);
-    *request_f = MPI_Request_c2f(request);
-}
-
 void mpi_allreduce_wrapper_real(const double *sendbuf, double *recvbuf, int *count,
                             int *datatype_f, int *op_f, int *comm_f, int *ierror) {
     MPI_Comm comm = get_c_comm_from_fortran(*comm_f);
