@@ -670,7 +670,7 @@ module mpi
         use mpi_c_bindings, only: c_mpi_waitall
         integer, intent(in) :: count
         integer, intent(inout) :: array_of_requests(count)
-        integer :: array_of_statuses(*)
+        integer, intent(out) :: array_of_statuses(*)
         integer, optional, intent(out) :: ierror
         call c_mpi_waitall(count, array_of_requests, array_of_statuses, ierror)
     end subroutine
