@@ -8,7 +8,8 @@ module mpi_c_bindings
 #endif
 
     interface
-        function c_mpi_comm_f2c(comm_f) bind(C, name="get_c_comm_from_fortran")
+    
+        function c_mpi_comm_f2c(comm_f) bind(C, name="MPI_Comm_f2c")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: comm_f
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_comm_f2c
@@ -32,6 +33,18 @@ module mpi_c_bindings
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_request_f2c
         end function c_mpi_request_f2c
 
+        function c_mpi_status_c2f(c_status, f_status) bind(C, name="MPI_Status_c2f")
+            use iso_c_binding, only: c_ptr, c_int
+            type(c_ptr) :: c_status
+            integer(c_int) :: f_status(*)  ! assumed-size array
+            integer(c_int) :: c_mpi_status_c2f
+        end function c_mpi_status_c2f
+        
+        function c_mpi_comm_world() bind(C, name="get_c_mpi_comm_world")
+            use iso_c_binding, only: c_ptr
+            integer(kind=MPI_HANDLE_KIND) :: c_mpi_comm_world
+        end function c_mpi_comm_world
+
         function c_mpi_datatype_f2c(datatype) bind(C, name="get_c_datatype_from_fortran")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: datatype
@@ -43,13 +56,6 @@ module mpi_c_bindings
             integer(c_int), value :: op_f
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_op_f2c
         end function c_mpi_op_f2c
-
-        function c_mpi_status_c2f(c_status, f_status) bind(C, name="MPI_Status_c2f")
-            use iso_c_binding, only: c_ptr, c_int
-            type(c_ptr) :: c_status
-            integer(c_int) :: f_status(*)  ! assumed-size array
-            integer(c_int) :: c_mpi_status_c2f
-        end function c_mpi_status_c2f
         
         function c_mpi_info_f2c(info_f) bind(C, name="get_c_info_from_fortran")
             use iso_c_binding, only: c_int, c_ptr
