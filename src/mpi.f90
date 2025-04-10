@@ -681,7 +681,7 @@ module mpi
 
     subroutine MPI_Waitall_proc(count, array_of_requests, array_of_statuses, ierror)
         use iso_c_binding, only: c_int, c_ptr
-        use mpi_c_bindings, only: c_mpi_waitall, c_mpi_request_f2c, c_mpi_request_c2f, c_mpi_status_c2f
+        use mpi_c_bindings, only: c_mpi_waitall, c_mpi_request_f2c, c_mpi_request_c2f, c_mpi_status_c2f, c_mpi_statuses_ignore
         integer, intent(in) :: count
         integer, dimension(count), intent(inout) :: array_of_requests
         integer, dimension(*), intent(out) :: array_of_statuses
@@ -691,10 +691,10 @@ module mpi
         integer :: i
 
         ! Allocate temporary arrays for the C representations.
-        integer(kind=MPI_HANDLE_KIND), allocatable :: c_requests(:)
-        type(c_ptr), allocatable :: c_statuses(:)
-        allocate(c_requests(count))
-        allocate(c_statuses(count*MPI_STATUS_SIZE))
+        integer(kind=MPI_HANDLE_KIND), dimension(count) :: c_requests
+        type(c_ptr) :: MPI_STATUSES_IGNORE_from_c
+
+        MPI_STATUSES_IGNORE_from_c = c_mpi_statuses_ignore()
 
         ! Convert Fortran requests to C requests.
         do i = 1, count
@@ -702,24 +702,12 @@ module mpi
         end do
 
         ! Call the native MPI_Waitall.
-        local_ierr = c_mpi_waitall(count, c_requests, c_statuses)
+        local_ierr = c_mpi_waitall(count, c_requests, MPI_STATUSES_IGNORE_from_c)
 
         ! Convert the C requests back to Fortran handles.
         do i = 1, count
             array_of_requests(i) = c_mpi_request_c2f(c_requests(i))
         end do
-
-        ! For each status, convert the C status to Fortran status.
-        if(array_of_statuses(1) == MPI_STATUS_IGNORE) then
-            ! If the status is ignored, we don't need to convert.
-            array_of_statuses(1) = 0
-            ! print *, "Status is ignored, no conversion needed."
-        else
-            ! Convert the C status to Fortran status.
-            do i = 1, count
-                status_ierr = c_mpi_status_c2f(c_statuses(i), array_of_statuses((i-1)*MPI_STATUS_SIZE+1))
-            end do
-        end if
 
         if (present(ierror)) then
             ierror = local_ierr
@@ -727,8 +715,6 @@ module mpi
             print *, "MPI_Waitall failed with error code: ", local_ierr
         end if
 
-        deallocate(c_requests)
-        deallocate(c_statuses)
     end subroutine MPI_Waitall_proc
 
     subroutine MPI_Ssend_proc(buf, count, datatype, dest, tag, comm, ierror)

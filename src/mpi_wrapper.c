@@ -60,3 +60,7 @@ MPI_Comm get_c_comm_from_fortran(int comm_f) {
 void* get_c_mpi_inplace_from_fortran(double sendbuf) {
     return MPI_IN_PLACE;
 }
+
+MPI_Status* get_c_MPI_STATUSES_IGNORE(){
+    return MPI_STATUSES_IGNORE;
+}

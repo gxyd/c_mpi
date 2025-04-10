@@ -57,6 +57,11 @@ module mpi_c_bindings
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_info_f2c
         end function c_mpi_info_f2c
 
+        function c_mpi_statuses_ignore() bind(C, name="get_c_MPI_STATUSES_IGNORE")
+            use iso_c_binding, only: c_ptr
+            type(c_ptr) :: c_mpi_statuses_ignore
+        end function c_mpi_statuses_ignore
+
         function c_mpi_in_place_f2c(in_place_f) bind(C,name="get_c_mpi_inplace_from_fortran")
             use iso_c_binding, only: c_double, c_ptr
             real(c_double), value :: in_place_f
@@ -199,7 +204,7 @@ module mpi_c_bindings
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: count
             integer(kind=MPI_HANDLE_KIND), dimension(*), intent(inout) :: requests
-            type(c_ptr), dimension(*), intent(out)   :: statuses
+            type(c_ptr), value :: statuses
             integer(c_int) :: c_mpi_waitall
         end function c_mpi_waitall
 
