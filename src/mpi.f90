@@ -686,6 +686,7 @@ module mpi
         integer, dimension(count), intent(inout) :: array_of_requests
         integer, dimension(*), intent(out) :: array_of_statuses
         integer, optional, intent(out) :: ierror
+        integer :: arr_request_item
 
         integer(c_int) :: local_ierr, status_ierr
         integer :: i
@@ -698,7 +699,8 @@ module mpi
 
         ! Convert Fortran requests to C requests.
         do i = 1, count
-            c_requests(i) = c_mpi_request_f2c(array_of_requests(i))
+            arr_request_item = array_of_requests(i)
+            c_requests(i) = c_mpi_request_f2c(arr_request_item)
         end do
 
         ! Call the native MPI_Waitall.
@@ -706,7 +708,8 @@ module mpi
 
         ! Convert the C requests back to Fortran handles.
         do i = 1, count
-            array_of_requests(i) = c_mpi_request_c2f(c_requests(i))
+            arr_request_item = c_requests(i)
+            array_of_requests(i) = c_mpi_request_c2f(arr_request_item)
         end do
 
         if (present(ierror)) then
