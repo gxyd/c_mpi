@@ -61,29 +61,6 @@ void* get_c_mpi_inplace_from_fortran(double sendbuf) {
     return MPI_IN_PLACE;
 }
 
-void mpi_waitall_wrapper(int *count, int *array_of_requests_f,
-                        int *array_of_statuses_f, int *ierror) {
-    MPI_Request *array_of_requests;
-    MPI_Status *array_of_statuses;
-    array_of_requests = (MPI_Request *)malloc((*count) * sizeof(MPI_Request));
-    array_of_statuses = (MPI_Status *)malloc((*count) * sizeof(MPI_Status));
-    if (array_of_requests == NULL || array_of_statuses == NULL) {
-        *ierror = MPI_ERR_NO_MEM;
-        return;
-    }
-    for (int i = 0; i < *count; i++) {
-        array_of_requests[i] = MPI_Request_f2c(array_of_requests_f[i]);
-    }
-
-    *ierror = MPI_Waitall(*count, array_of_requests, array_of_statuses);
-    for (int i = 0; i < *count; i++) {
-        array_of_requests_f[i] = MPI_Request_c2f(array_of_requests[i]);
-    }
-
-    for (int i = 0; i < *count; i++) {
-        MPI_Status_c2f(&array_of_statuses[i], &array_of_statuses_f[i * MPI_STATUS_SIZE]);
-    }
-
-    free(array_of_requests);
-    free(array_of_statuses);
+MPI_Status* get_c_MPI_STATUSES_IGNORE(){
+    return MPI_STATUSES_IGNORE;
 }

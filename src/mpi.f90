@@ -605,7 +605,7 @@ module mpi
           end if
         end if
     
-      end subroutine MPI_Comm_split_type_proc
+    end subroutine MPI_Comm_split_type_proc
 
     subroutine MPI_Recv_StatusArray_proc(buf, count, datatype, source, tag, comm, status, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
@@ -636,14 +636,14 @@ module mpi
         end if
     
         if (present(ierror)) then
-          ierror = local_ierr
+            ierror = local_ierr
         else if (local_ierr /= MPI_SUCCESS) then
-          print *, "MPI_Recv failed with error code: ", local_ierr
+            print *, "MPI_Recv failed with error code: ", local_ierr
         end if
     
-      end subroutine MPI_Recv_StatusArray_proc
+    end subroutine MPI_Recv_StatusArray_proc
 
-      subroutine MPI_Recv_StatusIgnore_proc(buf, count, datatype, source, tag, comm, status, ierror)
+    subroutine MPI_Recv_StatusIgnore_proc(buf, count, datatype, source, tag, comm, status, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
         use mpi_c_bindings, only: c_mpi_recv, c_mpi_comm_f2c, c_mpi_datatype_f2c, c_mpi_status_c2f
         real(8), dimension(*), intent(inout), target :: buf
@@ -672,21 +672,54 @@ module mpi
         end if
 
         if (present(ierror)) then
-          ierror = local_ierr
+            ierror = local_ierr
         else if (local_ierr /= MPI_SUCCESS) then
-          print *, "MPI_Recv failed with error code: ", local_ierr
+            print *, "MPI_Recv failed with error code: ", local_ierr
         end if
-
-      end subroutine MPI_Recv_StatusIgnore_proc
+    
+    end subroutine MPI_Recv_StatusIgnore_proc
 
     subroutine MPI_Waitall_proc(count, array_of_requests, array_of_statuses, ierror)
-        use mpi_c_bindings, only: c_mpi_waitall
+        use iso_c_binding, only: c_int, c_ptr
+        use mpi_c_bindings, only: c_mpi_waitall, c_mpi_request_f2c, c_mpi_request_c2f, c_mpi_status_c2f, c_mpi_statuses_ignore
         integer, intent(in) :: count
-        integer, intent(inout) :: array_of_requests(count)
-        integer, intent(out) :: array_of_statuses(*)
+        integer, dimension(count), intent(inout) :: array_of_requests
+        integer, dimension(*), intent(out) :: array_of_statuses
         integer, optional, intent(out) :: ierror
-        call c_mpi_waitall(count, array_of_requests, array_of_statuses, ierror)
-    end subroutine
+        integer :: arr_request_item_kind_4
+        integer(kind=MPI_HANDLE_KIND) :: arr_request_item_kind_mpi_handle_kind
+
+        integer(c_int) :: local_ierr, status_ierr
+        integer :: i
+
+        ! Allocate temporary arrays for the C representations.
+        integer(kind=MPI_HANDLE_KIND), dimension(count) :: c_requests
+        type(c_ptr) :: MPI_STATUSES_IGNORE_from_c
+
+        MPI_STATUSES_IGNORE_from_c = c_mpi_statuses_ignore()
+
+        ! Convert Fortran requests to C requests.
+        do i = 1, count
+            arr_request_item_kind_4 = array_of_requests(i)
+            c_requests(i) = c_mpi_request_f2c(arr_request_item_kind_4)
+        end do
+
+        ! Call the native MPI_Waitall.
+        local_ierr = c_mpi_waitall(count, c_requests, MPI_STATUSES_IGNORE_from_c)
+
+        ! Convert the C requests back to Fortran handles.
+        do i = 1, count
+            arr_request_item_kind_mpi_handle_kind = c_requests(i)
+            array_of_requests(i) = c_mpi_request_c2f(arr_request_item_kind_mpi_handle_kind)
+        end do
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else if (local_ierr /= MPI_SUCCESS) then
+            print *, "MPI_Waitall failed with error code: ", local_ierr
+        end if
+
+    end subroutine MPI_Waitall_proc
 
     subroutine MPI_Ssend_proc(buf, count, datatype, dest, tag, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr

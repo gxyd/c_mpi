@@ -26,6 +26,12 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_request_c2f
         end function
 
+        function c_mpi_request_f2c(request) bind(C, name="MPI_Request_f2c")
+            use iso_c_binding, only: c_int, c_ptr
+            integer(c_int), value :: request
+            integer(kind=MPI_HANDLE_KIND) :: c_mpi_request_f2c
+        end function c_mpi_request_f2c
+
         function c_mpi_datatype_f2c(datatype) bind(C, name="get_c_datatype_from_fortran")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: datatype
@@ -44,12 +50,17 @@ module mpi_c_bindings
             integer(c_int) :: f_status(*)  ! assumed-size array
             integer(c_int) :: c_mpi_status_c2f
         end function c_mpi_status_c2f
-
+        
         function c_mpi_info_f2c(info_f) bind(C, name="get_c_info_from_fortran")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: info_f
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_info_f2c
         end function c_mpi_info_f2c
+
+        function c_mpi_statuses_ignore() bind(C, name="get_c_MPI_STATUSES_IGNORE")
+            use iso_c_binding, only: c_ptr
+            type(c_ptr) :: c_mpi_statuses_ignore
+        end function c_mpi_statuses_ignore
 
         function c_mpi_in_place_f2c(in_place_f) bind(C,name="get_c_mpi_inplace_from_fortran")
             use iso_c_binding, only: c_double, c_ptr
@@ -189,13 +200,13 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_recv
         end function c_mpi_recv
 
-        subroutine c_mpi_waitall(count, array_of_requests, array_of_statuses, ierror) bind(C, name="mpi_waitall_wrapper")
-            use iso_c_binding, only: c_int
-            integer(c_int), intent(in) :: count
-            integer(c_int), intent(inout) :: array_of_requests(count)
-            integer(c_int) :: array_of_statuses(*)
-            integer(c_int), optional, intent(out) :: ierror
-        end subroutine
+        function c_mpi_waitall(count, requests, statuses) bind(C, name="MPI_Waitall")
+            use iso_c_binding, only: c_int, c_ptr
+            integer(c_int), value :: count
+            integer(kind=MPI_HANDLE_KIND), dimension(*), intent(inout) :: requests
+            type(c_ptr), value :: statuses
+            integer(c_int) :: c_mpi_waitall
+        end function c_mpi_waitall
 
         function c_mpi_ssend(buf, count, datatype, dest, tag, comm) bind(C, name="MPI_Ssend")
             use iso_c_binding, only: c_int, c_double, c_ptr
