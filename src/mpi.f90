@@ -451,7 +451,8 @@ module mpi
 
     subroutine MPI_Allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
-        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, c_mpi_comm_f2c, c_mpi_in_place_f2c, c_mpi_comm_world
+        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, &
+                                c_mpi_comm_f2c, c_mpi_in_place_f2c, c_mpi_comm_world
         real(8), intent(in), target :: sendbuf
         real(8), intent(out), target :: recvbuf
         integer, intent(in) :: count, datatype, op, comm
@@ -488,7 +489,8 @@ module mpi
 
     subroutine MPI_Allreduce_1D_recv_proc(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
-        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, c_mpi_comm_f2c, c_mpi_in_place_f2c, c_mpi_comm_world
+        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, &
+                                c_mpi_comm_f2c, c_mpi_in_place_f2c, c_mpi_comm_world
         real(8), intent(in), target :: sendbuf
         real(8), dimension(:), intent(out), target :: recvbuf
         integer, intent(in) :: count, datatype, op, comm
@@ -525,7 +527,8 @@ module mpi
 
     subroutine MPI_Allreduce_1D_real_proc(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
-        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, c_mpi_comm_f2c, c_mpi_in_place_f2c,c_mpi_comm_world
+        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, &
+                                c_mpi_comm_f2c, c_mpi_in_place_f2c,c_mpi_comm_world
         real(8), dimension(:), intent(in), target :: sendbuf
         real(8), dimension(:), intent(out), target :: recvbuf
         integer, intent(in) :: count, datatype, op, comm
@@ -558,7 +561,8 @@ module mpi
 
     subroutine MPI_Allreduce_1D_int_proc(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
-        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, c_mpi_comm_f2c, c_mpi_in_place_f2c, c_mpi_comm_world
+        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, &
+                                c_mpi_comm_f2c, c_mpi_in_place_f2c, c_mpi_comm_world
         integer, dimension(:), intent(in), target :: sendbuf
         integer, dimension(:), intent(out), target :: recvbuf
         integer, intent(in) :: count, datatype, op, comm
@@ -649,7 +653,8 @@ module mpi
 
     subroutine MPI_Comm_split_type_proc(comm, split_type, key, info, newcomm, ierror)
         use iso_c_binding, only: c_int, c_ptr
-        use mpi_c_bindings, only: c_mpi_comm_split_type, c_mpi_comm_f2c, c_mpi_comm_c2f, c_mpi_info_f2c, c_mpi_comm_world
+        use mpi_c_bindings, only: c_mpi_comm_split_type, c_mpi_comm_f2c, c_mpi_comm_c2f, &
+                                c_mpi_info_f2c, c_mpi_comm_world
         integer, intent(in) :: comm
         integer, intent(in) :: split_type, key
         integer, intent(in) :: info
