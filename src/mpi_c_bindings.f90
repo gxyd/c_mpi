@@ -29,7 +29,7 @@ module mpi_c_bindings
         function c_mpi_request_f2c(request) bind(C, name="MPI_Request_f2c")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: request
-            type(c_ptr) :: c_mpi_request_f2c
+            integer(kind=MPI_HANDLE_KIND) :: c_mpi_request_f2c
         end function c_mpi_request_f2c
 
         function c_mpi_datatype_f2c(datatype) bind(C, name="get_c_datatype_from_fortran")
@@ -198,7 +198,7 @@ module mpi_c_bindings
         function c_mpi_waitall(count, requests, statuses) bind(C, name="MPI_Waitall")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: count
-            type(c_ptr), dimension(*), intent(inout) :: requests
+            integer(kind=MPI_HANDLE_KIND), dimension(*), intent(inout) :: requests
             type(c_ptr), dimension(*), intent(out)   :: statuses
             integer(c_int) :: c_mpi_waitall
         end function c_mpi_waitall

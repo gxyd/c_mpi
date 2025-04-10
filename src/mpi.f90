@@ -691,7 +691,7 @@ module mpi
         integer :: i
 
         ! Allocate temporary arrays for the C representations.
-        type(c_ptr), allocatable :: c_requests(:)
+        integer(kind=MPI_HANDLE_KIND), allocatable :: c_requests(:)
         type(c_ptr), allocatable :: c_statuses(:)
         allocate(c_requests(count))
         allocate(c_statuses(count*MPI_STATUS_SIZE))
