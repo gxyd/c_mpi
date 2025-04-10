@@ -1,50 +1,98 @@
-## How to run 'tests/cart_sub.f90'
+# Custom MPI Wrapper for Fortran
 
-```console
-> cd src
-> echo ${CC}
-/usr/bin/clang  # result on macOS
-> ${CC} -c -I${CONDA_PREFIX}/include mpi_wrapper.c
-> mpif90 -c mpi_c_bindings.f90 mpi.f90
-> cd ../tests/
-> mpif90 cart_sub.f90 ../src/mpi_c_bindings.o ../src/mpi_wrapper.o ../src/mpi.o -o cart_sub && ./cart_sub
- Global Rank:           0 Cartesian Coordinates:           0           0
- New communicator rank:           0 New communicator size:           1
+Welcome to the Custom MPI Wrapper project! This repository contains a Fortran-based implementation of MPI wrappers that bind directly to native MPI library routines using ISO_C_BINDING. The goal is to eliminate intermediate C wrappers and call MPI functions directly from Fortran.
+
+This project currently supports MPI routines such as `MPI_Init`, `MPI_Bcast`, `MPI_Reduce`, `MPI_Comm_split_type`, `MPI_Recv`, `MPI_Ssend`, `MPI_Waitall`, and more. In addition, the repository provides several tests to verify the correctness of these custom wrappers.
+
+
+<!-- ## Features
+
+- **Direct MPI Bindings:**  
+  Use ISO_C_BINDING to call MPI functions directly without custom C wrappers.
+
+- **Comprehensive Wrappers:**  
+  Implements wrappers for various MPI functions (e.g., broadcast, reduction, communicator splitting, synchronous send/receive, wait-all).
+
+- **Status and Request Conversions:**  
+  Converts between Fortran integer handles and C pointers for MPI requests, statuses, and other objects.
+
+- **Cross-MPI Compatibility:**  
+  Supports both OpenMPI and MPICH. You can build separate conda environments for each MPI implementation. -->
+---
+
+## Prerequisites
+
+- **Fortran Compiler:**  
+  You can use LFortran, gfortran, or any standard Fortran compiler.
+
+- **MPI Library:**  
+  This project supports OpenMPI and MPICH. Install the desired MPI library along with its development headers.
+
+- **Conda Environment (Optional):**  
+  It is recommended to create separate conda environments for MPICH and OpenMPI:
+  - For **MPICH**:
+    ```bash
+    conda create -n mpich_env mpich=4.3.0
+    conda activate mpich_env
+    ```
+  - For **OpenMPI**:
+    ```bash
+    conda create -n openmpi_env openmpi=5.0.6
+    conda activate openmpi_env
+    ```
+
+---
+
+## Running Tests
+
+The repository contains a collection of standalone tests located in the `tests/` directory. These tests validate the functionality of the custom MPI wrappers.
+
+### Running All Standalone Tests
+
+To execute **all** standalone tests, navigate to the `tests/` directory and run:
+
+```bash
+cd tests/
+FC='lfortran' ./run_tests.sh
 ```
 
-OR via MPIRUN
+### Running a Specific Standalone Test
 
-```console
-> mpif90 cart_sub.f90 ../src/mpi_c_bindings.o ../src/mpi_wrapper.c ../src/mpi.o -o a && mpirun -np 4 ./a
- Global Rank:           3 Cartesian Coordinates:           1           1
- Global Rank:           0 Cartesian Coordinates:           0           0
- Global Rank:           1 Cartesian Coordinates:           0           1
- Global Rank:           2 Cartesian Coordinates:           1           0
- New communicator rank:           3 New communicator size:           2
- New communicator rank:           0 New communicator size:           2
- New communicator rank:           1 New communicator size:           2
- New communicator rank:           2 New communicator size:           2
+If you want to run a single test (for example, `testFilename.f90`), execute:
+
+```bash
+cd tests/
+FC='lfortran' ./run_tests.sh testFilename.f90
 ```
 
-## How to run a new MPI program with custom MPI wrappers
+### Running the `pot3d` Test
 
-```console
-> pwd
-/Users/gxyd/OpenSource/c_mpi
-> ls test.f90
-test.f90
-> ./run_with_mpi_wrappers.sh test.f90 -np 2
-Configuration results
----------------------
-Using C compiler: /usr/bin/clang
-Using Fortran compiler: /Users/gxyd/miniforge3/envs/pot3d_build/bin/arm64-apple-darwin20.0.0-gfortran
+To build and run the `pot3d` test, navigate to the `tests/pot3d/` directory.
 
-Compiling src/mpi_wrapper.c with /usr/bin/clang...
-Compiling src/mpi_c_bindings.f90 with /Users/gxyd/miniforge3/envs/pot3d_build/bin/arm64-apple-darwin20.0.0-gfortran...
-Compiling src/mpi.f90 with /Users/gxyd/miniforge3/envs/pot3d_build/bin/arm64-apple-darwin20.0.0-gfortran...
-Compiling test.f90 with /Users/gxyd/miniforge3/envs/pot3d_build/bin/arm64-apple-darwin20.0.0-gfortran...
-Linking objects to create executable: test
-Running: mpiexec -np 2 ./test
- Hello from rank            0  of            2
- Hello from rank            1  of            2
+- For Lfortran run:
+
+```bash
+cd tests/pot3d/
+FC='lfortran' ./build_and_run_lfortran.sh
 ```
+
+- For GFortran run:
+
+```bash
+cd tests/pot3d/
+FC='gfortran' ./build_and_run_gfortran.sh
+```
+
+---
+
+## Customizing Compiler Flags
+
+You can pass custom flags to your Fortran compiler using the `FC` environment variable. For example, to compile with optimization flags using gfortran, run:
+
+```bash
+FC='gfortran -O3' ./run_tests.sh
+```
+
+This enables you to tailor the compilation process to your needs.
+
+

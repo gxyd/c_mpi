@@ -73,8 +73,8 @@ jobs:
         shell: bash -e -x -l {0}
         run: |
           cd tests
-          FC="gfortran" ./run_tests.sh
-          FC="gfortran -O3 -march=native" ./run_tests.sh
+          FC="gfortran -cpp -DOPEN_MPI=yes" ./run_tests.sh
+          FC="gfortran -O3 -march=native -cpp -DOPEN_MPI=yes" ./run_tests.sh
 
   Run_standalone_tests_with_GFortran_with_MPICH:
     name: "Run standalone tests with GFortran with MPICH"
@@ -95,8 +95,8 @@ jobs:
         shell: bash -e -x -l {0}
         run: |
           cd tests
-          FC="gfortran" ./run_tests.sh
-          FC="gfortran -O3 -march=native" ./run_tests.sh
+          FC="gfortran -cpp" ./run_tests.sh
+          FC="gfortran -O3 -march=native -cpp" ./run_tests.sh
 
   Run_standalone_tests_with_LFortran_with_OpenMPI:
     name: "Run standalone tests with LFortran with Open MPI"
@@ -117,8 +117,8 @@ jobs:
         shell: bash -e -x -l {0}
         run: |
           cd tests
-          FC="lfortran" ./run_tests.sh
-          FC="lfortran --fast" ./run_tests.sh
+          FC="lfortran --cpp -DOPEN_MPI=yes" ./run_tests.sh
+          FC="lfortran --fast --cpp -DOPEN_MPI=yes" ./run_tests.sh
 
   Run_standalone_tests_with_LFortran_with_MPICH:
     name: "Run standalone tests with LFortran with MPICH"
@@ -139,8 +139,8 @@ jobs:
         shell: bash -e -x -l {0}
         run: |
           cd tests
-          FC="lfortran" ./run_tests.sh
-          FC="lfortran --fast" ./run_tests.sh
+          FC="lfortran --cpp" ./run_tests.sh
+          FC="lfortran --fast --cpp" ./run_tests.sh
 
   Compile_POT3D_with_GFortran_with_OpenMPI:
     name: "Build POT3D and validate with GFortran with Open MPI"
@@ -162,14 +162,14 @@ jobs:
         shell: bash -e -x -l {0}
         run: |
           cd tests/pot3d
-          FC="gfortran -O3 -march=native" ./build_and_run_gfortran.sh
+          FC="gfortran -O3 -march=native -cpp -DOPEN_MPI=yes" ./build_and_run_gfortran.sh
 
       # build and validation without GFortran's optimization
       - name: POT3D Build and validation with GFortran without optimization using Open MPI (MPI only)
         shell: bash -e -x -l {0}
         run: |
           cd tests/pot3d
-          FC="gfortran" ./build_and_run_gfortran.sh
+          FC="gfortran -cpp -DOPEN_MPI=yes" ./build_and_run_gfortran.sh
 
   Compile_POT3D_with_LFortran_with_OpenMPI:
     name: "Build POT3D and validate with LFortran with Open MPI"
@@ -191,14 +191,14 @@ jobs:
         shell: bash -e -x -l {0}
         run: |
           cd tests/pot3d
-          FC="lfortran --fast" ./build_and_run_lfortran.sh
+          FC="lfortran --fast --cpp -DOPEN_MPI=yes" ./build_and_run_lfortran.sh
 
       # build and validation without LFortran's optimization
       - name: POT3D Build and validation with LFortran without optimization using Open MPI (MPI only)
         shell: bash -e -x -l {0}
         run: |
           cd tests/pot3d
-          FC="lfortran" ./build_and_run_lfortran.sh
+          FC="lfortran --cpp -DOPEN_MPI=yes" ./build_and_run_lfortran.sh
 
   Compile_POT3D_with_GFortran_with_MPICH:
     name: "Build POT3D and validate with GFortran with MPICH"
@@ -220,14 +220,14 @@ jobs:
         shell: bash -e -x -l {0}
         run: |
           cd tests/pot3d
-          FC="gfortran -O3 -march=native" ./build_and_run_gfortran.sh
+          FC="gfortran -O3 -march=native -cpp" ./build_and_run_gfortran.sh
 
       # build and validation without GFortran's optimization
       - name: POT3D Build and validation with GFortran without optimization (MPI only)
         shell: bash -e -x -l {0}
         run: |
           cd tests/pot3d
-          FC="gfortran" ./build_and_run_gfortran.sh
+          FC="gfortran -cpp" ./build_and_run_gfortran.sh
 
   Compile_POT3D_with_LFortran_with_MPICH:
     name: "Build POT3D and validate with LFortran with MPICH"
@@ -249,11 +249,11 @@ jobs:
         shell: bash -e -x -l {0}
         run: |
           cd tests/pot3d
-          FC="lfortran --fast" ./build_and_run_lfortran.sh
+          FC="lfortran --fast --cpp" ./build_and_run_lfortran.sh
 
       # build and validation without LFortran's optimization
       - name: POT3D Build and validation with LFortran without optimization using MPICH (MPI only)
         shell: bash -e -x -l {0}
         run: |
           cd tests/pot3d
-          FC="lfortran" ./build_and_run_lfortran.sh
+          FC="lfortran --cpp" ./build_and_run_lfortran.sh
