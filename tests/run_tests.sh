@@ -48,6 +48,12 @@ else
   fi
 fi
 
+# Define preprocessor flags based on MPI type
+FC_FLAGS=""
+if [[ "$MPI_TYPE" == "openmpi" ]]; then
+  FC_FLAGS="-DOPEN_MPI"
+fi
+
 echo -e "${RED}Removing all untracked files${NC}"
 git clean -dfx
 echo -e "#################################"
@@ -70,8 +76,8 @@ fi
 
 if [ $USE_WRAPPERS -eq 1 ]; then
   $CC -I"$CONDA_PREFIX/include" -c ../src/mpi_wrapper.c
-  $FC -c ../src/mpi_c_bindings.f90
-  $FC -c ../src/mpi.f90
+  $FC $FC_FLAGS -c ../src/mpi_c_bindings.f90
+  $FC $FC_FLAGS -c ../src/mpi.f90
 fi
 
 start_time=$(date +%s)

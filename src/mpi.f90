@@ -1,5 +1,12 @@
 module mpi
     implicit none
+
+#ifdef OPEN_MPI
+#define MPI_HANDLE_KIND 8
+#else
+#define MPI_HANDLE_KIND 4
+#endif
+
     integer, parameter :: MPI_THREAD_FUNNELED = 1
 
     integer, parameter :: MPI_INTEGER = -10002
@@ -189,7 +196,7 @@ module mpi
         integer, intent(out) :: size
         integer, optional, intent(out) :: ierror
         integer :: local_ierr
-        integer(kind=8) :: c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_comm
 
         c_comm = c_mpi_comm_f2c(comm)
         local_ierr = c_mpi_comm_size(c_comm, size)
@@ -210,7 +217,7 @@ module mpi
         integer, intent(in) :: datatype
         integer, intent(in) :: comm
         integer, optional, intent(out) :: ierror
-        integer(kind=8) :: c_comm, c_datatype
+        integer(kind=MPI_HANDLE_KIND) :: c_comm, c_datatype
         integer :: local_ierr
         type(c_ptr) :: buffer_ptr
 
@@ -236,7 +243,7 @@ module mpi
         integer, intent(in) :: datatype
         integer, intent(in) :: comm
         integer, optional, intent(out) :: ierror
-        integer(kind=8) :: c_comm, c_datatype
+        integer(kind=MPI_HANDLE_KIND) :: c_comm, c_datatype
         integer :: local_ierr
         type(c_ptr) :: buffer_ptr
 
@@ -263,9 +270,9 @@ module mpi
         integer, intent(in) :: sendtype, recvtype
         integer, intent(in) :: comm
         integer, optional, intent(out) :: ierror
-        integer(kind=8) :: c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_comm
         integer(c_int) :: local_ierr
-        integer(kind=8) :: c_sendtype, c_recvtype
+        integer(kind=MPI_HANDLE_KIND) :: c_sendtype, c_recvtype
         type(c_ptr) :: sendbuf_ptr, recvbuf_ptr
 
         c_comm = c_mpi_comm_f2c(comm)
@@ -293,9 +300,9 @@ module mpi
         integer, intent(in) :: sendtype, recvtype
         integer, intent(in) :: comm
         integer, optional, intent(out) :: ierror
-        integer(kind=8) :: c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_comm
         integer(c_int) :: local_ierr
-        integer(kind=8) :: c_sendtype, c_recvtype
+        integer(kind=MPI_HANDLE_KIND) :: c_sendtype, c_recvtype
         type(c_ptr) :: sendbuf_ptr, recvbuf_ptr
 
         c_comm = c_mpi_comm_f2c(comm)
@@ -324,7 +331,7 @@ module mpi
         integer, intent(out) :: request
         integer, optional, intent(out) :: ierror
         type(c_ptr) :: buf_ptr
-        integer(kind=8) :: c_datatype, c_comm, c_request
+        integer(kind=MPI_HANDLE_KIND) :: c_datatype, c_comm, c_request
         integer(c_int) :: local_ierr
 
         buf_ptr = c_loc(buf)
@@ -353,7 +360,7 @@ module mpi
         integer, intent(out) :: request
         integer, optional, intent(out) :: ierror
         type(c_ptr) :: buf_ptr
-        integer(kind=8) :: c_datatype, c_comm, c_request
+        integer(kind=MPI_HANDLE_KIND) :: c_datatype, c_comm, c_request
         integer(c_int) :: local_ierr
 
         buf_ptr = c_loc(buf)
@@ -381,10 +388,10 @@ module mpi
         integer, intent(in) :: comm
         integer, intent(out) :: request
         integer, optional, intent(out) :: ierror
-        integer(kind=8) :: c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_comm
         integer(c_int) :: local_ierr
-        integer(kind=8) :: c_datatype
-        integer(kind=8) :: c_request
+        integer(kind=MPI_HANDLE_KIND) :: c_datatype
+        integer(kind=MPI_HANDLE_KIND) :: c_request
 
         c_comm = c_mpi_comm_f2c(comm)
         c_datatype = c_mpi_datatype_f2c(datatype)
@@ -408,7 +415,7 @@ module mpi
         integer, intent(in) :: count, datatype, op, comm
         integer, intent(out), optional :: ierror
         type(c_ptr) :: sendbuf_ptr, recvbuf_ptr
-        integer(kind=8) :: c_datatype, c_op, c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_datatype, c_op, c_comm
         integer(c_int) :: local_ierr
 
         if (sendbuf == MPI_IN_PLACE) then
@@ -440,7 +447,7 @@ module mpi
         integer, intent(in) :: count, datatype, op, comm
         integer, intent(out), optional :: ierror
         type(c_ptr) :: sendbuf_ptr, recvbuf_ptr
-        integer(kind=8) :: c_datatype, c_op, c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_datatype, c_op, c_comm
         integer(c_int) :: local_ierr
 
         if (sendbuf == MPI_IN_PLACE) then
@@ -472,7 +479,7 @@ module mpi
         integer, intent(in) :: count, datatype, op, comm
         integer, intent(out), optional :: ierror
         type(c_ptr) :: sendbuf_ptr, recvbuf_ptr
-        integer(kind=8) :: c_datatype, c_op, c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_datatype, c_op, c_comm
         integer(c_int) :: local_ierr
 
         sendbuf_ptr = c_loc(sendbuf)
@@ -500,7 +507,7 @@ module mpi
         integer, intent(in) :: count, datatype, op, comm
         integer, intent(out), optional :: ierror
         type(c_ptr) :: sendbuf_ptr, recvbuf_ptr
-        integer(kind=8) :: c_datatype, c_op, c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_datatype, c_op, c_comm
         integer(c_int) :: local_ierr
 
         sendbuf_ptr = c_loc(sendbuf)
@@ -531,7 +538,7 @@ module mpi
         use iso_c_binding, only: c_int, c_ptr
         integer, intent(in) :: comm
         integer, intent(out), optional :: ierror
-        integer(kind=8) :: c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_comm
         integer(c_int) :: local_ierr
 
         ! Convert Fortran handle to C handle
@@ -553,7 +560,7 @@ module mpi
         integer, intent(in) :: comm
         integer, intent(out) :: rank
         integer, optional, intent(out) :: ierror
-        integer(kind=8) :: c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_comm
         integer(c_int) :: local_ierr
 
         c_comm = c_mpi_comm_f2c(comm)
@@ -578,7 +585,7 @@ module mpi
         integer, optional, intent(out) :: ierror
     
         integer(c_int) :: local_ierr
-        integer(kind=8) :: c_comm, c_info, c_new_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_comm, c_info, c_new_comm
     
         ! Convert Fortran communicator and info handles to C pointers.
         c_comm = c_mpi_comm_f2c(comm)
@@ -609,7 +616,7 @@ module mpi
         integer, optional, intent(out) :: ierror
     
         integer(c_int) :: local_ierr, status_ierr
-        integer(kind=8) :: c_dtype, c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_dtype, c_comm
         type(c_ptr) :: c_status
         integer(c_int), dimension(MPI_STATUS_SIZE), target :: tmp_status
     
@@ -645,7 +652,7 @@ module mpi
         integer, optional, intent(out) :: ierror
     
         integer(c_int) :: local_ierr, status_ierr
-        integer(kind=8) :: c_dtype, c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_dtype, c_comm
         type(c_ptr) :: c_status
         integer(c_int), dimension(MPI_STATUS_SIZE), target :: tmp_status
 
@@ -689,7 +696,7 @@ module mpi
         integer, intent(in) :: datatype
         integer, intent(in) :: comm
         integer, optional, intent(out) :: ierror
-        integer(kind=8) :: c_datatype, c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_datatype, c_comm
         integer :: local_ierr
 
         c_datatype = c_mpi_datatype_f2c(datatype)
@@ -706,8 +713,8 @@ module mpi
         integer, intent(out) :: comm_cart
         integer, optional, intent(out) :: ierror
         integer(c_int) :: ndims_c, reorder_c, dims_c(ndims), periods_c(ndims)
-        integer(kind=8) :: c_comm_old
-        integer(kind=8) :: c_comm_cart
+        integer(kind=MPI_HANDLE_KIND) :: c_comm_old
+        integer(kind=MPI_HANDLE_KIND) :: c_comm_cart
         integer(c_int) :: local_ierr
 
         c_comm_old = c_mpi_comm_f2c(comm_old)
@@ -742,7 +749,7 @@ module mpi
         integer, intent(in) :: rank, maxdims
         integer, intent(out) :: coords(maxdims)
         integer, optional, intent(out) :: ierror
-        integer(kind=8) :: c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_comm
         integer(c_int) :: local_ierr
 
         c_comm = c_mpi_comm_f2c(comm)
@@ -764,7 +771,7 @@ module mpi
         integer, intent(in) :: direction, disp
         integer, intent(out) :: rank_source, rank_dest
         integer, optional, intent(out) :: ierror
-        integer(kind=8) :: c_comm
+        integer(kind=MPI_HANDLE_KIND) :: c_comm
         integer(c_int) :: local_ierr
 
         c_comm = c_mpi_comm_f2c(comm)
@@ -805,7 +812,7 @@ module mpi
         integer, intent(out) :: newcomm
         integer, optional, intent(out) :: ierror
         integer, target :: remain_dims_i(size(remain_dims))
-        integer(kind=8) :: c_comm, c_newcomm
+        integer(kind=MPI_HANDLE_KIND) :: c_comm, c_newcomm
         integer :: local_ierr
         type(c_ptr) :: remain_dims_i_ptr
 
@@ -838,7 +845,7 @@ module mpi
         integer, intent(in)  :: count, datatype, op, root, comm
         integer, optional, intent(out) :: ierror
 
-        integer(kind=8)    :: c_comm, c_dtype, c_op
+        integer(kind=MPI_HANDLE_KIND)    :: c_comm, c_dtype, c_op
         type(c_ptr)    :: c_sendbuf, c_recvbuf
         integer(c_int) :: local_ierr
 

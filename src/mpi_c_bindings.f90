@@ -1,35 +1,41 @@
 module mpi_c_bindings
     implicit none
 
+#ifdef OPEN_MPI
+#define MPI_HANDLE_KIND 8
+#else
+#define MPI_HANDLE_KIND 4
+#endif
+
     interface
         function c_mpi_comm_f2c(comm_f) bind(C, name="get_c_comm_from_fortran")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: comm_f
-            integer(kind=8) :: c_mpi_comm_f2c
+            integer(kind=MPI_HANDLE_KIND) :: c_mpi_comm_f2c
         end function c_mpi_comm_f2c
 
         function c_mpi_comm_c2f(comm_c) bind(C, name="MPI_Comm_c2f")
             use iso_c_binding, only: c_int, c_ptr
-            integer(kind=8), value :: comm_c
+            integer(kind=MPI_HANDLE_KIND), value :: comm_c
             integer(c_int) :: c_mpi_comm_c2f
         end function
 
         function c_mpi_request_c2f(request) bind(C, name="MPI_Request_c2f")
             use iso_c_binding, only: c_int, c_ptr
-            integer(kind=8), value :: request
+            integer(kind=MPI_HANDLE_KIND), value :: request
             integer(c_int) :: c_mpi_request_c2f
         end function
 
         function c_mpi_datatype_f2c(datatype) bind(C, name="get_c_datatype_from_fortran")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: datatype
-            integer(kind=8) :: c_mpi_datatype_f2c
+            integer(kind=MPI_HANDLE_KIND) :: c_mpi_datatype_f2c
         end function c_mpi_datatype_f2c
 
         function c_mpi_op_f2c(op_f) bind(C, name="get_c_op_from_fortran")
             use iso_c_binding, only: c_ptr, c_int
             integer(c_int), value :: op_f
-            integer(kind=8) :: c_mpi_op_f2c
+            integer(kind=MPI_HANDLE_KIND) :: c_mpi_op_f2c
         end function c_mpi_op_f2c
 
         function c_mpi_status_c2f(c_status, f_status) bind(C, name="MPI_Status_c2f")
@@ -42,7 +48,7 @@ module mpi_c_bindings
         function c_mpi_info_f2c(info_f) bind(C, name="get_c_info_from_fortran")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: info_f
-            integer(kind=8) :: c_mpi_info_f2c
+            integer(kind=MPI_HANDLE_KIND) :: c_mpi_info_f2c
         end function c_mpi_info_f2c
 
         function c_mpi_in_place_f2c(in_place_f) bind(C,name="get_c_mpi_inplace_from_fortran")
@@ -76,7 +82,7 @@ module mpi_c_bindings
 
         function c_mpi_comm_size(comm, size) bind(C, name="MPI_Comm_size")
             use iso_c_binding, only: c_int, c_ptr
-            integer(kind=8), value :: comm
+            integer(kind=MPI_HANDLE_KIND), value :: comm
             integer(c_int), intent(out) :: size
             integer(c_int) :: c_mpi_comm_size
         end function c_mpi_comm_size
@@ -85,9 +91,9 @@ module mpi_c_bindings
             use iso_c_binding, only : c_ptr, c_int
             type(c_ptr), value :: buffer
             integer(c_int), value :: count
-            integer(kind=8), value :: datatype
+            integer(kind=MPI_HANDLE_KIND), value :: datatype
             integer(c_int), value :: root
-            integer(kind=8), value :: comm
+            integer(kind=MPI_HANDLE_KIND), value :: comm
             integer(c_int) :: c_mpi_bcast
         end function c_mpi_bcast
 
@@ -97,8 +103,8 @@ module mpi_c_bindings
             type(c_ptr), value :: sendbuf
             type(c_ptr), value :: recvbuf
             integer(c_int), value :: sendcount, recvcount
-            integer(kind=8), value :: sendtype, recvtype
-            integer(kind=8), value :: comm
+            integer(kind=MPI_HANDLE_KIND), value :: sendtype, recvtype
+            integer(kind=MPI_HANDLE_KIND), value :: comm
             integer(c_int) :: c_mpi_allgather_int
         end function
 
@@ -108,8 +114,8 @@ module mpi_c_bindings
             type(c_ptr), value :: sendbuf
             type(c_ptr), value :: recvbuf
             integer(c_int), value :: sendcount, recvcount
-            integer(kind=8), value :: sendtype, recvtype
-            integer(kind=8), value :: comm
+            integer(kind=MPI_HANDLE_KIND), value :: sendtype, recvtype
+            integer(kind=MPI_HANDLE_KIND), value :: comm
             integer(c_int) :: c_mpi_allgather_real
         end function
 
@@ -117,9 +123,9 @@ module mpi_c_bindings
             use iso_c_binding, only: c_int, c_double, c_ptr
             type(c_ptr), value :: buf
             integer(c_int), value :: count, dest, tag
-            integer(kind=8), value :: datatype
-            integer(kind=8), value :: comm
-            integer(kind=8), intent(out) :: request
+            integer(kind=MPI_HANDLE_KIND), value :: datatype
+            integer(kind=MPI_HANDLE_KIND), value :: comm
+            integer(kind=MPI_HANDLE_KIND), intent(out) :: request
             integer(c_int) :: c_mpi_isend
         end function
 
@@ -127,9 +133,9 @@ module mpi_c_bindings
             use iso_c_binding, only: c_int, c_double, c_ptr
             real(c_double), dimension(*), intent(out) :: buf
             integer(c_int), value :: count, source, tag
-           integer(kind=8), value :: datatype
-           integer(kind=8), value :: comm
-           integer(kind=8), intent(out) :: request
+           integer(kind=MPI_HANDLE_KIND), value :: datatype
+           integer(kind=MPI_HANDLE_KIND), value :: comm
+           integer(kind=MPI_HANDLE_KIND), intent(out) :: request
             integer(c_int) :: c_mpi_irecv
         end function
 
@@ -139,7 +145,7 @@ module mpi_c_bindings
             type(c_ptr), value :: sendbuf
             type(c_ptr), value :: recvbuf
             integer(c_int), value :: count
-            integer(kind=8), value :: datatype, op, comm
+            integer(kind=MPI_HANDLE_KIND), value :: datatype, op, comm
             integer(c_int) :: c_mpi_allreduce
         end function
 
@@ -150,24 +156,24 @@ module mpi_c_bindings
 
         function c_mpi_barrier(comm) bind(C, name="MPI_Barrier")
             use iso_c_binding, only: c_ptr, c_int
-            integer(kind=8), value :: comm      ! MPI_Comm as pointer
+            integer(kind=MPI_HANDLE_KIND), value :: comm      ! MPI_Comm as pointer
             integer(c_int) :: c_mpi_barrier
         end function c_mpi_barrier
 
         function c_mpi_comm_rank(comm, rank) bind(C, name="MPI_Comm_rank")
             use iso_c_binding, only: c_int, c_ptr
-            integer(kind=8), value :: comm
+            integer(kind=MPI_HANDLE_KIND), value :: comm
             integer(c_int), intent(out) :: rank
             integer(c_int) :: c_mpi_comm_rank
         end function c_mpi_comm_rank
 
         function c_mpi_comm_split_type(c_comm, split_type, key, c_info, new_comm) bind(C, name="MPI_Comm_split_type")
             use iso_c_binding, only: c_ptr, c_int
-            integer(kind=8), value :: c_comm 
+            integer(kind=MPI_HANDLE_KIND), value :: c_comm
             integer(c_int), value :: split_type
             integer(c_int), value :: key
-            integer(kind=8), value :: c_info
-            integer(kind=8) :: new_comm
+            integer(kind=MPI_HANDLE_KIND), value :: c_info
+            integer(kind=MPI_HANDLE_KIND) :: new_comm
             integer(c_int) :: c_mpi_comm_split_type
         end function c_mpi_comm_split_type
 
@@ -175,10 +181,10 @@ module mpi_c_bindings
             use iso_c_binding, only: c_ptr, c_int, c_double
             type(c_ptr), value :: buf
             integer(c_int), value :: count
-            integer(kind=8), value :: c_dtype
+            integer(kind=MPI_HANDLE_KIND), value :: c_dtype
             integer(c_int), value :: source
             integer(c_int), value :: tag
-            integer(kind=8), value :: c_comm
+            integer(kind=MPI_HANDLE_KIND), value :: c_comm
             type(c_ptr), value :: status
             integer(c_int) :: c_mpi_recv
         end function c_mpi_recv
@@ -195,23 +201,23 @@ module mpi_c_bindings
             use iso_c_binding, only: c_int, c_double, c_ptr
             real(c_double), dimension(*), intent(in) :: buf
             integer(c_int), value :: count, dest, tag
-            integer(kind=8), value :: datatype
-            integer(kind=8), value :: comm
+            integer(kind=MPI_HANDLE_KIND), value :: datatype
+            integer(kind=MPI_HANDLE_KIND), value :: comm
             integer(c_int) :: c_mpi_ssend
         end function
 
         function c_mpi_cart_create(comm_old, ndims, dims, periods, reorder, comm_cart) bind(C, name="MPI_Cart_create")
             use iso_c_binding, only: c_int, c_ptr
-            integer(kind=8), value :: comm_old
+            integer(kind=MPI_HANDLE_KIND), value :: comm_old
             integer(c_int), value :: ndims, reorder
             integer(c_int), intent(in) :: dims(*), periods(*)
-            integer(kind=8), intent(out) :: comm_cart
+            integer(kind=MPI_HANDLE_KIND), intent(out) :: comm_cart
             integer(c_int) :: c_mpi_cart_create
         end function
 
         function c_mpi_cart_coords(comm, rank, maxdims, coords) bind(C, name="MPI_Cart_coords")
             use iso_c_binding,  only: c_int, c_ptr
-            integer(kind=8), value :: comm
+            integer(kind=MPI_HANDLE_KIND), value :: comm
             integer(c_int), value :: rank, maxdims
             integer(c_int), intent(out) :: coords(*)
             integer(c_int) :: c_mpi_cart_coords
@@ -219,7 +225,7 @@ module mpi_c_bindings
 
         function c_mpi_cart_shift(comm, direction, disp, rank_source, rank_dest) bind(C, name="MPI_Cart_shift")
             use iso_c_binding, only: c_int, c_ptr
-            integer(kind=8), value :: comm
+            integer(kind=MPI_HANDLE_KIND), value :: comm
             integer(c_int), value :: direction, disp
             integer(c_int), intent(out) :: rank_source, rank_dest
             integer(c_int) :: c_mpi_cart_shift
@@ -234,9 +240,9 @@ module mpi_c_bindings
 
         function c_mpi_cart_sub(comm, remain_dims, newcomm) bind(C, name ="MPI_Cart_sub")
             use iso_c_binding, only: c_int, c_ptr
-            integer(kind=8), value :: comm
+            integer(kind=MPI_HANDLE_KIND), value :: comm
             type(c_ptr), value :: remain_dims
-            integer(kind=8), intent(out) :: newcomm
+            integer(kind=MPI_HANDLE_KIND), intent(out) :: newcomm
             integer(c_int) :: c_mpi_cart_sub
         end function
 
@@ -247,10 +253,10 @@ module mpi_c_bindings
             type(c_ptr), value :: sendbuf
             type(c_ptr), value :: recvbuf
             integer(c_int), value :: count
-            integer(kind=8), value :: c_dtype
-            integer(kind=8), value :: c_op 
+            integer(kind=MPI_HANDLE_KIND), value :: c_dtype
+            integer(kind=MPI_HANDLE_KIND), value :: c_op
             integer(c_int), value :: root
-            integer(kind=8), value :: c_comm
+            integer(kind=MPI_HANDLE_KIND), value :: c_comm
            integer(c_int) :: c_mpi_reduce
         end function c_mpi_reduce
 
