@@ -127,6 +127,16 @@ module mpi
 
     contains
 
+    integer(kind=MPI_HANDLE_KIND) function handle_mpi_op_f2c(op_f) result(c_op)
+        use mpi_c_bindings, only: c_mpi_op_f2c, c_mpi_sum
+        integer, intent(in) :: op_f
+        if (op_f == MPI_SUM) then
+            c_op = c_mpi_sum()
+        else
+            c_op = c_mpi_op_f2c(op_f)
+        end if
+    end function
+
     integer(kind=MPI_HANDLE_KIND) function handle_mpi_comm_f2c(comm_f) result(c_comm)
         use mpi_c_bindings, only: c_mpi_comm_size, c_mpi_comm_f2c, c_mpi_comm_world
         integer, intent(in) :: comm_f
@@ -439,7 +449,7 @@ module mpi
 
     subroutine MPI_Allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
-        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, c_mpi_in_place_f2c
+        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_in_place_f2c
         real(8), intent(in), target :: sendbuf
         real(8), intent(out), target :: recvbuf
         integer, intent(in) :: count, datatype, op, comm
@@ -455,7 +465,7 @@ module mpi
         end if
         recvbuf_ptr = c_loc(recvbuf)
         c_datatype = c_mpi_datatype_f2c(datatype)
-        c_op = c_mpi_op_f2c(op)
+        c_op = handle_mpi_op_f2c(op)
 
         c_comm = handle_mpi_comm_f2c(comm)
 
@@ -472,7 +482,7 @@ module mpi
 
     subroutine MPI_Allreduce_1D_recv_proc(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
-        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, c_mpi_in_place_f2c
+        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_in_place_f2c
         real(8), intent(in), target :: sendbuf
         real(8), dimension(:), intent(out), target :: recvbuf
         integer, intent(in) :: count, datatype, op, comm
@@ -489,7 +499,7 @@ module mpi
 
         recvbuf_ptr = c_loc(recvbuf)
         c_datatype = c_mpi_datatype_f2c(datatype)
-        c_op = c_mpi_op_f2c(op)
+        c_op = handle_mpi_op_f2c(op)
 
         c_comm = handle_mpi_comm_f2c(comm)
 
@@ -506,7 +516,7 @@ module mpi
 
     subroutine MPI_Allreduce_1D_real_proc(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
-        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, c_mpi_in_place_f2c
+        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_in_place_f2c
         real(8), dimension(:), intent(in), target :: sendbuf
         real(8), dimension(:), intent(out), target :: recvbuf
         integer, intent(in) :: count, datatype, op, comm
@@ -518,7 +528,7 @@ module mpi
         sendbuf_ptr = c_loc(sendbuf)
         recvbuf_ptr = c_loc(recvbuf)
         c_datatype = c_mpi_datatype_f2c(datatype)
-        c_op = c_mpi_op_f2c(op)
+        c_op = handle_mpi_op_f2c(op)
 
         c_comm = handle_mpi_comm_f2c(comm)
  
@@ -535,7 +545,7 @@ module mpi
 
     subroutine MPI_Allreduce_1D_int_proc(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
-        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, c_mpi_op_f2c, &
+        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_datatype_f2c, &
                                 c_mpi_comm_f2c, c_mpi_in_place_f2c, c_mpi_comm_world
         integer, dimension(:), intent(in), target :: sendbuf
         integer, dimension(:), intent(out), target :: recvbuf
@@ -548,7 +558,7 @@ module mpi
         sendbuf_ptr = c_loc(sendbuf)
         recvbuf_ptr = c_loc(recvbuf)
         c_datatype = c_mpi_datatype_f2c(datatype)
-        c_op = c_mpi_op_f2c(op)
+        c_op = handle_mpi_op_f2c(op)
 
         c_comm = handle_mpi_comm_f2c(comm)
 
@@ -914,7 +924,7 @@ module mpi
     end subroutine
 
     subroutine MPI_Reduce_scalar_int(sendbuf, recvbuf, count, datatype, op, root, comm, ierror)
-        use mpi_c_bindings, only: c_mpi_reduce, c_mpi_datatype_f2c, c_mpi_op_f2c
+        use mpi_c_bindings, only: c_mpi_reduce, c_mpi_datatype_f2c
         use iso_c_binding, only: c_int, c_ptr, c_loc
         integer, target, intent(in)  :: sendbuf
         integer, target, intent(out) :: recvbuf
@@ -928,7 +938,7 @@ module mpi
         c_comm = handle_mpi_comm_f2c(comm)
 
         c_dtype = c_mpi_datatype_f2c(datatype)
-        c_op    = c_mpi_op_f2c(op)
+        c_op    = handle_mpi_op_f2c(op)
 
         ! Pass pointer to the actual data
         c_sendbuf = c_loc(sendbuf)
