@@ -55,7 +55,7 @@ module mpi_c_bindings
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_datatype_f2c
         end function c_mpi_datatype_f2c
 
-        function c_mpi_op_f2c(op_f) bind(C, name="get_c_op_from_fortran")
+        function c_mpi_op_f2c(op_f) bind(C, name="MPI_Op_f2c")
             use iso_c_binding, only: c_ptr, c_int
             integer(c_int), value :: op_f
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_op_f2c
