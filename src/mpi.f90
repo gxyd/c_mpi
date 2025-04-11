@@ -3,7 +3,9 @@ module mpi
 
 #ifdef OPEN_MPI
 #define MPI_HANDLE_KIND 8
+#define MPI_SUM_value 3
 #else
+#define MPI_SUM_value 1476395011
 #define MPI_HANDLE_KIND 4
 #endif
 
@@ -20,7 +22,7 @@ module mpi
 
     integer, parameter :: MPI_COMM_WORLD = -1000
     real(8), parameter :: MPI_IN_PLACE = -1002
-    integer, parameter :: MPI_SUM = -2300
+    integer, parameter :: MPI_SUM = MPI_SUM_value
     integer, parameter :: MPI_INFO_NULL = -2000
     integer, parameter :: MPI_STATUS_SIZE = 5
     integer :: MPI_STATUS_IGNORE = 0

@@ -37,14 +37,6 @@ MPI_Info get_c_MPI_INFO_NULL() {
     return MPI_INFO_NULL;
 }
 
-MPI_Op get_c_op_from_fortran(int op) {
-    if (op == FORTRAN_MPI_SUM) {
-        return MPI_SUM;
-    } else {
-        return MPI_Op_f2c(op);
-    }
-}
-
 MPI_Comm get_c_MPI_COMM_WORLD() {
     return MPI_COMM_WORLD;
 }
