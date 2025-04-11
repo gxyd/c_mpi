@@ -33,12 +33,8 @@ MPI_Datatype get_c_datatype_from_fortran(int datatype) {
     return c_datatype;
 }
 
-MPI_Info get_c_info_from_fortran(int info) {
-    if (info == FORTRAN_MPI_INFO_NULL) {
-        return MPI_INFO_NULL;
-    } else {
-        return MPI_Info_f2c(info);
-    }
+MPI_Info get_c_MPI_INFO_NULL() {
+    return MPI_INFO_NULL;
 }
 
 MPI_Op get_c_op_from_fortran(int op) {
@@ -49,14 +45,14 @@ MPI_Op get_c_op_from_fortran(int op) {
     }
 }
 
-MPI_Comm get_c_mpi_comm_world() {
+MPI_Comm get_c_MPI_COMM_WORLD() {
     return MPI_COMM_WORLD;
 }
 
-void* get_c_mpi_inplace_from_fortran(double sendbuf) {
+void* get_c_MPI_IN_PLACE() {
     return MPI_IN_PLACE;
 }
 
-MPI_Status* get_c_MPI_STATUSES_IGNORE(){
+MPI_Status* get_c_MPI_STATUSES_IGNORE() {
     return MPI_STATUSES_IGNORE;
 }
