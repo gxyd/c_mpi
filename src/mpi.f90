@@ -472,7 +472,7 @@ module mpi
         integer(c_int) :: local_ierr
 
         if (sendbuf == MPI_IN_PLACE) then
-            sendbuf_ptr = c_mpi_in_place_f2c(sendbuf)
+            sendbuf_ptr = c_mpi_in_place_f2c()
         else
             sendbuf_ptr = c_loc(sendbuf)
         end if
