@@ -45,6 +45,10 @@ module mpi_c_bindings
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_comm_world
         end function c_mpi_comm_world
 
+        function c_mpi_info_null() bind(C, name="get_c_MPI_INFO_NULL")
+            integer(kind=MPI_HANDLE_KIND) :: c_mpi_info_null
+        end function c_mpi_info_null
+
         function c_mpi_datatype_f2c(datatype) bind(C, name="get_c_datatype_from_fortran")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: datatype
@@ -56,8 +60,8 @@ module mpi_c_bindings
             integer(c_int), value :: op_f
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_op_f2c
         end function c_mpi_op_f2c
-        
-        function c_mpi_info_f2c(info_f) bind(C, name="get_c_info_from_fortran")
+
+        function c_mpi_info_f2c(info_f) bind(C, name="MPI_Info_f2c")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: info_f
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_info_f2c

@@ -33,12 +33,8 @@ MPI_Datatype get_c_datatype_from_fortran(int datatype) {
     return c_datatype;
 }
 
-MPI_Info get_c_info_from_fortran(int info) {
-    if (info == FORTRAN_MPI_INFO_NULL) {
-        return MPI_INFO_NULL;
-    } else {
-        return MPI_Info_f2c(info);
-    }
+MPI_Info get_c_MPI_INFO_NULL() {
+    return MPI_INFO_NULL;
 }
 
 MPI_Op get_c_op_from_fortran(int op) {
