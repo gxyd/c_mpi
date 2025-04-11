@@ -49,14 +49,14 @@ MPI_Op get_c_op_from_fortran(int op) {
     }
 }
 
-MPI_Comm get_c_mpi_comm_world() {
+MPI_Comm get_c_MPI_COMM_WORLD() {
     return MPI_COMM_WORLD;
 }
 
-void* get_c_mpi_inplace_from_fortran(double sendbuf) {
+void* get_c_MPI_IN_PLACE() {
     return MPI_IN_PLACE;
 }
 
-MPI_Status* get_c_MPI_STATUSES_IGNORE(){
+MPI_Status* get_c_MPI_STATUSES_IGNORE() {
     return MPI_STATUSES_IGNORE;
 }

@@ -39,8 +39,8 @@ module mpi_c_bindings
             integer(c_int) :: f_status(*)  ! assumed-size array
             integer(c_int) :: c_mpi_status_c2f
         end function c_mpi_status_c2f
-        
-        function c_mpi_comm_world() bind(C, name="get_c_mpi_comm_world")
+
+        function c_mpi_comm_world() bind(C, name="get_c_MPI_COMM_WORLD")
             use iso_c_binding, only: c_ptr
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_comm_world
         end function c_mpi_comm_world
@@ -68,9 +68,8 @@ module mpi_c_bindings
             type(c_ptr) :: c_mpi_statuses_ignore
         end function c_mpi_statuses_ignore
 
-        function c_mpi_in_place_f2c(in_place_f) bind(C,name="get_c_mpi_inplace_from_fortran")
-            use iso_c_binding, only: c_double, c_ptr
-            real(c_double), value :: in_place_f
+        function c_mpi_in_place_f2c() bind(C,name="get_c_MPI_IN_PLACE")
+            use iso_c_binding, only: c_ptr
             type(c_ptr) :: c_mpi_in_place_f2c
         end function c_mpi_in_place_f2c
 
