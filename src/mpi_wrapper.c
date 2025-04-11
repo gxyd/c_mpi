@@ -49,12 +49,8 @@ MPI_Op get_c_op_from_fortran(int op) {
     }
 }
 
-MPI_Comm get_c_comm_from_fortran(int comm_f) {
-    if (comm_f == FORTRAN_MPI_COMM_WORLD) {
-        return MPI_COMM_WORLD;
-    } else {
-        return MPI_Comm_f2c(comm_f);
-    }
+MPI_Comm get_c_mpi_comm_world() {
+    return MPI_COMM_WORLD;
 }
 
 void* get_c_mpi_inplace_from_fortran(double sendbuf) {
