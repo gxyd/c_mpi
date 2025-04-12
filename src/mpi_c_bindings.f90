@@ -53,11 +53,17 @@ module mpi_c_bindings
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_sum
         end function c_mpi_sum
 
-        function c_mpi_datatype_f2c(datatype) bind(C, name="get_c_datatype_from_fortran")
-            use iso_c_binding, only: c_int, c_ptr
-            integer(c_int), value :: datatype
-            integer(kind=MPI_HANDLE_KIND) :: c_mpi_datatype_f2c
-        end function c_mpi_datatype_f2c
+        function c_mpi_float() bind(C, name="get_c_MPI_FLOAT")
+            integer(kind=MPI_HANDLE_KIND) :: c_mpi_float
+        end function
+
+        function c_mpi_double() bind(C, name="get_c_MPI_DOUBLE")
+            integer(kind=MPI_HANDLE_KIND) :: c_mpi_double
+        end function
+
+        function c_mpi_int() bind(C, name="get_c_MPI_INT")
+            integer(kind=MPI_HANDLE_KIND) :: c_mpi_int
+        end function
 
         function c_mpi_op_f2c(op_f) bind(C, name="MPI_Op_f2c")
             use iso_c_binding, only: c_ptr, c_int
