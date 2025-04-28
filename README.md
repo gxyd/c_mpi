@@ -53,34 +53,48 @@ To execute **all** standalone tests, navigate to the `tests/` directory and run:
 
 ```bash
 cd tests/
-FC='lfortran' ./run_tests.sh
+FC='lfortran --cpp' ./run_tests.sh
+```
+
+or, to run them with GFortran compiler, do:
+
+```bash
+cd tests/
+FC='gfortran -cpp' ./run_tests.sh
 ```
 
 ### Running a Specific Standalone Test
 
-If you want to run a single test (for example, `testFilename.f90`), execute:
+If you want to run a single test (for example, `test_filename.f90`), execute:
 
 ```bash
 cd tests/
-FC='lfortran' ./run_tests.sh testFilename.f90
+FC='lfortran --cpp' ./run_tests.sh test_filename.f90
+```
+
+or, to run it with GFortran compiler, do:
+
+```bash
+cd tests/
+FC='gfortran -cpp' ./run_tests.sh test_filename.f90
 ```
 
 ### Running the `pot3d` Test
 
 To build and run the `pot3d` test, navigate to the `tests/pot3d/` directory.
 
-- For Lfortran run:
+- For LFortran run:
 
 ```bash
 cd tests/pot3d/
-FC='lfortran' ./build_and_run_lfortran.sh
+FC='lfortran --cpp' ./build_and_run_lfortran.sh
 ```
 
 - For GFortran run:
 
 ```bash
 cd tests/pot3d/
-FC='gfortran' ./build_and_run_gfortran.sh
+FC='gfortran -cpp' ./build_and_run_gfortran.sh
 ```
 
 ---
@@ -90,9 +104,7 @@ FC='gfortran' ./build_and_run_gfortran.sh
 You can pass custom flags to your Fortran compiler using the `FC` environment variable. For example, to compile with optimization flags using gfortran, run:
 
 ```bash
-FC='gfortran -O3' ./run_tests.sh
+FC='gfortran -cpp -O3' ./run_tests.sh
 ```
 
 This enables you to tailor the compilation process to your needs.
-
-
