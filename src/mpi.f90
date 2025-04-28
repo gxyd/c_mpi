@@ -161,11 +161,11 @@ module mpi
         use mpi_c_bindings, only: c_mpi_float, c_mpi_double, c_mpi_int
         integer, intent(in) :: datatype_f
         if (datatype_f == MPI_REAL4) then
-            c_datatype = c_mpi_float()
+            c_datatype = c_mpi_float
         else if (datatype_f == MPI_REAL8 .OR. datatype_f == MPI_DOUBLE_PRECISION) then
-            c_datatype = c_mpi_double()
+            c_datatype = c_mpi_double
         else if (datatype_f == MPI_INTEGER) then
-            c_datatype = c_mpi_int()
+            c_datatype = c_mpi_int
         end if
     end function
 
