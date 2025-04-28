@@ -12,10 +12,6 @@ MPI_Datatype get_c_MPI_INT() {
     return MPI_INT;
 }
 
-MPI_Info get_c_MPI_INFO_NULL() {
-    return MPI_INFO_NULL;
-}
-
 MPI_Op get_c_MPI_SUM() {
     return MPI_SUM;
 }
@@ -29,3 +25,5 @@ void* get_c_MPI_IN_PLACE() {
 }
 
 MPI_Status* c_MPI_STATUSES_IGNORE = MPI_STATUSES_IGNORE;
+
+MPI_Info c_MPI_INFO_NULL = MPI_INFO_NULL;

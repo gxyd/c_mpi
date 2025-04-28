@@ -151,7 +151,7 @@ module mpi
         use mpi_c_bindings, only: c_mpi_info_f2c, c_mpi_info_null
         integer, intent(in) :: info_f
         if (info_f == MPI_INFO_NULL) then
-            c_info = c_mpi_info_null()
+            c_info = c_mpi_info_null
         else
             c_info = c_mpi_info_f2c(info_f)
         end if

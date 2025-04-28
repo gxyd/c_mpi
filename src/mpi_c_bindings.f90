@@ -9,6 +9,7 @@ module mpi_c_bindings
 #endif
 
     type(c_ptr), bind(C, name="c_MPI_STATUSES_IGNORE") :: c_mpi_statuses_ignore
+    integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_INFO_NULL") :: c_mpi_info_null
 
     interface
 
@@ -47,10 +48,6 @@ module mpi_c_bindings
             use iso_c_binding, only: c_ptr
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_comm_world
         end function c_mpi_comm_world
-
-        function c_mpi_info_null() bind(C, name="get_c_MPI_INFO_NULL")
-            integer(kind=MPI_HANDLE_KIND) :: c_mpi_info_null
-        end function c_mpi_info_null
 
         function c_mpi_sum() bind(C, name="get_c_MPI_SUM")
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_sum
