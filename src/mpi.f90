@@ -141,7 +141,7 @@ module mpi
         use mpi_c_bindings, only: c_mpi_comm_size, c_mpi_comm_f2c, c_mpi_comm_world
         integer, intent(in) :: comm_f
         if (comm_f == MPI_COMM_WORLD) then
-            c_comm = c_mpi_comm_world()
+            c_comm = c_mpi_comm_world
         else
             c_comm = c_mpi_comm_f2c(comm_f)
         end if
@@ -280,7 +280,7 @@ module mpi
     end subroutine MPI_Bcast_int_scalar
 
     subroutine MPI_Bcast_real_2D(buffer, count, datatype, root, comm, ierror)
-        use mpi_c_bindings, only: c_mpi_bcast, c_mpi_comm_f2c, c_mpi_comm_world
+        use mpi_c_bindings, only: c_mpi_bcast, c_mpi_comm_f2c
         use iso_c_binding, only: c_int, c_ptr, c_loc
         real(8), dimension(:, :), target :: buffer
         integer, intent(in) :: count, root
@@ -558,7 +558,7 @@ module mpi
     subroutine MPI_Allreduce_1D_int_proc(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
         use mpi_c_bindings, only: c_mpi_allreduce, &
-                                c_mpi_comm_f2c, c_mpi_in_place_f2c, c_mpi_comm_world
+                                c_mpi_comm_f2c, c_mpi_in_place_f2c
         integer, dimension(:), intent(in), target :: sendbuf
         integer, dimension(:), intent(out), target :: recvbuf
         integer, intent(in) :: count, datatype, op, comm
@@ -859,7 +859,7 @@ module mpi
 
     subroutine MPI_Cart_shift_proc(comm, direction, disp, rank_source, rank_dest, ierror)
         use iso_c_binding, only: c_int, c_ptr
-        use mpi_c_bindings, only: c_mpi_cart_shift, c_mpi_comm_f2c, c_mpi_comm_world
+        use mpi_c_bindings, only: c_mpi_cart_shift, c_mpi_comm_f2c
         integer, intent(in) :: comm
         integer, intent(in) :: direction, disp
         integer, intent(out) :: rank_source, rank_dest
@@ -867,11 +867,7 @@ module mpi
         integer(kind=MPI_HANDLE_KIND) :: c_comm
         integer(c_int) :: local_ierr
 
-        if (comm == MPI_COMM_WORLD) then
-            c_comm = c_mpi_comm_world()
-        else
-            c_comm = c_mpi_comm_f2c(comm)
-        end if
+        c_comm = handle_mpi_comm_f2c(comm)
 
         local_ierr = c_mpi_cart_shift(c_comm, direction, disp, rank_source, rank_dest)
 
