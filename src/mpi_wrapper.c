@@ -28,6 +28,4 @@ void* get_c_MPI_IN_PLACE() {
     return MPI_IN_PLACE;
 }
 
-MPI_Status* get_c_MPI_STATUSES_IGNORE() {
-    return MPI_STATUSES_IGNORE;
-}
+MPI_Status* c_MPI_STATUSES_IGNORE = MPI_STATUSES_IGNORE;

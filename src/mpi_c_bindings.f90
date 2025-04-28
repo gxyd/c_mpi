@@ -1,4 +1,5 @@
 module mpi_c_bindings
+    use iso_c_binding, only: c_ptr
     implicit none
 
 #ifdef OPEN_MPI
@@ -7,8 +8,10 @@ module mpi_c_bindings
 #define MPI_HANDLE_KIND 4
 #endif
 
+    type(c_ptr), bind(C, name="c_MPI_STATUSES_IGNORE") :: c_mpi_statuses_ignore
+
     interface
-    
+
         function c_mpi_comm_f2c(comm_f) bind(C, name="MPI_Comm_f2c")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: comm_f
@@ -76,11 +79,6 @@ module mpi_c_bindings
             integer(c_int), value :: info_f
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_info_f2c
         end function c_mpi_info_f2c
-
-        function c_mpi_statuses_ignore() bind(C, name="get_c_MPI_STATUSES_IGNORE")
-            use iso_c_binding, only: c_ptr
-            type(c_ptr) :: c_mpi_statuses_ignore
-        end function c_mpi_statuses_ignore
 
         function c_mpi_in_place_f2c() bind(C,name="get_c_MPI_IN_PLACE")
             use iso_c_binding, only: c_ptr

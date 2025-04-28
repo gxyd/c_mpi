@@ -754,7 +754,7 @@ module mpi
         integer(kind=MPI_HANDLE_KIND), dimension(count) :: c_requests
         type(c_ptr) :: MPI_STATUSES_IGNORE_from_c
 
-        MPI_STATUSES_IGNORE_from_c = c_mpi_statuses_ignore()
+        MPI_STATUSES_IGNORE_from_c = c_mpi_statuses_ignore
 
         ! Convert Fortran requests to C requests.
         do i = 1, count
