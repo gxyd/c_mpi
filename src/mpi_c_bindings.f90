@@ -1,4 +1,5 @@
 module mpi_c_bindings
+    use iso_c_binding, only: c_ptr
     implicit none
 
 #ifdef OPEN_MPI
@@ -7,8 +8,17 @@ module mpi_c_bindings
 #define MPI_HANDLE_KIND 4
 #endif
 
+    type(c_ptr), bind(C, name="c_MPI_STATUSES_IGNORE") :: c_mpi_statuses_ignore
+    type(c_ptr), bind(C, name="c_MPI_IN_PLACE") :: c_mpi_in_place
+    integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_INFO_NULL") :: c_mpi_info_null
+    integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_DOUBLE") :: c_mpi_double
+    integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_FLOAT") :: c_mpi_float
+    integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_INT") :: c_mpi_int
+    integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_COMM_WORLD") :: c_mpi_comm_world
+    integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_SUM") :: c_mpi_sum
+
     interface
-    
+
         function c_mpi_comm_f2c(comm_f) bind(C, name="MPI_Comm_f2c")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: comm_f
@@ -40,31 +50,6 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_status_c2f
         end function c_mpi_status_c2f
 
-        function c_mpi_comm_world() bind(C, name="get_c_MPI_COMM_WORLD")
-            use iso_c_binding, only: c_ptr
-            integer(kind=MPI_HANDLE_KIND) :: c_mpi_comm_world
-        end function c_mpi_comm_world
-
-        function c_mpi_info_null() bind(C, name="get_c_MPI_INFO_NULL")
-            integer(kind=MPI_HANDLE_KIND) :: c_mpi_info_null
-        end function c_mpi_info_null
-
-        function c_mpi_sum() bind(C, name="get_c_MPI_SUM")
-            integer(kind=MPI_HANDLE_KIND) :: c_mpi_sum
-        end function c_mpi_sum
-
-        function c_mpi_float() bind(C, name="get_c_MPI_FLOAT")
-            integer(kind=MPI_HANDLE_KIND) :: c_mpi_float
-        end function
-
-        function c_mpi_double() bind(C, name="get_c_MPI_DOUBLE")
-            integer(kind=MPI_HANDLE_KIND) :: c_mpi_double
-        end function
-
-        function c_mpi_int() bind(C, name="get_c_MPI_INT")
-            integer(kind=MPI_HANDLE_KIND) :: c_mpi_int
-        end function
-
         function c_mpi_op_f2c(op_f) bind(C, name="MPI_Op_f2c")
             use iso_c_binding, only: c_ptr, c_int
             integer(c_int), value :: op_f
@@ -76,16 +61,6 @@ module mpi_c_bindings
             integer(c_int), value :: info_f
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_info_f2c
         end function c_mpi_info_f2c
-
-        function c_mpi_statuses_ignore() bind(C, name="get_c_MPI_STATUSES_IGNORE")
-            use iso_c_binding, only: c_ptr
-            type(c_ptr) :: c_mpi_statuses_ignore
-        end function c_mpi_statuses_ignore
-
-        function c_mpi_in_place_f2c() bind(C,name="get_c_MPI_IN_PLACE")
-            use iso_c_binding, only: c_ptr
-            type(c_ptr) :: c_mpi_in_place_f2c
-        end function c_mpi_in_place_f2c
 
         function c_mpi_init(argc, argv) bind(C, name="MPI_Init")
             use iso_c_binding, only : c_int, c_ptr

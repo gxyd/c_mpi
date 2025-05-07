@@ -1,33 +1,17 @@
 #include <mpi.h>
 
-MPI_Datatype get_c_MPI_DOUBLE() {
-    return MPI_DOUBLE;
-}
+MPI_Status* c_MPI_STATUSES_IGNORE = MPI_STATUSES_IGNORE;
 
-MPI_Datatype get_c_MPI_FLOAT() {
-    return MPI_FLOAT;
-}
+MPI_Info c_MPI_INFO_NULL = MPI_INFO_NULL;
 
-MPI_Datatype get_c_MPI_INT() {
-    return MPI_INT;
-}
+MPI_Comm c_MPI_COMM_WORLD = MPI_COMM_WORLD;
 
-MPI_Info get_c_MPI_INFO_NULL() {
-    return MPI_INFO_NULL;
-}
+MPI_Datatype c_MPI_DOUBLE = MPI_DOUBLE;
 
-MPI_Op get_c_MPI_SUM() {
-    return MPI_SUM;
-}
+MPI_Datatype c_MPI_FLOAT = MPI_FLOAT;
 
-MPI_Comm get_c_MPI_COMM_WORLD() {
-    return MPI_COMM_WORLD;
-}
+MPI_Datatype c_MPI_INT = MPI_INT;
 
-void* get_c_MPI_IN_PLACE() {
-    return MPI_IN_PLACE;
-}
+void* c_MPI_IN_PLACE = MPI_IN_PLACE;
 
-MPI_Status* get_c_MPI_STATUSES_IGNORE() {
-    return MPI_STATUSES_IGNORE;
-}
+MPI_Op c_MPI_SUM = MPI_SUM;
