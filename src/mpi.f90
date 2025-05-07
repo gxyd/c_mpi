@@ -1,11 +1,6 @@
 module mpi
+    use mpi_c_bindings, only: MPI_HANDLE_KIND
     implicit none
-
-#ifdef OPEN_MPI
-#define MPI_HANDLE_KIND 8
-#else
-#define MPI_HANDLE_KIND 4
-#endif
 
     integer, parameter :: MPI_THREAD_FUNNELED = 1
 

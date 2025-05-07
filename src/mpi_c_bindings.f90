@@ -8,6 +8,7 @@ module mpi_c_bindings
 #define MPI_HANDLE_KIND 4
 #endif
 
+    integer, parameter :: mpi_handle_kind = MPI_HANDLE_KIND
     type(c_ptr), bind(C, name="c_MPI_STATUSES_IGNORE") :: c_mpi_statuses_ignore
     type(c_ptr), bind(C, name="c_MPI_IN_PLACE") :: c_mpi_in_place
     integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_INFO_NULL") :: c_mpi_info_null
