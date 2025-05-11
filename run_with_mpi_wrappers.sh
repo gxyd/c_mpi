@@ -32,8 +32,8 @@ echo -e "${YELLOW}Using C compiler: ${RESET}${GREEN}$CC${RESET}"
 echo -e "${YELLOW}Using Fortran compiler: ${RESET}${GREEN}$FC${RESET}"
 echo ""
 
-echo -e "${BLUE}Compiling src/mpi_wrapper.c with $CC...${RESET}"
-$CC -I$CONDA_PREFIX/include -c src/mpi_wrapper.c
+echo -e "${BLUE}Compiling src/mpi_constants.c with $CC...${RESET}"
+$CC -I$CONDA_PREFIX/include -c src/mpi_constants.c
 
 echo -e "${BLUE}Compiling src/mpi_c_bindings.f90 with $FC...${RESET}"
 $FC -c src/mpi_c_bindings.f90
@@ -45,7 +45,7 @@ echo -e "${BLUE}Compiling $TEST_FILE with $FC...${RESET}"
 $FC -c "$TEST_FILE"
 
 echo -e "${CYAN}Linking objects to create executable: ${BOLD}${EXECUTABLE}${RESET}"
-$FC mpi_wrapper.o mpi_c_bindings.o mpi.o "$TEST_OBJ" -o "$EXECUTABLE" -L$CONDA_PREFIX/lib -lmpi -Wl,-rpath,$CONDA_PREFIX/lib
+$FC mpi_constants.o mpi_c_bindings.o mpi.o "$TEST_OBJ" -o "$EXECUTABLE" -L$CONDA_PREFIX/lib -lmpi -Wl,-rpath,$CONDA_PREFIX/lib
 
 echo -e "${BOLD}${GREEN}Running:${RESET} ${YELLOW}mpiexec $MPI_ARGS ./$EXECUTABLE${RESET}"
 mpiexec $MPI_ARGS ./"$EXECUTABLE"

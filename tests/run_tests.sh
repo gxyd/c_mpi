@@ -75,7 +75,7 @@ else
 fi
 
 if [ $USE_WRAPPERS -eq 1 ]; then
-  $CC -I"$CONDA_PREFIX/include" -c ../src/mpi_wrapper.c
+  $CC -I"$CONDA_PREFIX/include" -c ../src/mpi_constants.c
   $FC $FC_FLAGS -c ../src/mpi_c_bindings.f90
   $FC $FC_FLAGS -c ../src/mpi.f90
 fi
@@ -94,7 +94,7 @@ for file in "${TEST_FILES[@]}"; do
   $FC -c "$file"
 
   if [ $USE_WRAPPERS -eq 1 ]; then
-    $FC mpi_wrapper.o mpi_c_bindings.o mpi.o "$filename.o" \
+    $FC mpi_constants.o mpi_c_bindings.o mpi.o "$filename.o" \
       -o "$filename" -L"$CONDA_PREFIX/lib" -lmpi -Wl,-rpath,"$CONDA_PREFIX/lib"
   else
     $FC "$filename.o" -o "$filename"
