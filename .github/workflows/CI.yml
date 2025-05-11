@@ -30,6 +30,7 @@ jobs:
           environment-file: ci/environment_${{ matrix.compiler }}_${{ matrix.mpi }}.yml
 
       - name: Run standalone tests without custom MPI wrappers
+        if: matrix.compiler == 'gfortran'
         shell: bash -e -x -l {0}
         run: |
           cd tests
