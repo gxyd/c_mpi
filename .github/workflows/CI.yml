@@ -12,12 +12,14 @@ env:
   MACOSX_DEPLOYMENT_TARGET: 14.0
 
 jobs:
-  Run_standalone_tests_without_custom_MPI_wrappers_with_OpenMPI:
-    name: "Run standalone tests with Open MPI without custom MPI Wrappers"
+  Run_Tests:
+    name: "Run tests with ${{ matrix.compiler }} and ${{ matrix.mpi }} on ${{ matrix.os }}"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: ["macos-latest", "ubuntu-latest"]
+        compiler: ["gfortran", "lfortran"]
+        mpi: ["openmpi", "mpich"]
     steps:
       - uses: actions/checkout@v4
 
@@ -25,235 +27,58 @@ jobs:
         uses: mamba-org/setup-micromamba@v2.0.2
         with:
           micromamba-version: '2.0.4-0'
-          environment-file: ci/environment_gfortran_openmpi.yml
+          environment-file: ci/environment_${{ matrix.compiler }}_${{ matrix.mpi }}.yml
 
-      - name: Run standalone tests with OpenMPI and without MPI wrappers
+      - name: Run standalone tests without custom MPI wrappers
+        if: matrix.compiler == 'gfortran'
         shell: bash -e -x -l {0}
         run: |
           cd tests
           ./run_tests.sh --without-wrappers
 
-  Run_standalone_tests_without_custom_MPI_wrappers_with_MPICH:
-    name: "Run standalone tests with MPICH without custom MPI Wrappers"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ["macos-latest", "ubuntu-latest"]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Micromamba
-        uses: mamba-org/setup-micromamba@v2.0.2
-        with:
-          micromamba-version: '2.0.4-0'
-          environment-file: ci/environment_gfortran_mpich.yml
-
-      - name: Run standalone tests with MPICH and without MPI wrappers
+      - name: Run standalone tests with ${{ matrix.compiler }}
         shell: bash -e -x -l {0}
         run: |
           cd tests
-          ./run_tests.sh --without-wrappers
 
-  Run_standalone_tests_with_GFortran_with_OpenMPI:
-    name: "Run standalone tests with GFortran with Open MPI"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ["macos-latest", "ubuntu-latest"]
-    steps:
-      - uses: actions/checkout@v4
+          if [ "${{ matrix.compiler }}" = "gfortran" ]; then
+            FC_without_opt="gfortran -cpp"
+            FC_with_opt="gfortran -O3 -march=native -cpp"
+          else
+            FC_without_opt="lfortran --cpp"
+            FC_with_opt="lfortran --fast --cpp"
+          fi
 
-      - name: Setup Micromamba
-        uses: mamba-org/setup-micromamba@v2.0.2
-        with:
-          micromamba-version: '2.0.4-0'
-          environment-file: ci/environment_gfortran_openmpi.yml
+          # when it's OpenMPI we add "-DOPEN_MPI=yes" flag
+          if [ "${{ matrix.mpi }}" = "openmpi" ]; then
+            FC_without_opt="$FC_without_opt -DOPEN_MPI=yes"
+            FC_with_opt="$FC_with_opt -DOPEN_MPI=yes"
+          fi
 
-      - name: Run standalone tests with GFortran with and without optimization using Open MPI
-        shell: bash -e -x -l {0}
-        run: |
-          cd tests
-          FC="gfortran -cpp -DOPEN_MPI=yes" ./run_tests.sh
-          FC="gfortran -O3 -march=native -cpp -DOPEN_MPI=yes" ./run_tests.sh
+          # Run tests with and without optimization
+          FC="$FC_without_opt" ./run_tests.sh
+          FC="$FC_with_opt" ./run_tests.sh
 
-  Run_standalone_tests_with_GFortran_with_MPICH:
-    name: "Run standalone tests with GFortran with MPICH"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ["macos-latest", "ubuntu-latest"]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Micromamba
-        uses: mamba-org/setup-micromamba@v2.0.2
-        with:
-          micromamba-version: '2.0.4-0'
-          environment-file: ci/environment_gfortran_mpich.yml
-
-      - name: Run standalone tests with GFortran with and without optimization using MPICH
-        shell: bash -e -x -l {0}
-        run: |
-          cd tests
-          FC="gfortran -cpp" ./run_tests.sh
-          FC="gfortran -O3 -march=native -cpp" ./run_tests.sh
-
-  Run_standalone_tests_with_LFortran_with_OpenMPI:
-    name: "Run standalone tests with LFortran with Open MPI"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ["macos-latest", "ubuntu-latest"]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Micromamba
-        uses: mamba-org/setup-micromamba@v2.0.2
-        with:
-          micromamba-version: '2.0.4-0'
-          environment-file: ci/environment_lfortran_openmpi.yml
-
-      - name: Run standalone tests with LFortran with and without optimization using Open MPI
-        shell: bash -e -x -l {0}
-        run: |
-          cd tests
-          FC="lfortran --cpp -DOPEN_MPI=yes" ./run_tests.sh
-          FC="lfortran --fast --cpp -DOPEN_MPI=yes" ./run_tests.sh
-
-  Run_standalone_tests_with_LFortran_with_MPICH:
-    name: "Run standalone tests with LFortran with MPICH"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ["macos-latest", "ubuntu-latest"]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Micromamba
-        uses: mamba-org/setup-micromamba@v2.0.2
-        with:
-          micromamba-version: '2.0.4-0'
-          environment-file: ci/environment_lfortran_mpich.yml
-
-      - name: Run standalone tests with LFortran with and without optimization using MPICH
-        shell: bash -e -x -l {0}
-        run: |
-          cd tests
-          FC="lfortran --cpp" ./run_tests.sh
-          FC="lfortran --fast --cpp" ./run_tests.sh
-
-  Compile_POT3D_with_GFortran_with_OpenMPI:
-    name: "Build POT3D and validate with GFortran with Open MPI"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ["macos-latest", "ubuntu-latest"]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Micromamba
-        uses: mamba-org/setup-micromamba@v2.0.2
-        with:
-          micromamba-version: '2.0.4-0'
-          environment-file: ci/environment_gfortran_openmpi.yml
-
-      # build and validation with GFortran's optimization
-      - name: POT3D Build and validation with GFortran with optimization using Open MPI (MPI only)
+      - name: Build and validate POT3D with ${{ matrix.compiler }}
         shell: bash -e -x -l {0}
         run: |
           cd tests/pot3d
-          FC="gfortran -O3 -march=native -cpp -DOPEN_MPI=yes" ./build_and_run_gfortran.sh
 
-      # build and validation without GFortran's optimization
-      - name: POT3D Build and validation with GFortran without optimization using Open MPI (MPI only)
-        shell: bash -e -x -l {0}
-        run: |
-          cd tests/pot3d
-          FC="gfortran -cpp -DOPEN_MPI=yes" ./build_and_run_gfortran.sh
+          if [ "${{ matrix.compiler }}" = "gfortran" ]; then
+            FC_without_opt="gfortran -cpp"
+            FC_with_opt="gfortran -O3 -march=native -cpp"
+            build_script="./build_and_run_gfortran.sh"
+          else
+            FC_without_opt="lfortran --cpp"
+            FC_with_opt="lfortran --fast --cpp"
+            build_script="./build_and_run_lfortran.sh"
+          fi
 
-  Compile_POT3D_with_LFortran_with_OpenMPI:
-    name: "Build POT3D and validate with LFortran with Open MPI"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ["macos-latest", "ubuntu-latest"]
-    steps:
-      - uses: actions/checkout@v4
+          # when it's OpenMPI we add "-DOPEN_MPI=yes" flag
+          if [ "${{ matrix.mpi }}" = "openmpi" ]; then
+            FC_without_opt="$FC_without_opt -DOPEN_MPI=yes"
+            FC_with_opt="$FC_with_opt -DOPEN_MPI=yes"
+          fi
 
-      - name: Set up Micromamba
-        uses: mamba-org/setup-micromamba@v2.0.2
-        with:
-          micromamba-version: '2.0.4-0'
-          environment-file: ci/environment_lfortran_openmpi.yml
-
-      # build and validation with LFortran's optimization
-      - name: POT3D Build and validation with LFortran with optimization using Open MPI (MPI only)
-        shell: bash -e -x -l {0}
-        run: |
-          cd tests/pot3d
-          FC="lfortran --fast --cpp -DOPEN_MPI=yes" ./build_and_run_lfortran.sh
-
-      # build and validation without LFortran's optimization
-      - name: POT3D Build and validation with LFortran without optimization using Open MPI (MPI only)
-        shell: bash -e -x -l {0}
-        run: |
-          cd tests/pot3d
-          FC="lfortran --cpp -DOPEN_MPI=yes" ./build_and_run_lfortran.sh
-
-  Compile_POT3D_with_GFortran_with_MPICH:
-    name: "Build POT3D and validate with GFortran with MPICH"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ["macos-latest", "ubuntu-latest"]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Micromamba
-        uses: mamba-org/setup-micromamba@v2.0.2
-        with:
-          micromamba-version: '2.0.4-0'
-          environment-file: ci/environment_gfortran_mpich.yml
-
-      # build and validation with GFortran's optimization
-      - name: POT3D Build and validation with GFortran with optimization (MPI only)
-        shell: bash -e -x -l {0}
-        run: |
-          cd tests/pot3d
-          FC="gfortran -O3 -march=native -cpp" ./build_and_run_gfortran.sh
-
-      # build and validation without GFortran's optimization
-      - name: POT3D Build and validation with GFortran without optimization (MPI only)
-        shell: bash -e -x -l {0}
-        run: |
-          cd tests/pot3d
-          FC="gfortran -cpp" ./build_and_run_gfortran.sh
-
-  Compile_POT3D_with_LFortran_with_MPICH:
-    name: "Build POT3D and validate with LFortran with MPICH"
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: ["macos-latest", "ubuntu-latest"]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Micromamba
-        uses: mamba-org/setup-micromamba@v2.0.2
-        with:
-          micromamba-version: '2.0.4-0'
-          environment-file: ci/environment_lfortran_mpich.yml
-
-      # build and validation with LFortran's optimization
-      - name: POT3D Build and validation with LFortran with optimization using MPICH (MPI only)
-        shell: bash -e -x -l {0}
-        run: |
-          cd tests/pot3d
-          FC="lfortran --fast --cpp" ./build_and_run_lfortran.sh
-
-      # build and validation without LFortran's optimization
-      - name: POT3D Build and validation with LFortran without optimization using MPICH (MPI only)
-        shell: bash -e -x -l {0}
-        run: |
-          cd tests/pot3d
-          FC="lfortran --cpp" ./build_and_run_lfortran.sh
+          FC="$FC_without_opt" $build_script
+          FC="$FC_with_opt" $build_script
