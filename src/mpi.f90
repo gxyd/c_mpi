@@ -41,6 +41,10 @@ module mpi
         module procedure MPI_Comm_size_proc
     end interface MPI_Comm_size
 
+    interface MPI_Comm_dup
+        module procedure MPI_Comm_dup_proc
+    end interface MPI_Comm_dup
+
     interface MPI_Bcast
         module procedure MPI_Bcast_int_scalar
         module procedure MPI_Bcast_real_2D
@@ -243,6 +247,28 @@ module mpi
         else
             if (local_ierr /= MPI_SUCCESS) then
                 print *, "MPI_Comm_size failed with error code: ", local_ierr
+            end if
+        end if
+    end subroutine
+
+    subroutine MPI_Comm_dup_proc(comm, newcomm, ierror)
+        use mpi_c_bindings, only: c_mpi_comm_dup, c_mpi_comm_c2f
+        integer, intent(in) :: comm
+        integer, intent(out) :: newcomm
+        integer, optional, intent(out) :: ierror
+
+        integer(kind=MPI_HANDLE_KIND) :: c_new_comm, c_comm
+        integer :: local_ierr
+
+        c_comm = handle_mpi_comm_f2c(comm)
+        local_ierr = c_mpi_comm_dup(c_comm, c_new_comm)
+        newcomm = c_mpi_comm_c2f(c_new_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= 0) then
+                print *, "MPI_Comm_dup failed with error code: ", local_ierr
             end if
         end if
     end subroutine
