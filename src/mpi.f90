@@ -92,6 +92,11 @@ module mpi
         module procedure MPI_Waitall_proc
     end interface
 
+    interface MPI_Allgatherv
+        module procedure MPI_Allgatherv_int
+        module procedure MPI_Allgatherv_real
+    end interface MPI_Allgatherv
+
     interface MPI_Ssend
         module procedure MPI_Ssend_proc
     end interface
@@ -772,6 +777,89 @@ module mpi
         end if
 
     end subroutine MPI_Waitall_proc
+
+    subroutine MPI_Allgatherv_int(sendbuf, sendcount, sendtype, recvbuf, recvcounts, &
+                                  displs, recvtype, comm, ierror)
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        use mpi_c_bindings, only: c_mpi_allgatherv, c_mpi_in_place
+        integer, dimension(:), intent(in), target :: sendbuf
+        integer, intent(in) :: sendcount
+        integer, intent(in) :: sendtype
+        integer, dimension(:), intent(out), target :: recvbuf
+        integer, dimension(:), intent(in) :: recvcounts
+        integer, dimension(:), intent(in) :: displs
+        integer, intent(in) :: recvtype
+        integer, intent(in) :: comm
+        integer, optional, intent(out) :: ierror
+        integer(kind=MPI_HANDLE_KIND) :: c_sendtype, c_recvtype, c_comm
+        type(c_ptr) :: c_sendbuf, c_recvbuf
+        integer(c_int) :: local_ierr
+
+        ! Handle sendbuf (support MPI_IN_PLACE)
+        if (sendbuf(1) == MPI_IN_PLACE) then
+            c_sendbuf = c_MPI_IN_PLACE
+        else
+            c_sendbuf = c_loc(sendbuf)
+        end if
+        c_recvbuf = c_loc(recvbuf)
+        c_sendtype = handle_mpi_datatype_f2c(sendtype)
+        c_recvtype = handle_mpi_datatype_f2c(recvtype)
+        c_comm = handle_mpi_comm_f2c(comm)
+
+        ! Call C MPI_Allgatherv
+        local_ierr = c_mpi_allgatherv(c_sendbuf, sendcount, c_sendtype, &
+                                      c_recvbuf, recvcounts, displs, c_recvtype, &
+                                      c_comm)
+
+        ! Handle error
+        if (present(ierror)) then
+            ierror = local_ierr
+        else if (local_ierr /= MPI_SUCCESS) then
+            print *, "MPI_Allgatherv failed with error code: ", local_ierr
+        end if
+        
+    end subroutine MPI_Allgatherv_int
+
+    subroutine MPI_Allgatherv_real(sendbuf, sendcount, sendtype, recvbuf, recvcounts, &
+                                      displs, recvtype, comm, ierror)
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        use mpi_c_bindings, only: c_mpi_allgatherv, c_mpi_in_place
+        real(8), dimension(:), intent(in), target :: sendbuf
+        integer, intent(in) :: sendcount
+        integer, intent(in) :: sendtype
+        real(8), dimension(:), intent(out), target :: recvbuf
+        integer, dimension(:), intent(in) :: recvcounts
+        integer, dimension(:), intent(in) :: displs
+        integer, intent(in) :: recvtype
+        integer, intent(in) :: comm
+        integer, optional, intent(out) :: ierror
+        integer(kind=MPI_HANDLE_KIND) :: c_sendtype, c_recvtype, c_comm
+        type(c_ptr) :: c_sendbuf, c_recvbuf
+        integer(c_int) :: local_ierr
+
+        if (sendbuf(1) == MPI_IN_PLACE) then
+            c_sendbuf = c_MPI_IN_PLACE
+        else
+            c_sendbuf = c_loc(sendbuf)
+        end if
+
+        c_recvbuf = c_loc(recvbuf)
+        c_sendtype = handle_mpi_datatype_f2c(sendtype)
+        c_recvtype = handle_mpi_datatype_f2c(recvtype)
+        c_comm = handle_mpi_comm_f2c(comm)
+
+        ! Call C MPI_Allgatherv
+        local_ierr = c_mpi_allgatherv(c_sendbuf, sendcount, c_sendtype, &
+                                      c_recvbuf, recvcounts, displs, c_recvtype, &
+                                      c_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else if (local_ierr /= MPI_SUCCESS) then
+            print *, "MPI_Allgatherv failed with error code: ", local_ierr
+        end if
+
+    end subroutine MPI_Allgatherv_real
 
     subroutine MPI_Ssend_proc(buf, count, datatype, dest, tag, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr
