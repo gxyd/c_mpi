@@ -94,8 +94,10 @@ module mpi_c_bindings
         end function c_mpi_comm_size
 
         function c_mpi_comm_dup(comm, newcomm) bind(C, name="MPI_Comm_dup")
+            use iso_c_binding, only: c_int
             integer(kind=MPI_HANDLE_KIND), value :: comm
             integer(kind=MPI_HANDLE_KIND), intent(out) :: newcomm
+            integer(c_int) :: c_mpi_comm_dup
         end function
 
         function c_mpi_bcast(buffer, count, datatype, root, comm) bind(C, name="MPI_Bcast")
