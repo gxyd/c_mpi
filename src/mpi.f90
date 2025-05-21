@@ -8,6 +8,8 @@ module mpi
     integer, parameter :: MPI_DOUBLE_PRECISION = -10004
     integer, parameter :: MPI_REAL4 = -10013
     integer, parameter :: MPI_REAL8 = -10014
+    integer, parameter :: MPI_CHARACTER = -10003
+    integer, parameter :: MPI_LOGICAL = -10005
 
     integer, parameter :: MPI_COMM_TYPE_SHARED = 1
     integer, parameter :: MPI_PROC_NULL = -1
@@ -75,6 +77,7 @@ module mpi
     interface MPI_Gatherv
         module procedure MPI_Gatherv_int
         module procedure MPI_Gatherv_real
+        module procedure MPI_Gatherv_character
     end interface MPI_Gatherv
 
     interface MPI_Wtime
@@ -170,7 +173,7 @@ module mpi
     end function handle_mpi_info_f2c
 
     integer(kind=MPI_HANDLE_KIND) function handle_mpi_datatype_f2c(datatype_f) result(c_datatype)
-        use mpi_c_bindings, only: c_mpi_float, c_mpi_double, c_mpi_int
+        use mpi_c_bindings, only: c_mpi_float, c_mpi_double, c_mpi_int, c_mpi_logical, c_mpi_character
         integer, intent(in) :: datatype_f
         if (datatype_f == MPI_REAL4) then
             c_datatype = c_mpi_float
@@ -178,6 +181,10 @@ module mpi
             c_datatype = c_mpi_double
         else if (datatype_f == MPI_INTEGER) then
             c_datatype = c_mpi_int
+        else if (datatype_f == MPI_CHARACTER) then
+            c_datatype = c_mpi_character
+        else if (datatype_f == MPI_LOGICAL) then
+            c_datatype = c_mpi_logical
         end if
     end function
 
@@ -851,6 +858,42 @@ module mpi
             print *, "MPI_Gatherv failed with error code: ", local_ierr
         end if
     end subroutine MPI_Gatherv_real
+
+    subroutine MPI_Gatherv_character(sendbuf, sendcount, sendtype, recvbuf, recvcounts, &
+                                displs, recvtype, root, comm, ierror)
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        use mpi_c_bindings, only: c_mpi_gatherv
+        character(len=*), intent(in), target :: sendbuf(*)
+        integer, intent(in) :: sendcount
+        integer, intent(in) :: sendtype
+        character(len=*), intent(out), target :: recvbuf(*)
+        integer, dimension(:), intent(in) :: recvcounts
+        integer, dimension(:), intent(in) :: displs
+        integer, intent(in) :: recvtype
+        integer, intent(in) :: root
+        integer, intent(in) :: comm
+        integer, optional, intent(out) :: ierror
+        integer(kind=MPI_HANDLE_KIND) :: c_sendtype, c_recvtype, c_comm
+        type(c_ptr) :: c_sendbuf, c_recvbuf
+        integer(c_int) :: local_ierr
+
+        c_sendbuf = c_loc(sendbuf)
+        c_recvbuf = c_loc(recvbuf)
+        c_sendtype = handle_mpi_datatype_f2c(sendtype)
+        c_recvtype = handle_mpi_datatype_f2c(recvtype)
+        c_comm = handle_mpi_comm_f2c(comm)
+
+        ! Call C MPI_Gatherv
+        local_ierr = c_mpi_gatherv(c_sendbuf, sendcount, c_sendtype, &
+                                   c_recvbuf, recvcounts, displs, c_recvtype, &
+                                   root, c_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else if (local_ierr /= MPI_SUCCESS) then
+            print *, "MPI_Gatherv failed with error code: ", local_ierr
+        end if
+    end subroutine MPI_Gatherv_character
 
     subroutine MPI_Waitall_proc(count, array_of_requests, array_of_statuses, ierror)
         use iso_c_binding, only: c_int, c_ptr
