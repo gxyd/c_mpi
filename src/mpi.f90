@@ -16,6 +16,7 @@ module mpi
     integer, parameter :: MPI_COMM_WORLD = -1000
     real(8), parameter :: MPI_IN_PLACE = -1002
     integer, parameter :: MPI_SUM = -2300
+    integer, parameter :: MPI_MAX = -2301
     integer, parameter :: MPI_INFO_NULL = -2000
     integer, parameter :: MPI_STATUS_SIZE = 5
     integer :: MPI_STATUS_IGNORE = 0
@@ -132,10 +133,12 @@ module mpi
     contains
 
     integer(kind=MPI_HANDLE_KIND) function handle_mpi_op_f2c(op_f) result(c_op)
-        use mpi_c_bindings, only: c_mpi_op_f2c, c_mpi_sum
+        use mpi_c_bindings, only: c_mpi_op_f2c, c_mpi_sum, c_mpi_max
         integer, intent(in) :: op_f
         if (op_f == MPI_SUM) then
             c_op = c_mpi_sum
+        else if (op_f == MPI_MAX) then
+            c_op = c_MPI_MAX
         else
             c_op = c_mpi_op_f2c(op_f)
         end if

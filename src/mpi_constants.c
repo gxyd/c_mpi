@@ -15,3 +15,5 @@ MPI_Datatype c_MPI_INT = MPI_INT;
 void* c_MPI_IN_PLACE = MPI_IN_PLACE;
 
 MPI_Op c_MPI_SUM = MPI_SUM;
+
+MPI_Op c_MPI_MAX = MPI_MAX;
