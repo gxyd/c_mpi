@@ -220,6 +220,21 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_ssend
         end function
 
+        function c_mpi_gatherv(sendbuf, sendcount, sendtype, recvbuf, recvcounts, &
+                               displs, recvtype, root, comm) bind(C, name="MPI_Gatherv")
+            use iso_c_binding, only: c_int, c_ptr
+            type(c_ptr), value :: sendbuf
+            integer(c_int), value :: sendcount
+            integer(kind=MPI_HANDLE_KIND), value :: sendtype
+            type(c_ptr), value :: recvbuf
+            integer(c_int), dimension(*), intent(in) :: recvcounts
+            integer(c_int), dimension(*), intent(in) :: displs
+            integer(kind=MPI_HANDLE_KIND), value :: recvtype
+            integer(c_int), value :: root
+            integer(kind=MPI_HANDLE_KIND), value :: comm
+            integer(c_int) :: c_mpi_gatherv
+        end function c_mpi_gatherv
+
         function c_mpi_cart_create(comm_old, ndims, dims, periods, reorder, comm_cart) bind(C, name="MPI_Cart_create")
             use iso_c_binding, only: c_int, c_ptr
             integer(kind=MPI_HANDLE_KIND), value :: comm_old
