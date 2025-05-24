@@ -1,7 +1,7 @@
 set -ex
 
 POT3D_HOME=$PWD
-TEST="validation"
+TEST="validation2"
 MPIEXEC=${CONDA_PREFIX}/bin/mpiexec
 
 cp ${POT3D_HOME}/testsuite/${TEST}/input/* ${POT3D_HOME}/testsuite/${TEST}/run/
