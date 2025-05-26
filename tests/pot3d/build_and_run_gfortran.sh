@@ -17,3 +17,4 @@ cp pot3d ../bin/
 
 cd ..
 ./validate.sh
+./validate.sh validation2
