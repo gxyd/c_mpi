@@ -22,7 +22,21 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-MPIEXEC=${CONDA_PREFIX}/bin/mpiexec
+# Check if conda is active
+if [[ -z "$CONDA_PREFIX" ]]; then
+  echo -e "${RED}Error: No Conda environment is active. Please activate a conda env with MPI installed.${NC}"
+  exit 1
+fi
+
+# Try locating mpiexec
+if [[ -x "${CONDA_PREFIX}/bin/mpiexec" ]]; then
+  MPIEXEC="${CONDA_PREFIX}/bin/mpiexec"
+elif command -v mpiexec &> /dev/null; then
+  MPIEXEC=$(command -v mpiexec)
+else
+  echo -e "${RED}Error: mpiexec not found. Please install MPI (OpenMPI or MPICH) via Conda or system package manager.${NC}"
+  exit 1
+fi
 
 # detect MPI implementation
 MPI_VERSION=$($MPIEXEC --version 2>&1)
