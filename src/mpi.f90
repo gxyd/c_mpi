@@ -5,6 +5,7 @@ module mpi
     integer, parameter :: MPI_THREAD_FUNNELED = 1
 
     integer, parameter :: MPI_INTEGER = -10002
+    integer, parameter :: MPI_REAL = -10003
     integer, parameter :: MPI_DOUBLE_PRECISION = -10004
     integer, parameter :: MPI_REAL4 = -10013
     integer, parameter :: MPI_REAL8 = -10014
@@ -173,10 +174,12 @@ module mpi
     end function handle_mpi_info_f2c
 
     integer(kind=MPI_HANDLE_KIND) function handle_mpi_datatype_f2c(datatype_f) result(c_datatype)
-        use mpi_c_bindings, only: c_mpi_float, c_mpi_double, c_mpi_int, c_mpi_logical, c_mpi_character
+        use mpi_c_bindings, only: c_mpi_float, c_mpi_double, c_mpi_int, c_mpi_logical, c_mpi_character, c_mpi_real
         integer, intent(in) :: datatype_f
         if (datatype_f == MPI_REAL4) then
             c_datatype = c_mpi_float
+        else if (datatype_f == MPI_REAL) then
+            c_datatype = c_mpi_real
         else if (datatype_f == MPI_REAL8 .OR. datatype_f == MPI_DOUBLE_PRECISION) then
             c_datatype = c_mpi_double
         else if (datatype_f == MPI_INTEGER) then
