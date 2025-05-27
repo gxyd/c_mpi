@@ -1,7 +1,7 @@
  &topology
   nr=63
-  nt=91
-  np=225
+  nt=29
+  np=75
  /
  &inputvars
   ifprec=1
