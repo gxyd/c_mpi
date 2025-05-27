@@ -365,7 +365,7 @@ module mpi
         use iso_c_binding, only: c_int, c_ptr
         integer, intent(in) :: group
         integer, intent(in) :: n
-        integer, dimension(:), intent(in) :: ranks
+        integer, dimension(:,:), intent(in) :: ranks
         integer, intent(out) :: newgroup
         integer, optional, intent(out) :: ierror
         integer(kind=MPI_HANDLE_KIND) :: c_group, c_newgroup
