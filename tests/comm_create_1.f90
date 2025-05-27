@@ -5,7 +5,6 @@ program minimal_mre_range
   integer :: ierr, rank, size
   integer :: group_world, group_range, new_comm
   integer, dimension(3) :: range   ! 1D array to define a single range
-  integer, dimension(3) :: range_2d
   integer :: i
 
   call MPI_INIT(ierr)
@@ -20,11 +19,9 @@ program minimal_mre_range
   range(2) = size - 1  ! end
   range(3) = 1         ! stride
 
-  ! Convert 1D range to 2D required by MPI_GROUP_RANGE_INCL
-  range_2d(:) = range
 
   ! Create a new group that includes all ranks
-  call MPI_GROUP_RANGE_INCL(group_world, 1, range_2d, group_range, ierr)
+  call MPI_GROUP_RANGE_INCL(group_world, 1, range, group_range, ierr)
 
   ! Create new communicator
   call MPI_COMM_CREATE(MPI_COMM_WORLD, group_range, new_comm, ierr)
