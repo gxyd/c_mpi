@@ -67,6 +67,18 @@ module mpi_c_bindings
             integer(kind=MPI_HANDLE_KIND) :: c_mpi_info_f2c
         end function c_mpi_info_f2c
 
+        function c_mpi_group_f2c(group_f) bind(C, name="MPI_Group_f2c")
+            use iso_c_binding, only: c_int, c_ptr
+            integer(c_int), value :: group_f
+            integer(kind=MPI_HANDLE_KIND) :: c_mpi_group_f2c
+        end function c_mpi_group_f2c
+
+        function c_mpi_group_c2f(group_c) bind(C, name="MPI_Group_c2f")
+            use iso_c_binding, only: c_int, c_ptr
+            integer(kind=MPI_HANDLE_KIND), value :: group_c
+            integer(c_int) :: c_mpi_group_c2f
+        end function c_mpi_group_c2f
+
         function c_mpi_init(argc, argv) bind(C, name="MPI_Init")
             use iso_c_binding, only : c_int, c_ptr
             !> TODO: is the intent need to be explicitly specified
@@ -305,6 +317,26 @@ module mpi_c_bindings
             integer(kind=MPI_HANDLE_KIND), value :: c_comm
            integer(c_int) :: c_mpi_reduce
         end function c_mpi_reduce
+
+        function c_mpi_comm_group(comm, group) bind(C, name="MPI_Comm_group")
+            use iso_c_binding, only: c_ptr, c_int
+            integer(kind=MPI_HANDLE_KIND), value :: comm
+            integer(kind=MPI_HANDLE_KIND), intent(out) :: group
+            integer(c_int) :: c_mpi_comm_group
+        end function c_mpi_comm_group
+
+        function c_mpi_group_size(group, size) bind(C, name="MPI_Group_size")
+            use iso_c_binding, only: c_ptr, c_int
+            integer(kind=MPI_HANDLE_KIND), value :: group
+            integer(c_int), intent(out) :: size
+            integer(c_int) :: c_mpi_group_size
+        end function c_mpi_group_size
+
+        function c_mpi_group_free(group) bind(C, name="MPI_Group_free")
+            use iso_c_binding, only: c_ptr, c_int
+            integer(kind=MPI_HANDLE_KIND), intent(in) :: group
+            integer(c_int) :: c_mpi_group_free
+        end function c_mpi_group_free
 
     end interface
 end module mpi_c_bindings

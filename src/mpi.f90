@@ -45,6 +45,18 @@ module mpi
         module procedure MPI_Comm_size_proc
     end interface MPI_Comm_size
 
+    interface MPI_Comm_Group
+        module procedure MPI_Comm_Group_proc
+    end interface MPI_Comm_Group
+
+    interface MPI_Group_free
+        module procedure MPI_Group_free_proc
+    end interface MPI_Group_free
+
+    interface MPI_Group_size
+        module procedure MPI_Group_size_proc
+    end interface MPI_Group_size
+
     interface MPI_Comm_dup
         module procedure MPI_Comm_dup_proc
     end interface MPI_Comm_dup
@@ -273,6 +285,70 @@ module mpi
             end if
         end if
     end subroutine
+
+    subroutine MPI_Comm_Group_proc(comm, group, ierror)
+        use mpi_c_bindings, only: c_mpi_comm_group, c_mpi_group_f2c, c_mpi_group_c2f
+        use iso_c_binding, only: c_int, c_ptr
+        integer, intent(in) :: comm
+        integer, intent(out) :: group
+        integer, optional, intent(out) :: ierror
+        integer(kind=MPI_HANDLE_KIND) :: c_comm, c_group
+        integer :: local_ierr
+
+        c_comm = handle_mpi_comm_f2c(comm)
+        c_group = c_mpi_group_f2c(group)
+        local_ierr = c_mpi_comm_group(c_comm, c_group)
+        group = c_mpi_group_c2f(c_group)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= 0) then
+                print *, "MPI_Comm_Group failed with error code: ", local_ierr
+            end if
+        end if
+    end subroutine MPI_Comm_Group_proc
+
+    subroutine MPI_Group_size_proc(group, size, ierror)
+        use mpi_c_bindings, only: c_mpi_group_size, c_mpi_group_f2c
+        use iso_c_binding, only: c_int, c_ptr
+        integer, intent(in) :: group
+        integer, intent(out) :: size
+        integer, optional, intent(out) :: ierror
+        integer(kind=MPI_HANDLE_KIND) :: c_group
+        integer :: local_ierr
+
+        c_group = c_mpi_group_f2c(group)
+        local_ierr = c_mpi_group_size(c_group, size)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= 0) then
+                print *, "MPI_Group_size failed with error code: ", local_ierr
+            end if
+        end if
+    end subroutine MPI_Group_size_proc
+
+    subroutine MPI_Group_free_proc(group, ierror)
+        use mpi_c_bindings, only: c_mpi_group_free, c_mpi_group_f2c
+        use iso_c_binding, only: c_int, c_ptr
+        integer, intent(in) :: group
+        integer, optional, intent(out) :: ierror
+        integer(kind=MPI_HANDLE_KIND) :: c_group
+        integer :: local_ierr
+
+        c_group = c_mpi_group_f2c(group)
+        local_ierr = c_mpi_group_free(c_group)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= 0) then
+                print *, "MPI_Group_free failed with error code: ", local_ierr
+            end if
+        end if
+    end subroutine MPI_Group_free_proc
 
     subroutine MPI_Comm_dup_proc(comm, newcomm, ierror)
         use mpi_c_bindings, only: c_mpi_comm_dup, c_mpi_comm_c2f
