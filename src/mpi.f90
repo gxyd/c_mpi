@@ -17,6 +17,7 @@ module mpi
     integer, parameter :: MPI_SUCCESS = 0
 
     integer, parameter :: MPI_COMM_WORLD = -1000
+    integer, parameter :: MPI_COMM_NULL = -1001
     real(8), parameter :: MPI_IN_PLACE = -1002
     integer, parameter :: MPI_SUM = -2300
     integer, parameter :: MPI_MAX = -2301
@@ -49,6 +50,10 @@ module mpi
         module procedure MPI_Comm_Group_proc
     end interface MPI_Comm_Group
 
+    interface MPI_Comm_create
+        module procedure MPI_Comm_create_proc
+    end interface MPI_Comm_create
+
     interface MPI_Group_free
         module procedure MPI_Group_free_proc
     end interface MPI_Group_free
@@ -56,6 +61,11 @@ module mpi
     interface MPI_Group_size
         module procedure MPI_Group_size_proc
     end interface MPI_Group_size
+
+    interface MPI_Group_range_incl
+        module procedure MPI_Group_range_incl_proc
+    end interface MPI_Group_range_incl
+
 
     interface MPI_Comm_dup
         module procedure MPI_Comm_dup_proc
@@ -349,6 +359,55 @@ module mpi
             end if
         end if
     end subroutine MPI_Group_free_proc
+
+    subroutine MPI_Group_range_incl_proc(group, n, ranks, newgroup, ierror)
+        use mpi_c_bindings, only: c_mpi_group_range_incl, c_mpi_group_f2c, c_mpi_comm_c2f, c_mpi_group_c2f
+        use iso_c_binding, only: c_int, c_ptr
+        integer, intent(in) :: group
+        integer, intent(in) :: n
+        integer, dimension(:), intent(in) :: ranks
+        integer, intent(out) :: newgroup
+        integer, optional, intent(out) :: ierror
+        integer(kind=MPI_HANDLE_KIND) :: c_group, c_newgroup
+        integer(c_int) :: local_ierr
+
+        c_group = c_mpi_group_f2c(group)
+        local_ierr = c_mpi_group_range_incl(c_group, n, ranks, c_newgroup)
+        newgroup = c_mpi_group_c2f(c_newgroup)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else if (local_ierr /= MPI_SUCCESS) then
+            print *, "MPI_Group_incl failed with error code: ", local_ierr
+        end if
+    end subroutine MPI_Group_range_incl_proc
+
+    subroutine MPI_Comm_create_proc(comm, group, newcomm, ierror)
+        use mpi_c_bindings, only: c_mpi_comm_create, c_mpi_comm_f2c, c_mpi_comm_c2f, c_mpi_group_f2c, c_mpi_comm_null
+        use iso_c_binding, only: c_int, c_ptr
+        integer, intent(in) :: comm
+        integer, intent(in) :: group
+        integer, intent(out) :: newcomm
+        integer, optional, intent(out) :: ierror
+        integer(kind=MPI_HANDLE_KIND) :: c_comm, c_group, c_newcomm
+        integer(c_int) :: local_ierr
+
+        c_comm = handle_mpi_comm_f2c(comm)
+        c_group = c_mpi_group_f2c(group)
+        local_ierr = c_mpi_comm_create(c_comm, c_group, c_newcomm)
+
+        if (c_newcomm == c_mpi_comm_null) then
+            newcomm = MPI_COMM_NULL
+        else
+            newcomm = c_mpi_comm_c2f(c_newcomm)
+        end if
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else if (local_ierr /= MPI_SUCCESS) then
+            print *, "MPI_Comm_create failed with error code: ", local_ierr
+        end if
+    end subroutine MPI_Comm_create_proc
 
     subroutine MPI_Comm_dup_proc(comm, newcomm, ierror)
         use mpi_c_bindings, only: c_mpi_comm_dup, c_mpi_comm_c2f

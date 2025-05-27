@@ -17,6 +17,7 @@ module mpi_c_bindings
     integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_REAL") :: c_mpi_real
     integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_INT") :: c_mpi_int
     integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_COMM_WORLD") :: c_mpi_comm_world
+    integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_COMM_NULL") :: c_mpi_comm_null
     integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_SUM") :: c_mpi_sum
     integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_MAX") :: c_mpi_max
     integer(kind=MPI_HANDLE_KIND), bind(C, name="c_MPI_LOGICAL") :: c_mpi_logical
@@ -337,6 +338,23 @@ module mpi_c_bindings
             integer(kind=MPI_HANDLE_KIND), intent(in) :: group
             integer(c_int) :: c_mpi_group_free
         end function c_mpi_group_free
+
+        function c_mpi_group_range_incl(group, n, ranges, c_newgroup) bind(C, name="MPI_Group_range_incl")
+            use iso_c_binding, only: c_ptr, c_int
+            integer(kind=MPI_HANDLE_KIND), value :: group
+            integer(c_int), value :: n
+            integer(c_int), dimension(*)  :: ranges
+            integer(kind=MPI_HANDLE_KIND) :: c_newgroup
+            integer(c_int) :: c_mpi_group_range_incl
+        end function c_mpi_group_range_incl
+
+        function c_mpi_comm_create(comm, group, newcomm) bind(C, name="MPI_Comm_create")
+            use iso_c_binding, only: c_ptr, c_int
+            integer(kind=MPI_HANDLE_KIND), value :: comm
+            integer(kind=MPI_HANDLE_KIND), value :: group
+            integer(kind=MPI_HANDLE_KIND), intent(out) :: newcomm
+            integer(c_int) :: c_mpi_comm_create
+        end function c_mpi_comm_create
 
     end interface
 end module mpi_c_bindings
