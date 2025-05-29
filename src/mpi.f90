@@ -185,6 +185,16 @@ module mpi
         end if
     end function handle_mpi_comm_f2c
 
+    integer(kind=MPI_HANDLE_KIND) function handle_mpi_comm_c2f(comm_c) result(f_comm)
+        use mpi_c_bindings, only: c_mpi_comm_c2f, c_mpi_comm_null
+        integer(kind=mpi_handle_kind), intent(in) :: comm_c
+        if (comm_c == c_mpi_comm_null) then
+            f_comm = MPI_COMM_NULL
+        else
+            f_comm = c_mpi_comm_c2f(comm_c)
+        end if
+    end function handle_mpi_comm_c2f
+
     integer(kind=MPI_HANDLE_KIND) function handle_mpi_info_f2c(info_f) result(c_info)
         use mpi_c_bindings, only: c_mpi_info_f2c, c_mpi_info_null
         integer, intent(in) :: info_f
@@ -396,11 +406,7 @@ module mpi
         c_group = c_mpi_group_f2c(group)
         local_ierr = c_mpi_comm_create(c_comm, c_group, c_newcomm)
 
-        if (c_newcomm == c_mpi_comm_null) then
-            newcomm = MPI_COMM_NULL
-        else
-            newcomm = c_mpi_comm_c2f(c_newcomm)
-        end if
+        newcomm = handle_mpi_comm_c2f(c_newcomm)
 
         if (present(ierror)) then
             ierror = local_ierr

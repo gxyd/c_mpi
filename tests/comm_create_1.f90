@@ -2,7 +2,7 @@ program minimal_mre_range
   use mpi
   implicit none
 
-  integer :: ierr, rank, size
+  integer :: ierr, rank, new_rank, size
   integer :: group_world, group_range, new_comm
   integer, dimension(1,3) :: range   ! 1D array to define a single range
   integer :: i
@@ -28,7 +28,9 @@ program minimal_mre_range
 
   ! Print participation
   if (new_comm /= MPI_COMM_NULL) then
-    print *, 'Rank', rank, 'is in the new communicator.'
+    call MPI_COMM_RANK(new_comm, new_rank, ierr)
+    if (ierr /= MPI_SUCCESS) error stop "MPI_COMM_RANK on new_comm failed"
+    print *, 'Global rank', rank, 'is in new_comm with local rank', new_rank
   else
     print *, 'Rank', rank, 'is NOT in the new communicator.'
   end if
