@@ -356,5 +356,11 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_comm_create
         end function c_mpi_comm_create
 
+        function c_mpi_comm_free(comm) bind(C, name="MPI_Comm_free")
+            use iso_c_binding, only: c_ptr, c_int
+            integer(kind=MPI_HANDLE_KIND), intent(inout) :: comm
+            integer(c_int) :: c_mpi_comm_free
+        end function c_mpi_comm_free
+
     end interface
 end module mpi_c_bindings

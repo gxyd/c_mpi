@@ -71,6 +71,10 @@ module mpi
         module procedure MPI_Comm_dup_proc
     end interface MPI_Comm_dup
 
+    interface MPi_Comm_free
+        module procedure MPI_Comm_free_proc
+    end interface MPI_Comm_free
+
     interface MPI_Bcast
         module procedure MPI_Bcast_int_scalar
         module procedure MPI_Bcast_real_2D
@@ -435,7 +439,29 @@ module mpi
                 print *, "MPI_Comm_dup failed with error code: ", local_ierr
             end if
         end if
-    end subroutine
+    end subroutine MPI_Comm_dup_proc
+
+    subroutine MPI_Comm_free_proc(comm, ierror)
+        use mpi_c_bindings, only: c_mpi_comm_free, c_mpi_comm_f2c
+        integer, intent(inout) :: comm
+        integer, optional, intent(out) :: ierror
+        integer(kind=MPI_HANDLE_KIND) :: c_comm
+        integer :: local_ierr
+
+        c_comm = handle_mpi_comm_f2c(comm)
+        local_ierr = c_mpi_comm_free(c_comm)
+        comm = handle_mpi_comm_c2f(c_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Comm_free failed with error code: ", local_ierr
+            end if
+        end if
+
+        comm = MPI_COMM_NULL  ! Set to null after freeing
+    end subroutine MPI_Comm_free_proc
 
     subroutine MPI_Bcast_int_scalar(buffer, count, datatype, root, comm, ierror)
         use mpi_c_bindings, only: c_mpi_bcast
