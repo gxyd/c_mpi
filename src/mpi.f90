@@ -705,7 +705,7 @@ module mpi
                                     c_comm, c_status)
 
         if (local_ierr == MPI_SUCCESS) then
-          status_ierr =  c_mpi_status_c2f(c_status, status)
+        !   status_ierr =  c_mpi_status_c2f(c_status, status)
         end if
 
         if (local_ierr /= MPI_SUCCESS) then
