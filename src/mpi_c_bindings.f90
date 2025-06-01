@@ -219,6 +219,22 @@ module mpi_c_bindings
             integer(c_int) :: c_mpi_recv
         end function c_mpi_recv
 
+        function c_mpi_sendrecv (sendbuf, sendcount, sendtype, dest, sendtag, &
+            recvbuf, recvcount, recvtype, source, recvtag, comm, status) bind(C, name="MPI_Sendrecv")
+            use iso_c_binding, only: c_int, c_ptr
+            type(c_ptr), value :: sendbuf
+            integer(c_int), value :: sendcount
+            integer(kind=MPI_HANDLE_KIND), value :: sendtype
+            integer(c_int), value :: dest, sendtag
+            type(c_ptr), value :: recvbuf
+            integer(c_int), value :: recvcount
+            integer(kind=MPI_HANDLE_KIND), value :: recvtype
+            integer(c_int), value :: source, recvtag
+            integer(kind=MPI_HANDLE_KIND), value :: comm
+            type(c_ptr), value :: status
+            integer(c_int) :: c_mpi_sendrecv
+        end function c_mpi_sendrecv
+
         function c_mpi_waitall(count, requests, statuses) bind(C, name="MPI_Waitall")
             use iso_c_binding, only: c_int, c_ptr
             integer(c_int), value :: count
