@@ -26,6 +26,8 @@ MPI_Op c_MPI_SUM = MPI_SUM;
 
 MPI_Op c_MPI_MAX = MPI_MAX;
 
+MPI_Op c_MPI_LOR = MPI_LOR;
+
 // Communicators Declarations
 
 MPI_Comm c_MPI_COMM_NULL = MPI_COMM_NULL;

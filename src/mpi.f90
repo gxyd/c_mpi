@@ -21,6 +21,7 @@ module mpi
     real(8), parameter :: MPI_IN_PLACE = -1002
     integer, parameter :: MPI_SUM = -2300
     integer, parameter :: MPI_MAX = -2301
+    integer, parameter :: MPI_LOR = -2302
     integer, parameter :: MPI_INFO_NULL = -2000
     integer, parameter :: MPI_STATUS_SIZE = 5
     integer :: MPI_STATUS_IGNORE = 0
@@ -99,6 +100,7 @@ module mpi
         module procedure MPI_Allreduce_1D_recv_proc
         module procedure MPI_Allreduce_1D_real_proc
         module procedure MPI_Allreduce_1D_int_proc
+        module procedure MPI_Allreduce_scalar_logical_proc
     end interface
 
     interface MPI_Gatherv
@@ -172,14 +174,16 @@ module mpi
     contains
 
     integer(kind=MPI_HANDLE_KIND) function handle_mpi_op_f2c(op_f) result(c_op)
-        use mpi_c_bindings, only: c_mpi_op_f2c, c_mpi_sum, c_mpi_max
+        use mpi_c_bindings, only: c_mpi_op_f2c, c_mpi_sum, c_mpi_max, c_mpi_lor
         integer, intent(in) :: op_f
         if (op_f == MPI_SUM) then
             c_op = c_mpi_sum
         else if (op_f == MPI_MAX) then
             c_op = c_MPI_MAX
+        else if (op_f == MPI_LOR) then
+            c_op = c_mpi_lor
         else
-            c_op = c_mpi_op_f2c(op_f)
+            c_op = c_mpi_op_f2c(op_f)  ! For other operations, use the C binding
         end if
     end function
 
@@ -840,6 +844,35 @@ module mpi
             end if
         end if
     end subroutine MPI_Allreduce_1D_int_proc
+
+    subroutine MPI_Allreduce_scalar_logical_proc(sendbuf, recvbuf, count, datatype, op, comm, ierror)
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        use mpi_c_bindings, only: c_mpi_allreduce, c_mpi_comm_f2c
+        logical, intent(in), target :: sendbuf
+        logical, intent(out), target :: recvbuf
+        integer, intent(in) :: count, datatype, op, comm
+        integer, intent(out), optional :: ierror
+        type(c_ptr) :: sendbuf_ptr, recvbuf_ptr
+        integer(kind=MPI_HANDLE_KIND) :: c_datatype, c_op, c_comm
+        integer(c_int) :: local_ierr
+
+        sendbuf_ptr = c_loc(sendbuf)
+        recvbuf_ptr = c_loc(recvbuf)
+        c_datatype = handle_mpi_datatype_f2c(datatype)
+        c_op = handle_mpi_op_f2c(op)
+
+        c_comm = handle_mpi_comm_f2c(comm)
+
+        local_ierr = c_mpi_allreduce(sendbuf_ptr, recvbuf_ptr, count, c_datatype, c_op, c_comm)
+
+        if (present(ierror)) then
+            ierror = local_ierr
+        else
+            if (local_ierr /= MPI_SUCCESS) then
+                print *, "MPI_Allreduce_1D_recv_proc failed with error code: ", local_ierr
+            end if
+        end if
+    end subroutine MPI_Allreduce_scalar_logical_proc
 
     function MPI_Wtime_proc() result(time)
         use mpi_c_bindings, only: c_mpi_wtime
