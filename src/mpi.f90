@@ -128,6 +128,10 @@ module mpi
         module procedure MPI_Recv_StatusIgnore_proc    
     end interface
 
+    interface MPI_Sendrecv
+        module procedure MPI_Sendrecv_proc
+    end interface
+
     interface MPI_Waitall
         module procedure MPI_Waitall_proc
     end interface
@@ -668,7 +672,49 @@ module mpi
                 print *, "MPI_Irecv failed with error code: ", local_ierr
             end if
         end if
-    end subroutine
+    end subroutine MPI_Irecv_proc
+
+    subroutine MPI_Sendrecv_proc (sendbuf, sendcount, sendtype, dest, sendtag, &
+                        recvbuf, recvcount, recvtype, source, recvtag, comm, status, ierror)
+        use iso_c_binding, only: c_int, c_ptr, c_loc
+        use mpi_c_bindings, only: c_mpi_sendrecv, c_mpi_status_c2f
+        real(8), dimension(:,:), target, intent(in) :: sendbuf
+        integer, intent(in) :: sendcount, dest, sendtag
+        real(8), dimension(:,:), target, intent(out) :: recvbuf
+        integer, intent(in) :: recvcount, source, recvtag
+        integer, intent(in) :: comm
+        integer, intent(in) :: sendtype, recvtype
+        integer(kind=MPI_HANDLE_KIND) :: c_comm
+        integer, intent(out) :: status(MPI_STATUS_SIZE)
+        integer, optional, intent(out) :: ierror
+        integer(c_int) :: local_ierr, status_ierr
+        integer(kind=MPI_HANDLE_KIND) :: c_sendtype, c_recvtype
+        type(c_ptr) :: sendbuf_ptr, recvbuf_ptr, c_status
+        integer(c_int), dimension(MPI_STATUS_SIZE), target :: tmp_status
+
+        c_comm = handle_mpi_comm_f2c(comm)
+
+        c_sendtype = handle_mpi_datatype_f2c(sendtype)
+        c_recvtype = handle_mpi_datatype_f2c(recvtype)
+        sendbuf_ptr = c_loc(sendbuf)
+        recvbuf_ptr = c_loc(recvbuf)
+        c_status = c_loc(tmp_status)
+
+        local_ierr = c_mpi_sendrecv(sendbuf_ptr, sendcount, c_sendtype, dest, sendtag, &
+                                    recvbuf_ptr, recvcount, c_recvtype, source, recvtag, &
+                                    c_comm, c_status)
+
+        if (local_ierr == MPI_SUCCESS) then
+        !   status_ierr =  c_mpi_status_c2f(c_status, status)
+        end if
+
+        if (local_ierr /= MPI_SUCCESS) then
+            print *, "MPI_Sendrecv failed with error code: ", local_ierr
+            if (present(ierror)) then
+                ierror = local_ierr
+            end if
+        end if
+    end subroutine MPI_Sendrecv_proc
 
     subroutine MPI_Allreduce_scalar(sendbuf, recvbuf, count, datatype, op, comm, ierror)
         use iso_c_binding, only: c_int, c_ptr, c_loc
